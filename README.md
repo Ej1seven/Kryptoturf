@@ -116,7 +116,7 @@ If you follow any of the prominent tech influencers, I'm sure you've come across
 - [React.js](https://reactjs.org/)
 - [Typescript](https://typescriptlang.org/)
 - [Solidity](https://docs.soliditylang.org/)
-- [TailwindCss](https://tailwindcss.com/)
+- [TailwindCSS](https://tailwindcss.com/)
 - [Vercel](https://vercel.com/)
 <!-- - [Node.js](https://nodejs.org/)
 - [Express.js](https://expressjs.com/)
@@ -184,10 +184,9 @@ To get a local copy up and running follow these simple example steps.
 
 ### MVP / User Stories
 
-- [x] As a user, I can register my information so I can log in when I want to post content
-- [x] As a user, I can vote up or down on posts once I am logged in
-- [x] As a user, I want to be able to edit my post if I make a mistake
-- [x] As a user, I want to be able to delete my post if I make a mistake
+- [x] As a user, I can connect to my wallet using Metamask
+- [x] As a user, I can view my transactions
+- [x] As a user, send ethereum to another account
 
 See the [open issues](https://github.com/ej1seven/Kryptoturf/issues) for a full list of proposed features (and known issues).
 
