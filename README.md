@@ -71,7 +71,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
     <a href="https://github.com/ej1seven/Kryptoturf"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://theforumlab.com/">View Demo</a>
+    <a href="https://kryptoturf.com/">View Demo</a>
     ·
     <a href="https://github.com/ej1seven/Kryptoturf/issues">Report Bug</a>
     ·
@@ -114,6 +114,10 @@ Social media is an integral part of our lives, and many of us seek a place to ex
 <!-- - [Next.js](https://nextjs.org/) -->
 
 - [React.js](https://reactjs.org/)
+- [Typescript](https://typescriptlang.org/)
+- [Solidity](https://docs.soliditylang.org/)
+- [TailwindCss](https://tailwindcss.com/)
+- [Vercel](https://vercel.com/)
 <!-- - [Node.js](https://nodejs.org/)
 - [Express.js](https://expressjs.com/)
 - [Chakra](https://chakra-ui.com/)
@@ -123,15 +127,11 @@ Social media is an integral part of our lives, and many of us seek a place to ex
 - [Postgresql](https://postgresql.org/)
 - [Redis](https://redis.io/)
 - [Nodemailer](https://nodemailer.com/) -->
-- [Typescript](https://typescriptlang.org/)
-- [Solidity](https://docs.soliditylang.org/)
-- [TailwindCss](https://tailwindcss.com/)
 <!-- - [Docker](https://www.docker.com/)
 - [Urql](https://formidable.com/open-source/urql/)
 - [MikroOrm](https://mikro-orm.io/)
 - [Argon2](https://www.npmjs.com/package/argon2)
 - [Dataloader](https://www.npmjs.com/package/dataloader) -->
-- [Vercel](https://vercel.com/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
