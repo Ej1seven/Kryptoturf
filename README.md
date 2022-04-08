@@ -105,7 +105,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
 
 ## About The Project
 
-If you follow any of the prominent tech influencers, I'm sure you've come across the word Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. Kryptoturf allows users to connect their wallet using Metamask, then send ethereum to another account. Kyptoturf shows the last transactions from the related account. Each transaction is associated with a gif that is determined by the keyword supplied by the end user at the time of exchange.
+If you follow any of the prominent tech influencers, I'm sure you've come across the word Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. Kryptoturf allows users to connect to their wallet using Metamask, then send ethereum to another account. Kyptoturf shows the last transactions from the related account. Each transaction is associated with a gif that is determined by the keyword supplied by the end user at the time of exchange.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
