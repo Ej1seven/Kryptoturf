@@ -20,7 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   return (
     <div className="w-full flex md:justify-center justify-between items-center">
       <div className="md:flex-[0.5] flex-initial justify-center items-center">
-        <img src={logo} alt="logo" className="w-32 cursor-pointer"></img>
+        <img src={logo} alt="logo" className="cursor-pointer"></img>
       </div>
       <ul className="text-white md:flex hidden list-none flex-row justify-between items-center flex-initial">
         {['Market', 'Exchange', 'Tutorials', 'Wallets'].map((item, index) => (
