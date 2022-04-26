@@ -3,7 +3,6 @@ import Redis from 'ioredis';
 import { validateRegister } from '../utils/validateRegister';
 import argon2 from 'argon2';
 import process from 'process';
-import { json } from 'body-parser';
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
@@ -11,25 +10,48 @@ const redis = new Redis();
 
 let router = express.Router();
 
-router.route('/token').post(async (req: Request, res: Response) => {
-  const refreshToken = await req.body.token;
-  if (refreshToken === null) return res.sendStatus(401);
+router.route('/token').get(async (req: any, res: Response) => {
+  const refreshToken = await req.cookies.refreshToken;
+  if (refreshToken === null) return await res.sendStatus(401);
   const refreshTokens = await redis.lrange('refreshTokens', 0, -1);
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-  jwt.verify(
+  if (!refreshTokens.includes(refreshToken))
+    return res.json('RefreshTokenNotFound');
+  await jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     async (err: any, user: any) => {
-      if (err) return res.sendStatus(403);
-      const accessToken = await generateAccessToken({ user });
-      res.json({ accessToken: accessToken });
+      if (err) return res.json(err);
+      const accessToken = await jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+      const newRefreshToken = await jwt.sign(
+        user,
+        process.env.REFRESH_TOKEN_SECRET
+      );
+      await redis.rpush('refreshTokens', newRefreshToken);
+      res
+        .status(202)
+        .cookie('accessToken', accessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+        })
+        .cookie('refreshToken', newRefreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+        })
+        .json(user);
     }
   );
+  await redis.lrem('refreshTokens', 0, refreshToken);
 });
 
 router.route('/logout').delete(async (req: Request, res: Response) => {
-  await redis.lrem('refreshTokens', 0, req.body.token);
-  res.sendStatus(204);
+  await redis.lrem('refreshTokens', 0, req.cookies.refreshToken);
+  res
+    .status(202)
+    .clearCookie('accessToken')
+    .clearCookie('refreshToken')
+    .json('cookies cleared');
 });
 
 router.route('/register').post(async (req: Request, res: Response) => {
@@ -46,7 +68,6 @@ router.route('/register').post(async (req: Request, res: Response) => {
     });
     user = createUser;
   } catch (err: any) {
-    console.log('error: ', err);
     if (err.code === 'P2002') {
       if (err.meta.target[0] === 'email') {
         return res.json({
@@ -79,9 +100,21 @@ router.route('/login').post(async (req: Request, res: Response) => {
     res.json({ message: 'incorrect password' });
   }
   const accessToken = await generateAccessToken(user);
-  const refreshToken = await jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+  const refreshToken = await generateRefreshToken(user);
   await redis.rpush('refreshTokens', refreshToken);
-  res.json({ accessToken: accessToken, refreshToken: refreshToken });
+  res
+    .status(202)
+    .cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    })
+    .cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    })
+    .json({ accessToken: accessToken, refreshToken: refreshToken });
 
   // return res.json({ user });
 });
@@ -91,7 +124,12 @@ router.route('/me').get(authenticateToken, async (req: any, res: any) => {
 
 function generateAccessToken(user: any) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '30s',
+    expiresIn: '5s',
+  });
+}
+function generateRefreshToken(user: any) {
+  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: '4h',
   });
 }
 redis.on('error', function (error) {
@@ -102,13 +140,17 @@ redis.on('connect', function () {
 });
 
 function authenticateToken(req: any, res: any, next: any) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (token === null) return res.sendStatus(401);
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err: any, user: any) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
+  const accessToken = req.cookies.accessToken;
+  if (accessToken === null) return res.sendStatus(401);
+  jwt.verify(
+    accessToken,
+    process.env.ACCESS_TOKEN_SECRET,
+    (err: any, user: any) => {
+      if (err) return res.json(err.name);
+
+      req.user = user;
+      next();
+    }
+  );
 }
 module.exports = router;

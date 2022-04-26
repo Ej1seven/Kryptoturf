@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { login } from '../adapters/user';
+import React, { useEffect, useState } from 'react';
+import { me, login } from '../adapters/user';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Loader } from '../components/Loader';
+import { useNavigate } from 'react-router-dom';
+import { useIsAuth } from '../utils/useIsAuth';
 
 interface LoginProps {}
 const Input = ({
@@ -30,22 +33,33 @@ const commonStyles =
   'min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white';
 
 export const Login: React.FC<LoginProps> = ({}) => {
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     usernameOrEmail: '',
     password: '',
   });
+  const { data, isLoading, isError, refetch } = useQuery('me', me);
+  const queryClient = useQueryClient();
   const handleChange = (e: any, name: any) => {
-    console.log(e.target.value);
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
-  const handleSubmit = (e: any) => {
-    const { usernameOrEmail, password } = formData;
+  const handleSubmit = async (e: any) => {
+    const { usernameOrEmail, password } = await formData;
     e.preventDefault();
 
     if (!usernameOrEmail || !password) return;
-    login(usernameOrEmail, password);
+    await login(usernameOrEmail, password);
+    await me();
+    await queryClient.invalidateQueries('me');
   };
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (data?.id) {
+      // if the user is not logged in the router will take the user to the login page
+      //once the user logs in the router with proceed forward by taking the end user to their intended page
+      navigate('/');
+    }
+  }, [data, navigate]);
   return (
     <div className="flex justify-center">
       <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism  lg:mt-72 md:mt-64 mt-60">

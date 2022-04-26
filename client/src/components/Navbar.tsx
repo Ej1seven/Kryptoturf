@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import logo from '../../src/images/logo.png';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { me, logout } from '../adapters/user';
 import { HiMenu, HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 
@@ -16,7 +19,17 @@ const NavbarItem = ({
 };
 
 export const Navbar: React.FC<NavbarProps> = ({}) => {
+  const navigate = useNavigate();
+  const { data, isLoading, isError, refetch, isFetching } = useQuery('me', me);
   const [toggleMenu, setToggleMenu] = useState(false);
+  const queryClient = useQueryClient();
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    (await !data?.id) ? navigate('/login') : logout();
+    // logout();
+    await me();
+    await queryClient.invalidateQueries('me');
+  };
   return (
     <div className="w-full flex md:justify-center justify-between items-center">
       <div className="md:flex-[0.5] flex-initial justify-center items-center">
@@ -26,9 +39,18 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         {['Market', 'Exchange', 'Tutorials', 'Wallets'].map((item, index) => (
           <NavbarItem key={item + index} title={item} />
         ))}
-        <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
-          Login
-        </li>
+        <button
+          onClick={handleSubmit}
+          className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
+        >
+          {isLoading
+            ? 'Loading'
+            : isError
+            ? 'Something went wrong'
+            : !data?.id
+            ? 'Login'
+            : 'Logout'}
+        </button>
       </ul>
 
       <div className="flex relative">
