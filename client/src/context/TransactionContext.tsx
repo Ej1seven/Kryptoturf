@@ -28,7 +28,9 @@ export const TransactionContext = React.createContext<TransactionContextValue>(
 );
 
 const { ethereum } = window;
-ethereum.on('chainChanged', (_chainId: any) => window.location.reload());
+if (ethereum) {
+  ethereum.on('chainChanged', (_chainId: any) => window.location.reload());
+}
 
 const getEthereumContract = async () => {
   let transactionContract;
