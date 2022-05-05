@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ethers, Transaction } from 'ethers';
-import { contractABI, contractAddress } from '../utils/constants';
+import {
+  contractABI,
+  contractAddress,
+  contractAddressTwo,
+} from '../utils/constants';
 
 declare global {
   interface Window {
@@ -24,16 +28,28 @@ export const TransactionContext = React.createContext<TransactionContextValue>(
 );
 
 const { ethereum } = window;
+ethereum.on('chainChanged', (_chainId: any) => window.location.reload());
 
-const getEthereumContract = () => {
+const getEthereumContract = async () => {
+  let transactionContract;
+  const chainId = await ethereum.request({
+    method: 'eth_chainId',
+  });
   const provider = new ethers.providers.Web3Provider(ethereum);
   const signer = provider.getSigner();
-  const transactionContract = new ethers.Contract(
-    contractAddress,
-    contractABI,
-    signer
-  );
-
+  if (chainId === '0x3') {
+    transactionContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      signer
+    );
+  } else {
+    transactionContract = new ethers.Contract(
+      contractAddressTwo,
+      contractABI,
+      signer
+    );
+  }
   return transactionContract;
 };
 
@@ -56,7 +72,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
   const getAllTransactions = async () => {
     try {
       if (!ethereum) return alert('Please install metamask');
-      const transactionContract = getEthereumContract();
+      const transactionContract = await getEthereumContract();
       const availableTransactions =
         await transactionContract.getAllTransactions();
       const structuredTransactions = availableTransactions.map(
@@ -97,7 +113,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
 
   const checkIfTransactionsExist = async () => {
     try {
-      const transactionContract = getEthereumContract();
+      const transactionContract = await getEthereumContract();
       const transactionCount = await transactionContract.getTransactionCount();
 
       window.localStorage.setItem('transactionCount', transactionCount);
@@ -113,7 +129,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
       const accounts = await ethereum.request({
         method: 'eth_requestAccounts',
       });
-
+      console.log(accounts);
       setCurrentAccount(accounts[0]);
     } catch (error) {
       console.log(error);
@@ -126,7 +142,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
       if (!ethereum) return alert('Please install metamask');
       const { addressTo, amount, keyword, message } = formData;
       console.log(addressTo);
-      const transactionContract = getEthereumContract();
+      const transactionContract = await getEthereumContract();
       const parsedAmount = ethers.utils.parseEther(amount);
       await ethereum.request({
         method: 'eth_sendTransaction',

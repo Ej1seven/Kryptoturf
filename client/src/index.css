@@ -14,7 +14,7 @@
 }
 
 .blue-glassmorphism {
-  background: rgb(39, 51, 89, 0.4);
+  background: rgba(39, 51, 89, 0.4);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
@@ -28,7 +28,7 @@
   border-radius: 16px;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid hwb(0 100% 0% / 0.302);
 }
 
 .eth-card {
