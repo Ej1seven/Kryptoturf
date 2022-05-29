@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Loader } from '../components/Loader';
 import { useNavigate } from 'react-router-dom';
 import { useIsAuth } from '../utils/useIsAuth';
+import Swal from 'sweetalert2';
 
 interface LoginProps {}
 const Input = ({

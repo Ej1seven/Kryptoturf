@@ -5,6 +5,7 @@ import {
   contractAddress,
   contractAddressTwo,
 } from '../utils/constants';
+import Swal from 'sweetalert2';
 
 declare global {
   interface Window {
@@ -73,7 +74,14 @@ export const TransactionProvider: React.FC = ({ children }) => {
   };
   const getAllTransactions = async () => {
     try {
-      if (!ethereum) return alert('Please install metamask');
+      if (!ethereum)
+        return Swal.fire({
+          icon: 'info',
+          text: 'Please install metamask',
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
       const transactionContract = await getEthereumContract();
       const availableTransactions =
         await transactionContract.getAllTransactions();
@@ -98,7 +106,14 @@ export const TransactionProvider: React.FC = ({ children }) => {
   };
   const checkIfWalletIsConnected = async () => {
     try {
-      if (!ethereum) return alert('Please install metamask');
+      if (!ethereum)
+        return Swal.fire({
+          icon: 'info',
+          text: 'Please install metamask',
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
       const accounts = await ethereum.request({ method: 'eth_accounts' });
       if (accounts.length) {
         setCurrentAccount(accounts[0]);
@@ -127,7 +142,14 @@ export const TransactionProvider: React.FC = ({ children }) => {
 
   const connectWallet = async () => {
     try {
-      if (!ethereum) return alert('Please install metamask');
+      if (!ethereum)
+        return Swal.fire({
+          icon: 'info',
+          text: 'Please install metamask',
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
       const accounts = await ethereum.request({
         method: 'eth_requestAccounts',
       });
@@ -141,7 +163,14 @@ export const TransactionProvider: React.FC = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      if (!ethereum) return alert('Please install metamask');
+      if (!ethereum)
+        return Swal.fire({
+          icon: 'info',
+          text: 'Please install metamask',
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
       const { addressTo, amount, keyword, message } = formData;
       console.log(addressTo);
       const transactionContract = await getEthereumContract();

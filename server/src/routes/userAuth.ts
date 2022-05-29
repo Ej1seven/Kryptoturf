@@ -55,7 +55,7 @@ router.route('/logout').delete(async (req: Request, res: Response) => {
 });
 
 router.route('/register').post(async (req: Request, res: Response) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, address } = req.body;
   const errors = validateRegister(username, email, password);
   if (errors) {
     return res.json(errors.message);
@@ -64,7 +64,12 @@ router.route('/register').post(async (req: Request, res: Response) => {
   let user: any;
   try {
     const createUser = await prisma.user.create({
-      data: { username: username, email: email, password: hashedPassword },
+      data: {
+        username: username,
+        email: email,
+        password: hashedPassword,
+        walletAddress: address,
+      },
     });
     user = createUser;
   } catch (err: any) {
@@ -74,12 +79,19 @@ router.route('/register').post(async (req: Request, res: Response) => {
           message:
             'There is a unique constraint violation, a new user cannot be created with this email',
         });
-      } else {
+      } else if (err.meta.target[0] === 'username') {
         return res.json({
           message:
             'There is a unique constraint violation, a new user cannot be created with this username',
         });
+      } else if (err.meta.target[0] === 'walletAddress') {
+        return res.json({
+          message:
+            'There is a unique constraint violation, a new user cannot be created with this wallet address',
+        });
       }
+    } else {
+      return res.json(err);
     }
   }
   return res.json({ user });

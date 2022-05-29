@@ -78,3 +78,16 @@
     ),
     radial-gradient(at 50% 0%, hsla(225, 39%, 25%, 1) 0, transparent 50%);
 }
+/* border for popup menu*/
+body > div.swal2-container.swal2-center.swal2-backdrop-show > div {
+  border: solid 2px #2952e3;
+}
+
+/* border for confirmButton*/
+body
+  > div.swal2-container.swal2-center.swal2-backdrop-show
+  > div
+  > div.swal2-actions
+  > button.swal2-confirm.swal2-styled.swal2-default-outline {
+  border: solid 2px #2546bd;
+}

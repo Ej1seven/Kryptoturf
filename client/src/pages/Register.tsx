@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { register } from '../adapters/user';
+import React, { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { register, user, me } from '../adapters/user';
 import { Loader } from '../components/Loader';
+import { useWeb3 } from '@3rdweb/hooks';
+import { useNavigate } from 'react-router-dom';
 
 interface RegisterProps {}
 const Input = ({
@@ -30,6 +33,10 @@ const commonStyles =
   'min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white';
 
 export const Register: React.FC<RegisterProps> = ({}) => {
+  const navigate = useNavigate();
+  const { ethereum } = window;
+  const { data, isError, refetch } = useQuery('me', me);
+  const { address, connectWallet } = useWeb3();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -40,14 +47,46 @@ export const Register: React.FC<RegisterProps> = ({}) => {
     console.log(e.target.value);
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     const { username, email, password } = formData;
+    console.log(address);
+    if (!address) {
+      let connectWalletPrompt = window.confirm(
+        'You need to connect your wallet to create a new account. Would you like to connect your wallet now?'
+      );
+      if (connectWalletPrompt) {
+        connectWallet('injected');
+      } else {
+        return;
+      }
+    }
+    console.log(address);
     e.preventDefault();
-
-    if (!username || !email || !password) return;
-    register(username, email, password);
+    if (!username || !email || !password || !address) return;
+    await register(username, email, password, address);
+    if (user) {
+      console.log(user);
+      navigate('/login');
+    }
   };
-
+  // Detect change in Metamask account
+  useEffect(() => {
+    if (ethereum) {
+      ethereum.on('chainChanged', () => {
+        window.location.reload();
+      });
+      ethereum.on('accountsChanged', () => {
+        window.location.reload();
+      });
+    }
+    me();
+    if (data?.id) {
+      // if the user is not logged in the router will take the user to the login page
+      //once the user logs in the router with proceed forward by taking the end user to their intended page
+      alert('Please logout before creating a new user');
+      navigate('/');
+    }
+  });
   return (
     <div className="flex justify-center">
       <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism  lg:mt-72 md:mt-64 mt-60">

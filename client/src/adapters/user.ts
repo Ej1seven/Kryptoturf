@@ -1,10 +1,13 @@
 import axios from 'axios';
+import Swal from 'sweetalert2';
 const URL = 'http://localhost:4001/userAuth';
+export let user: any;
 
 export async function register(
   username: String,
   email: String,
-  password: String
+  password: String,
+  address?: String
 ) {
   // console.log(usernameOrEmail, password);
   return await axios
@@ -12,9 +15,38 @@ export async function register(
       username: username.toLowerCase(),
       email: email.toLowerCase(),
       password: password,
+      address: address,
     })
-    .then((res) => {
-      return res.data;
+    .then((res): any => {
+      if (res.data.message)
+        return Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: res.data.message,
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
+      if (res.data.err)
+        return Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: res.data.err,
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
+      if (res.data.user.username === username) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'You have successfully created an account. Please login!',
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
+        user = res.data.user;
+      }
     });
 }
 export async function login(usernameOrEmail: String, password: String) {
