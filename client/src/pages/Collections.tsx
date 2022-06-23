@@ -9,6 +9,7 @@ import { Navbar } from '../components/Navbar';
 import { CgWebsite } from 'react-icons/cg';
 import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai';
 import { HiDotsVertical } from 'react-icons/hi';
+import { FaEthereum } from 'react-icons/fa';
 
 interface CollectionsProps {}
 
@@ -157,22 +158,14 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
             </div>
             <div className={style.collectionStat}>
               <div className={style.statValue}>
-                <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
-                  alt="eth"
-                  className={style.ethLogo}
-                />
+                <FaEthereum className={style.ethLogo} />
                 {collectionItem?.floorPrice}
               </div>
               <div className={style.statName}>floor price</div>
             </div>
             <div className={style.collectionStat}>
               <div className={style.statValue}>
-                <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
-                  alt="eth"
-                  className={style.ethLogo}
-                />
+                <FaEthereum className={style.ethLogo} />
                 {collectionItem?.volumeTraded}
               </div>
               <div className={style.statName}>volume traded</div>

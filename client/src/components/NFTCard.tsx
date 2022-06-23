@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BiHeart } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import { FaEthereum } from 'react-icons/fa';
 
 const style = {
   wrapper: `bg-[#303339] flex-auto w-[14rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer`,
@@ -64,11 +65,7 @@ const NFTCard = ({ nftItem, title, listings }: any) => {
             <div className={style.infoRight}>
               <div className={style.priceTag}></div>
               <div className={style.priceValue}>
-                <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
-                  alt="eth"
-                  className={style.ethLogo}
-                />
+                <FaEthereum className={style.ethLogo} />
                 {price}
               </div>
             </div>
