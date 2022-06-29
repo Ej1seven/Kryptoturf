@@ -6,7 +6,7 @@ import process from 'process';
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
-const redis = new Redis();
+const redis = new Redis(`${process.env.REDIS_URL}`);
 
 let router = express.Router();
 
@@ -98,6 +98,11 @@ router.route('/register').post(async (req: Request, res: Response) => {
 });
 
 router.route('/login').post(async (req: Request, res: Response) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
   const { usernameOrEmail, password } = req.body;
   const user = await prisma.user.findUnique(
     usernameOrEmail.includes('@')

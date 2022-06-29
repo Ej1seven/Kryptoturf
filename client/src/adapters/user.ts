@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
-const URL = 'http://localhost:4001/userAuth';
+const URL = process.env.REACT_APP_API_URL;
+
 export let user: any;
 
 export async function register(
@@ -11,7 +12,7 @@ export async function register(
 ) {
   // console.log(usernameOrEmail, password);
   return await axios
-    .post(`${URL}/register`, {
+    .post(`${URL}/userAuth/register`, {
       username: username.toLowerCase(),
       email: email.toLowerCase(),
       password: password,
@@ -53,7 +54,7 @@ export async function login(usernameOrEmail: String, password: String) {
   // console.log(usernameOrEmail, password);
   return await axios
     .post(
-      `${URL}/login`,
+      `${URL}/userAuth/login`,
       {
         usernameOrEmail: usernameOrEmail.toLowerCase(),
         password: password,
@@ -62,6 +63,7 @@ export async function login(usernameOrEmail: String, password: String) {
         withCredentials: true,
         headers: {
           'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Allow-Origin': '*',
         },
       }
     )
@@ -75,7 +77,7 @@ export async function login(usernameOrEmail: String, password: String) {
 export async function logout() {
   // console.log(usernameOrEmail, password);
   return await axios
-    .delete(`${URL}/logout`, {
+    .delete(`${URL}/userAuth/logout`, {
       withCredentials: true,
     })
     .then((res) => {
@@ -85,7 +87,7 @@ export async function logout() {
 export async function me() {
   // console.log(usernameOrEmail, password);
   return await axios
-    .get(`${URL}/me`, {
+    .get(`${URL}/userAuth/me`, {
       withCredentials: true,
     })
     .then(async (res) => {
@@ -99,7 +101,7 @@ export async function me() {
 
 export async function token() {
   return await axios
-    .get(`${URL}/token`, {
+    .get(`${URL}/userAuth/token`, {
       withCredentials: true,
     })
     .then((res) => {

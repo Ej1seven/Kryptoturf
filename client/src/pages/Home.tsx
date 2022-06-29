@@ -22,7 +22,7 @@ const style = {
 
 export const Home: React.FC<HomeProps> = ({}) => {
   const { data, isLoading, isError, refetch } = useQuery('me', me);
-
+  console.log(process.env);
   useEffect(() => {
     if (data?.id) {
       // if the user is not logged in the router will take the user to the login page
