@@ -20,7 +20,7 @@ const process_1 = __importDefault(require("process"));
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
-const redis = new ioredis_1.default();
+const redis = new ioredis_1.default(`${process_1.default.env.REDIS_URL}`);
 let router = express_1.default.Router();
 router.route('/token').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = yield req.cookies.refreshToken;
@@ -97,12 +97,13 @@ router.route('/register').post((req, res) => __awaiter(void 0, void 0, void 0, f
             }
         }
         else {
-            return res.json(err);
+            return res.json({ message: err.code });
         }
     }
     return res.json({ user });
 }));
 router.route('/login').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.header('Access-Control-Allow-Origin', 'https://kryptoturf.com');
     const { usernameOrEmail, password } = req.body;
     const user = yield prisma.user.findUnique(usernameOrEmail.includes('@')
         ? { where: { email: usernameOrEmail } }
@@ -130,7 +131,7 @@ router.route('/login').post((req, res) => __awaiter(void 0, void 0, void 0, func
         sameSite: 'strict',
     })
         .json({ accessToken: accessToken, refreshToken: refreshToken });
-    // return res.json({ user });
+    // return res.json(user);
 }));
 router.route('/me').get(authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json(req.user);
@@ -152,14 +153,16 @@ redis.on('connect', function () {
     console.log('Redis connecton establised');
 });
 function authenticateToken(req, res, next) {
-    const accessToken = req.cookies.accessToken;
-    if (accessToken === null)
-        return res.sendStatus(401);
-    jwt.verify(accessToken, process_1.default.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err)
-            return res.json(err.name);
-        req.user = user;
-        next();
+    return __awaiter(this, void 0, void 0, function* () {
+        const accessToken = yield req.cookies.accessToken;
+        if (accessToken === null)
+            return yield res.sendStatus(401);
+        yield jwt.verify(accessToken, process_1.default.env.ACCESS_TOKEN_SECRET, (err, user) => __awaiter(this, void 0, void 0, function* () {
+            if (err)
+                return res.json(err.name);
+            req.user = user;
+            next();
+        }));
     });
 }
 module.exports = router;

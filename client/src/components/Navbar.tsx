@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import logo from '../../src/images/logo.png';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link, useNavigate } from 'react-router-dom';
-import { me, logout } from '../adapters/user';
+import { me, logout, token } from '../adapters/user';
 import { HiMenu, HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose, AiOutlineSearch } from 'react-icons/ai';
 import { CgProfile } from 'react-icons/cg';
@@ -12,7 +12,12 @@ interface NavbarProps {}
 
 export const Navbar: React.FC<NavbarProps> = ({}) => {
   const navigate = useNavigate();
-  const { data, isLoading, isError, refetch, isFetching } = useQuery('me', me);
+  const { data, isLoading, isError, refetch, isFetching } = useQuery('me', me, {
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+    cacheTime: 0,
+    refetchInterval: 0,
+  });
   const [toggleMenu, setToggleMenu] = useState(false);
   const queryClient = useQueryClient();
   const NavbarItem = ({
@@ -31,14 +36,14 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     (await !data?.id) ? navigate('/login') : logout();
-    // logout();
     await me();
     await queryClient.invalidateQueries('me');
+    window.location.reload();
   };
   const navigateTo: any = (e: any) => {
     switch (e.target.innerText) {
-      case 'Collections':
-        navigate('/collections/0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8');
+      case 'Collection':
+        navigate('/collection/0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8');
         break;
       case 'Stats':
         navigate('/stats');
@@ -77,7 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         ></input>
       </div>
       <ul className="text-white md:flex  list-none flex-row justify-between items-center flex-initial">
-        {['Collections', 'Stats', 'Resources', 'Create'].map((item, index) => (
+        {['Collection', 'Stats', 'Resources', 'Create'].map((item, index) => (
           <div className="hidden lg:block">
             <NavbarItem key={item + index} title={item} />
           </div>
@@ -107,12 +112,12 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
             />
           )}
           {toggleMenu && (
-            <ul className="z-index fixed top-0 -right-2 p-3 w-[70vw] h-screen shadow-2xl lg:hidden list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-in blue-glassmorphism ">
+            <ul className="z-10 fixed top-0 -right-2 p-3 w-[70vw] h-screen shadow-2xl lg:hidden list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-in blue-glassmorphism ">
               <li className="text-xl w-full my-2">
                 <AiOutlineClose onClick={() => setToggleMenu(false)} />
               </li>
               {[
-                'Collections',
+                'Collection',
                 'Stats',
                 'Resources',
                 'Create',
@@ -127,9 +132,15 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
               ))}
               <li
                 className="mx-4 cursor-pointer my-2 text-lg md:hidden"
-                onClick={navigateTo}
+                onClick={handleSubmit}
               >
-                Login
+                {isLoading
+                  ? 'Loading'
+                  : isError
+                  ? 'Something went wrong'
+                  : !data?.id
+                  ? 'Login'
+                  : 'Logout'}
               </li>
             </ul>
           )}

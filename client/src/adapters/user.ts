@@ -63,7 +63,7 @@ export async function login(usernameOrEmail: String, password: String) {
         withCredentials: true,
         headers: {
           'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': 'https://kryptoturf.com',
         },
       }
     )

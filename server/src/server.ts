@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const prisma = new PrismaClient();
 const user = require('./routes/userAuth');
 const marketItems = require('./routes/marketItems');
+// const uploads = require('./routes/uploads');
 const cors = require('cors');
 const app = express();
 app.all('/*', function (req, res, next) {
@@ -39,13 +40,19 @@ app.use(cookieParser());
 app.use('/userAuth', user);
 // app.use('/user', user);
 app.use('/marketItems', marketItems);
+// app.use('/uploads', uploads);
+//app.get('/uploads', express.static('uploads/1659375700669.jpg'));
+app.use('/uploads', express.static('uploads'));
 
+app.get('/', (req: Request, res: Response) => {
+  res.json({ message: 'hey whats up erik hunter' });
+});
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'hey whats up erik hunter' });
 });
 
 app.get('/hello', (req: Request, res: Response) => {
-  res.json({ message: 'hey whats up erik 2' });
+  res.json({ message: 'hey whats up erik ' });
 });
 
 app.get('/wow', (req: Request, res: Response) => {

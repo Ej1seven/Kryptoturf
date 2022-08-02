@@ -10,9 +10,15 @@ import {
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { Register } from './pages/Register';
-import { Collections } from './pages/Collections';
+import { Collection } from './pages/Collection';
 import { NFTS } from './pages/NFTS';
 import { ThirdwebWeb3Provider } from '@3rdweb/hooks';
+import { Stats } from './pages/Stats';
+import { Resources } from './pages/Resources';
+import { Create } from './pages/Create';
+import { Profile } from './pages/Profile';
+import { Wallet } from './pages/Wallet';
+import { Collections } from './pages/Collections';
 
 /**
  * The chain ID 4 represents the Rinkeby network
@@ -35,8 +41,14 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/collections/:id" element={<Collections />} />
+            <Route path="/collections" element={<Collections />} />
+            <Route path="/collection/:id" element={<Collection />} />
             <Route path="/nfts/:id" element={<NFTS />} />
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/create" element={<Create />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/wallet" element={<Wallet />} />
           </Routes>
         </Router>
       </div>

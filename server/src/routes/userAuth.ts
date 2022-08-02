@@ -91,18 +91,14 @@ router.route('/register').post(async (req: Request, res: Response) => {
         });
       }
     } else {
-      return res.json(err);
+      return res.json({ message: err.code });
     }
   }
   return res.json({ user });
 });
 
 router.route('/login').post(async (req: Request, res: Response) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
+  res.header('Access-Control-Allow-Origin', 'https://kryptoturf.com');
   const { usernameOrEmail, password } = req.body;
   const user = await prisma.user.findUnique(
     usernameOrEmail.includes('@')
@@ -133,7 +129,7 @@ router.route('/login').post(async (req: Request, res: Response) => {
     })
     .json({ accessToken: accessToken, refreshToken: refreshToken });
 
-  // return res.json({ user });
+  // return res.json(user);
 });
 router.route('/me').get(authenticateToken, async (req: any, res: any) => {
   res.json(req.user);
@@ -156,13 +152,13 @@ redis.on('connect', function () {
   console.log('Redis connecton establised');
 });
 
-function authenticateToken(req: any, res: any, next: any) {
-  const accessToken = req.cookies.accessToken;
-  if (accessToken === null) return res.sendStatus(401);
-  jwt.verify(
+async function authenticateToken(req: any, res: any, next: any) {
+  const accessToken = await req.cookies.accessToken;
+  if (accessToken === null) return await res.sendStatus(401);
+  await jwt.verify(
     accessToken,
     process.env.ACCESS_TOKEN_SECRET,
-    (err: any, user: any) => {
+    async (err: any, user: any) => {
       if (err) return res.json(err.name);
 
       req.user = user;

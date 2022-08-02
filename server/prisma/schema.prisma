@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,23 +8,51 @@ datasource db {
 }
 
 model User {
-  id String @id @default(cuid())
-  username String @unique
-  email String @unique
+  id            String   @id @default(cuid())
+  username      String   @unique
+  email         String   @unique
+  walletAddress String   @unique
+  password      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  NFTS NFTS[] 
+}
+
+model NFTS {
+  id       Int  @id @default(autoincrement())
+  owner User? @relation(fields: [walletAddress], references: [walletAddress])
   walletAddress String @unique
-  password String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  image Image?
+  name          String   @unique 
+  externalLink  String   @unique 
+  description   String   @unique 
+  collection    String   @unique 
+  supply        String   @unique 
+ 
+}
+
+model Image {
+  id     Int  @id @default(autoincrement())
+  nftData   NFTS? @relation(fields: [walletAddress], references: [walletAddress])
+  walletAddress String @unique// relation scalar field (used in the `@relation` attribute above)
+  name String @unique
+  lastModified Int 
+  lastModifiedDate DateTime
+  size Int
+  type String
+  webkitRelativePath String
 }
 
 model MarketItems {
-  title String @unique
-  contactAddress String @unique
-  description String @unique
-  createdBy String @unique
-  volumeTraded Int @unique
-  floorPrice Int @unique
-  owners String[] 
-  profileImage String
-  bannerImage String
+  title          String   @unique
+  contactAddress String   @unique
+  description    String   @unique
+  createdBy      String   @unique
+  volumeTraded   Int      @unique
+  floorPrice     Int      @unique
+  owners         String[]
+  profileImage   String
+  bannerImage    String
 }
+
+

@@ -13,8 +13,23 @@ const jwt = require('jsonwebtoken');
 const prisma = new PrismaClient();
 const user = require('./routes/userAuth');
 const marketItems = require('./routes/marketItems');
+// const uploads = require('./routes/uploads');
 const cors = require('cors');
 const app = (0, express_1.default)();
+app.all('/*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', `${process.env.CORS_ORIGIN}`);
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+    next();
+});
+// app.use(function (req, res, next) {
+//   res.setHeader('Access-Control-Allow-Origin', `${process.env.CORS_ORIGIN}`);
+//   res.setHeader(
+//     'Access-Control-Allow-Methods',
+//     'GET, POST, OPTIONS, PUT, PATCH, DELETE'
+//   );
+//   res.setHeader('Access-Control-Allow-Credentials', 'true');
+//   return next();
+// });
 const redis = new ioredis_1.default(`${process.env.REDIS_URL}`);
 redis.on('error', function (error) {
     console.error('Error encountered: ', error);
@@ -29,11 +44,20 @@ app.use(cookieParser());
 app.use('/userAuth', user);
 // app.use('/user', user);
 app.use('/marketItems', marketItems);
+// app.use('/uploads', uploads);
+//app.get('/uploads', express.static('uploads/1659375700669.jpg'));
+app.use('/uploads', express_1.default.static('uploads'));
+app.get('/', (req, res) => {
+    res.json({ message: 'hey whats up erik hunter' });
+});
 app.get('/', (req, res) => {
     res.json({ message: 'hey whats up erik hunter' });
 });
 app.get('/hello', (req, res) => {
-    res.json({ message: 'hey whats up erik 2' });
+    res.json({ message: 'hey whats up erik ' });
+});
+app.get('/wow', (req, res) => {
+    res.json({ message: 'hey whats up erik 3' });
 });
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port 3001`);
