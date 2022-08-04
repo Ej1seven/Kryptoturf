@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+let wrongFormat;
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
@@ -26,7 +27,20 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype == 'image/png' ||
+            file.mimetype == 'image/jpg' ||
+            file.mimetype == 'image/jpeg') {
+            cb(null, true);
+        }
+        else {
+            cb(null, false);
+            return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+        }
+    },
+});
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 let router = express_1.default.Router();
@@ -42,11 +56,18 @@ router.route('/collection').post((req, res) => __awaiter(void 0, void 0, void 0,
     // });
     res.json(collectionId);
 }));
-router.route('/upload').post(upload.array('image'), (req, res) => {
-    res.send('image uploaded');
-    let originalFileName = req.files;
-    console.log(originalFileName);
-});
+const uploadImages = upload.array('image');
+router.route('/upload').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    uploadImages(req, res, function (err) {
+        if (err) {
+            return res.status(400).send({ message: err.message });
+        }
+        // Everything went fine.
+        const files = req.files;
+        console.log(files);
+        res.json(files);
+    });
+}));
 router.route('/upload').get((req, res) => {
     res.sendFile('/uploads/');
 });

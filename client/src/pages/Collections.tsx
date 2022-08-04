@@ -129,6 +129,8 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
 
   const createNFTCollection = async () => {
     const { name, description, fee_recipient, external_link } = formData;
+    let profileImageFilePath;
+    let bannerImageFilePath;
     // const imageData = new FormData(formData);
     // imageData.append('File', image.raw);
     const collectionData = {
@@ -152,8 +154,18 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
       })
       .then((res): any => {
         console.log(res.data);
+        let imageFilePath = res.data;
+        imageFilePath.map((image: any, index: any) => {
+          let editedFilePath;
+          if (index < 1) {
+            editedFilePath = image.path.split('uploads\\').join('').trim();
+          }
+          console.log(index);
+          console.log(editedFilePath);
+        });
         return res.data;
       });
+
     // let collectionId = 100;
     // console.log(image.raw);
     // collection(image.raw);
