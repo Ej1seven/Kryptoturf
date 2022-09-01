@@ -44,17 +44,77 @@ const upload = multer({
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 let router = express_1.default.Router();
-router.route('/collection').get((_, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route('/collections').get((_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const collections = yield prisma.marketItems.findMany();
     res.json(collections);
 }));
 router.route('/collection').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { collectionId } = yield req.body;
-    console.log(collectionId);
+    const { title, contractAddress, description, createdBy, owners, profileImage, bannerImage, logoImage, } = req.body;
+    console.log('body request', req.body);
+    let collection;
+    try {
+        const createCollection = yield prisma.MarketItems.create({
+            data: {
+                title: title,
+                contractAddress: contractAddress,
+                description: description,
+                createdBy: createdBy,
+                owners: owners,
+                profileImage: profileImage,
+                bannerImage: bannerImage,
+                logoImage: logoImage,
+                volumeTraded: 0,
+                floorPrice: 0,
+            },
+        });
+        collection = createCollection;
+    }
+    catch (err) {
+        return res.json(err);
+    }
     // const collection = await prisma.marketItems.findUnique({
     //   where: { contactAddress: collectionId },
     // });
-    res.json(collectionId);
+    return res.json({ collection });
+}));
+router.route('/collection/:id').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const collection = yield prisma.marketItems.findUnique({
+        where: { contractAddress: id },
+        include: {
+            likes: true, // Return all fields
+        },
+    });
+    return res.json({ collection });
+}));
+router.route('/collection').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { title, contractAddress, description, createdBy, owners, profileImage, bannerImage, logoImage, } = req.body;
+    console.log('body request', req.body);
+    let collection;
+    try {
+        const createCollection = yield prisma.MarketItems.create({
+            data: {
+                title: title,
+                contractAddress: contractAddress,
+                description: description,
+                createdBy: createdBy,
+                owners: owners,
+                profileImage: profileImage,
+                bannerImage: bannerImage,
+                logoImage: logoImage,
+                volumeTraded: 0,
+                floorPrice: 0,
+            },
+        });
+        collection = createCollection;
+    }
+    catch (err) {
+        return res.json(err);
+    }
+    // const collection = await prisma.marketItems.findUnique({
+    //   where: { contactAddress: collectionId },
+    // });
+    return res.json({ collection });
 }));
 const uploadImages = upload.array('image');
 router.route('/upload').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -71,4 +131,43 @@ router.route('/upload').post((req, res) => __awaiter(void 0, void 0, void 0, fun
 router.route('/upload').get((req, res) => {
     res.sendFile('/uploads/');
 });
+router.route('/likes').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { collectionContractAddress, tokenId, nftName } = req.body;
+    console.log('body request', req.body);
+    let post;
+    try {
+        const like = yield prisma.like.create({
+            data: {
+                tokenId: tokenId,
+                nftName: nftName,
+                collectionContractAddress: collectionContractAddress,
+            },
+        });
+        post = like;
+    }
+    catch (err) {
+        console.log(err);
+        return res.json(err);
+    }
+    return res.json(post);
+}));
+router.route('/likes/:id').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    console.log(id);
+    let likes;
+    try {
+        const collectionLikes = yield prisma.marketItems.findUnique({
+            where: {
+                contractAddress: id,
+            },
+            select: { likes: true },
+        });
+        likes = collectionLikes;
+    }
+    catch (err) {
+        console.log(err);
+        return res.json(err);
+    }
+    return res.json(likes);
+}));
 module.exports = router;

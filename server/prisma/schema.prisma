@@ -15,44 +15,57 @@ model User {
   password      String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  NFTS NFTS[] 
+  profileImage  String?
+  bannerImage   String? 
+  likes          Like[]
+  // NFTS NFTS[] 
 }
 
-model NFTS {
-  id       Int  @id @default(autoincrement())
-  owner User? @relation(fields: [walletAddress], references: [walletAddress])
-  walletAddress String @unique
-  image Image?
-  name          String   @unique 
-  externalLink  String   @unique 
-  description   String   @unique 
-  collection    String   @unique 
-  supply        String   @unique 
+// model NFTS {
+//   id       Int  @id @default(autoincrement())
+//   owner User? @relation(fields: [walletAddress], references: [walletAddress])
+//   walletAddress String @unique
+//   image Image?
+//   name          String   @unique 
+//   externalLink  String   @unique 
+//   description   String   @unique 
+//   collection    String   @unique 
+//   supply        String   @unique 
  
-}
+// }
 
-model Image {
-  id     Int  @id @default(autoincrement())
-  nftData   NFTS? @relation(fields: [walletAddress], references: [walletAddress])
-  walletAddress String @unique// relation scalar field (used in the `@relation` attribute above)
-  name String @unique
-  lastModified Int 
-  lastModifiedDate DateTime
-  size Int
-  type String
-  webkitRelativePath String
-}
+// model Image {
+//   id     Int  @id @default(autoincrement())
+//   nftData   NFTS? @relation(fields: [walletAddress], references: [walletAddress])
+//   walletAddress String @unique// relation scalar field (used in the `@relation` attribute above)
+//   name String @unique
+//   lastModified Int 
+//   lastModifiedDate DateTime
+//   size Int
+//   type String
+//   webkitRelativePath String
+// }
 
 model MarketItems {
   title          String   @unique
-  contactAddress String   @unique
-  description    String   @unique
-  createdBy      String   @unique
-  volumeTraded   Int      @unique
-  floorPrice     Int      @unique
+  contractAddress String   @unique
+  description    String?   
+  createdBy      String   
+  volumeTraded   Int?      
+  floorPrice     Int?      
   owners         String[]
-  profileImage   String
-  bannerImage    String
+  profileImage   String?
+  bannerImage    String?
+  logoImage      String?
+  likes          Like[]
 }
-
+model Like {
+  id  Int    @id @default(autoincrement())
+  MarketItems MarketItems? @relation(fields: [collectionContractAddress], references: [contractAddress])
+  tokenId Int
+  nftName  String
+  collectionContractAddress String
+  User User? @relation(fields: [email], references: [email])
+  email String
+}
 

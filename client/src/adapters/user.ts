@@ -109,3 +109,42 @@ export async function token() {
       return res.data;
     });
 }
+
+export async function addImages(images: {
+  profileImage?: String;
+  bannerImage?: String;
+  email: String;
+}) {
+  console.log(images);
+  return await axios
+    .post(
+      `${URL}/userAuth/images`,
+      {
+        profileImage: images.profileImage,
+        bannerImage: images.bannerImage,
+        email: images.email,
+      },
+      { withCredentials: true }
+    )
+    .then((res): any => {
+      console.log(res.data);
+      // collectionItem = res.data;
+      return res.data;
+    });
+}
+
+export async function getUserData(email: String) {
+  console.log(email);
+  return await axios
+    .post(
+      `${URL}/userAuth/user`,
+      {
+        email: email,
+      },
+      { withCredentials: true }
+    )
+    .then((res): any => {
+      console.log(res.data);
+      return res.data.userProfile;
+    });
+}

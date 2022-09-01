@@ -15,10 +15,11 @@ import { NFTS } from './pages/NFTS';
 import { ThirdwebWeb3Provider } from '@3rdweb/hooks';
 import { Stats } from './pages/Stats';
 import { Resources } from './pages/Resources';
-import { Create } from './pages/Create';
+import { CreateNFT } from './pages/CreateNFT';
 import { Profile } from './pages/Profile';
 import { Wallet } from './pages/Wallet';
 import { Collections } from './pages/Collections';
+import { CreateCollection } from './pages/CreateCollection';
 
 /**
  * The chain ID 4 represents the Rinkeby network
@@ -46,7 +47,8 @@ const App = () => {
             <Route path="/nfts/:id" element={<NFTS />} />
             <Route path="/stats" element={<Stats />} />
             <Route path="/resources" element={<Resources />} />
-            <Route path="/create" element={<Create />} />
+            <Route path="/createNFT" element={<CreateNFT />} />
+            <Route path="/createCollection" element={<CreateCollection />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/wallet" element={<Wallet />} />
           </Routes>

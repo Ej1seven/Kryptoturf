@@ -16,9 +16,14 @@ export const Purchase: React.FC<any> = ({
   selectedNft,
   listings,
   marketPlaceModule,
+  collection,
+  enableToggleMenu,
 }) => {
   const [selectedMarketNft, setSelectedMarketNft]: any = useState();
   const [enableButton, setEnableButton] = useState(false);
+  const TOKEN_ADDRESS = process.env.REACT_APP_TOKEN_ADDRESS;
+  console.log(collection);
+  console.log(TOKEN_ADDRESS);
 
   useEffect(() => {
     if (!listings || isListed == 'false') return;
@@ -60,6 +65,18 @@ export const Purchase: React.FC<any> = ({
 
     confirmPurchase();
   };
+  const listItem: any = async (
+    listingId = selectedMarketNft.id,
+    quantityDesired = 1,
+    marketModule = marketPlaceModule
+  ) => {
+    console.log(Number(listingId), quantityDesired, marketModule, 'david');
+    await marketModule.direct
+      .buyoutListing(Number(listingId), quantityDesired)
+      .catch((error: any) => console.error(error));
+
+    confirmPurchase();
+  };
 
   return (
     <div className="flex h-20 w-full items-center rounded-lg border border-[#151c22] bg-[#303339] px-12">
@@ -85,7 +102,14 @@ export const Purchase: React.FC<any> = ({
       ) : (
         <div className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}>
           <IoMdWallet className={style.buttonIcon} />
-          <div className={style.buttonText}>List Item</div>
+          <div
+            className={style.buttonText}
+            onClick={() => {
+              enableToggleMenu();
+            }}
+          >
+            List Item
+          </div>
         </div>
       )}
     </div>

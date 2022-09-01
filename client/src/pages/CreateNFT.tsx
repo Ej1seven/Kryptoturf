@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ethers } from 'ethers';
 import fs from 'fs';
 import { TransactionContext } from '../context/TransactionContext';
@@ -7,8 +7,13 @@ import { Loader } from '../components/Loader';
 import { HiMenuAlt4, HiOutlinePhotograph } from 'react-icons/hi';
 import { IoIosAdd } from 'react-icons/io';
 import { AiOutlineClose } from 'react-icons/ai';
+import { useWeb3 } from '@3rdweb/hooks';
+import { getCollections } from '../adapters/marketItems';
+import { me } from '../adapters/user';
+import { useQuery } from 'react-query';
+import { createCollection } from '../adapters/marketItems';
 
-interface CreateProps {}
+interface CreateNFTProps {}
 const Input = ({
   placeholder,
   name,
@@ -29,6 +34,37 @@ const Input = ({
     value={value}
     onChange={(e) => handleChange(e, name)}
     className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+  />
+);
+const CollectionInput = ({
+  id,
+  placeholder,
+  name,
+  type,
+  value,
+  handleChange,
+  searchCollections,
+  toggleCollectionsDropdown,
+}: {
+  id: any;
+  placeholder: any;
+  name: String;
+  type: any;
+  value: any;
+  handleChange: any;
+  searchCollections: any;
+  toggleCollectionsDropdown: any;
+}) => (
+  <input
+    id={id}
+    placeholder={placeholder}
+    type={type}
+    step="0.0001"
+    value={value}
+    onChange={(e) => handleChange(e, name)}
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+    onKeyUp={(e) => searchCollections(e)}
+    onClick={(e) => toggleCollectionsDropdown(e)}
   />
 );
 
@@ -52,7 +88,7 @@ const style = {
   likeIcon: `text-xl mr-2`,
 };
 
-export const Create: React.FC<CreateProps> = ({}) => {
+export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
   const {
     connectWallet,
     currentAccount,
@@ -61,6 +97,67 @@ export const Create: React.FC<CreateProps> = ({}) => {
     // handleChange,
     isLoading,
   } = useContext(TransactionContext);
+  const { provider } = useWeb3();
+  const [collections, setCollections]: any = useState([]);
+  const [marketplaceCollections, setMarketplaceCollections] = useState([]);
+  const [collectionsOwnedByUser, setCollectionsOwnedByUser]: any = useState([
+    { name: '', contractAddress: '' },
+  ]);
+  const [collectionInput, setCollectionInput] = useState();
+  const [collectionsInputActive, setCollectionsInputActive] = useState(false);
+  const [displayCollections, setDisplayCollections] = useState(false);
+  const [collectionAddress, setCollectionAddress] = useState('');
+  const { data, isError, refetch } = useQuery('me', me);
+  const marketPlaceModule = useMemo(() => {
+    if (!provider) return;
+    const sdk = new ThirdwebSDK(provider.getSigner());
+    return sdk;
+  }, [provider]);
+  useEffect(() => {
+    if (!marketPlaceModule) return;
+    let collectionsArray: any = [];
+    for (let x = 0; x <= collections.length - 1; x++) {
+      (async () => {
+        const contract = await sdk.getNFTCollection(
+          collections[x].contractAddress
+        );
+        console.log(contract);
+        const metadata = await contract.metadata.get();
+        await collectionsArray.push(metadata);
+      })();
+      setMarketplaceCollections(collectionsArray);
+    }
+  }, [marketPlaceModule]);
+  useEffect(() => {
+    if (!marketplaceCollections) return;
+    let ownedCollections: any = [];
+    (async () => {
+      const username = await data.username;
+      console.log(username);
+      for (let x = 0; x <= collections.length - 1; x++) {
+        console.log(collections[x].createdBy);
+        if (collections[x].createdBy === username) {
+          ownedCollections.push({
+            name: collections[x].title,
+            contractAddress: collections[x].contractAddress,
+          });
+          console.log('match!');
+        }
+      }
+      setCollectionsOwnedByUser(ownedCollections);
+    })();
+  }, [collections]);
+  console.log(marketplaceCollections);
+  console.log(collections);
+  console.log(collectionsOwnedByUser);
+  console.log(collectionsOwnedByUser.length);
+
+  useEffect(() => {
+    (async () => {
+      const collections = await getCollections();
+      await setCollections(collections);
+    })();
+  }, []);
   const [image, setImage] = useState({
     preview: '',
     raw: '',
@@ -121,10 +218,6 @@ export const Create: React.FC<CreateProps> = ({}) => {
     ethers.getDefaultProvider(rpcUrl)
   );
   const sdk = new ThirdwebSDK(wallet);
-  const getModule = sdk.getNFTCollection(
-    REACT_APP_MODULE_ADDRESS
-    //The address of you the module you created in ThirdWeb
-  );
 
   const createNFTCollection = async () => {
     await sdk.deployer
@@ -142,16 +235,125 @@ export const Create: React.FC<CreateProps> = ({}) => {
 
   const mintNFT = async () => {
     const { name, externalLink, description, collection, supply } = formData;
-    const nftData = {
-      name: name,
-      description: description,
-      attributes: rows,
-      externalLink,
-      collection,
-      supply,
-    };
     rows.shift();
-    console.log(rows);
+    let val = Math.floor(1000 + Math.random() * 9000000);
+    let untitledCollection = `Untitled Collection #${val}`;
+    console.log(untitledCollection);
+    let collectionName;
+    let collectionInput: any = document.getElementById('collection');
+    console.log(collectionInput.value);
+    for (let x = 0; x <= collectionsOwnedByUser.length - 1; x++) {
+      if (
+        collectionInput.value.toLowerCase() ===
+        collectionsOwnedByUser[x].name.toLowerCase()
+      ) {
+        console.log('match', collectionInput.value);
+        collectionName = collectionsOwnedByUser[x].name;
+        // setCollectionAddress(collectionsOwnedByUser[x].contractAddress);
+        const getModule = await sdk.getNFTCollection(
+          // REACT_APP_MODULE_ADDRESS
+          //The address of you the module you created in ThirdWeb
+          // '0x0b75d3533Eb2ef516e5237FD20d59d2BAc8549B5'
+          collectionsOwnedByUser[x].contractAddress
+        );
+        const mint = await getModule.mintTo(currentAccount, {
+          name: name,
+          description: description,
+          attributes: rows,
+          image: image.raw,
+          external_url: externalLink,
+        });
+        const receipt = mint.receipt;
+        const tokenId = mint.id; // the id of the NFT minted
+        await mint.data();
+        console.log(receipt);
+        console.log(tokenId);
+      }
+    }
+    console.log(collectionName);
+    if (!collectionName) {
+      console.log('new collection');
+      console.log(currentAccount);
+      for (let x = 0; x <= collectionsOwnedByUser.length - 1; x++) {
+        if (
+          collectionsOwnedByUser[x].name
+            .toLowerCase()
+            .includes('untitled collection')
+        ) {
+          console.log('match', collectionsOwnedByUser[x].name);
+          const getModule = await sdk.getNFTCollection(
+            // REACT_APP_MODULE_ADDRESS
+            //The address of you the module you created in ThirdWeb
+            // '0x0b75d3533Eb2ef516e5237FD20d59d2BAc8549B5'
+            collectionsOwnedByUser[x].contractAddress
+          );
+          const mint = await getModule.mintTo(currentAccount, {
+            name: name,
+            description: description,
+            attributes: rows,
+            image: image.raw,
+            external_url: externalLink,
+          });
+          const receipt = mint.receipt;
+          const tokenId = mint.id; // the id of the NFT minted
+          await mint.data();
+          console.log(receipt);
+          return console.log(tokenId);
+        }
+      }
+      (async () => {
+        await sdk.deployer
+          .deployNFTCollection({
+            name: untitledCollection,
+            primary_sale_recipient: currentAccount,
+          })
+          .then(async (res) => {
+            let contractAddress = await res;
+            const collectionData = await {
+              title: untitledCollection,
+              contractAddress: contractAddress,
+              createdBy: data.username,
+              owners: data.username,
+            };
+            const getModule = await sdk.getNFTCollection(
+              // REACT_APP_MODULE_ADDRESS
+              //The address of you the module you created in ThirdWeb
+              // '0x0b75d3533Eb2ef516e5237FD20d59d2BAc8549B5'
+              contractAddress
+            );
+
+            console.log(collectionData);
+            await createCollection(collectionData);
+            const mint = await getModule.mintTo(currentAccount, {
+              name: name,
+              description: description,
+              attributes: rows,
+              image: image.raw,
+              external_url: externalLink,
+            });
+            const receipt = mint.receipt;
+            const tokenId = mint.id; // the id of the NFT minted
+            await mint.data();
+            console.log(receipt);
+            console.log(tokenId);
+            // await setCollectionAddress(contractAddress);
+            // await console.log(getModule);
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
+      })();
+    }
+    // const nftData = {
+    //   name: name,
+    //   description: description,
+    //   attributes: rows,
+    //   externalLink,
+    //   collection,
+    //   supply,
+    // };
+    // console.log(rows);
+    // console.log(collectionAddress);
     // console.log(image.raw);
     // console.log(image.properties.name);
     // console.log(image.properties.lastModified);
@@ -163,19 +365,6 @@ export const Create: React.FC<CreateProps> = ({}) => {
     // console.log(externalLink);
     // console.log(collection);
     // console.log(supply);
-
-    const mint = await getModule.mintTo(currentAccount, {
-      name: name,
-      description: description,
-      attributes: rows,
-      image: image.raw,
-      external_url: externalLink,
-    });
-    const receipt = mint.receipt;
-    const tokenId = mint.id; // the id of the NFT minted
-    await mint.data();
-    console.log(receipt);
-    console.log(tokenId);
   };
 
   const handleSubmit = async (e: any) => {
@@ -231,8 +420,50 @@ export const Create: React.FC<CreateProps> = ({}) => {
     setRows(tempRows); // update state
   };
 
+  const searchCollections = (e: any) => {
+    let input = e.target.value;
+    input = input.toLowerCase();
+    console.log(input);
+    // if (input.length === 0) {
+    //   setDisplayCollections(true);
+    // }
+    let collections = document.getElementsByClassName('collection');
+    for (let i = 0; i < collections.length; i++) {
+      if (
+        !collections[i].innerHTML.toLowerCase().startsWith(input.toLowerCase())
+      ) {
+        collections[i].classList.add('hidden');
+      } else {
+        collections[i].classList.remove('hidden');
+      }
+    }
+  };
+
+  const toggleCollectionsDropdown = (e: any) => {
+    // let collectionInput: any = document.getElementById('collection');
+    // if(e.target !== )
+    let val = Math.floor(1000 + Math.random() * 9000000);
+    console.log(val);
+    console.log(e.target);
+    console.log(document.activeElement);
+    setDisplayCollections(!displayCollections);
+  };
+  const changeCollectionInput = (e: any) => {
+    console.log(e.target.outerText);
+    let collectionInput: any = document.getElementById('collection');
+    console.log(collectionInput.value);
+    collectionInput.value = e.target.outerText;
+  };
+  let collectionInputElement: any = document.getElementById('collection');
+  document.addEventListener('click', (event) => {
+    const isClickInside = collectionInputElement.contains(event.target);
+
+    if (!isClickInside) {
+      setDisplayCollections(false);
+    }
+  });
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center outer-container">
       <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism  lg:mt-72 md:mt-64 mt-60">
         <p className="text-white text-3xl text-left w-full pb-8 text-center">
           Create New Item
@@ -291,13 +522,49 @@ export const Create: React.FC<CreateProps> = ({}) => {
           handleChange={handleChange}
           value={null}
         />
-        <Input
+        <CollectionInput
+          id="collection"
           placeholder="Collection"
           name="collection"
           type="text"
           handleChange={handleChange}
           value={null}
+          searchCollections={searchCollections}
+          toggleCollectionsDropdown={toggleCollectionsDropdown}
         />
+        {displayCollections && (
+          <>
+            {' '}
+            {collectionsOwnedByUser.length > 0 && (
+              <div className="w-full white-glassmorphism-options ">
+                {collectionsOwnedByUser.map((collection: any, index: any) => {
+                  console.log(index);
+                  console.log(collectionsOwnedByUser.length - 1);
+                  if (index !== collectionsOwnedByUser.length - 1) {
+                    return (
+                      <div
+                        className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection"
+                        onClick={(e) => changeCollectionInput(e)}
+                      >
+                        {collection.name}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        className="w-full  p-2 outline-none bg-transparent text-white text-sm border-none collection"
+                        onClick={(e) => changeCollectionInput(e)}
+                      >
+                        {collection.name}
+                      </div>
+                    );
+                  }
+                })}
+              </div>
+            )}
+          </>
+        )}
+
         <Input
           placeholder="Supply"
           name="supply"
@@ -327,7 +594,7 @@ export const Create: React.FC<CreateProps> = ({}) => {
         ) : (
           <button
             type="button"
-            onClick={createNFTCollection}
+            onClick={mintNFT}
             className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer "
           >
             Create

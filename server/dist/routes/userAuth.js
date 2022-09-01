@@ -21,6 +21,33 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
 const redis = new ioredis_1.default(`${process_1.default.env.REDIS_URL}`);
+const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads');
+    },
+    filename: function (req, file, cb) {
+        console.log(file);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, Date.now() + path.extname(file.originalname));
+    },
+});
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype == 'image/png' ||
+            file.mimetype == 'image/jpg' ||
+            file.mimetype == 'image/jpeg') {
+            cb(null, true);
+        }
+        else {
+            cb(null, false);
+            return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+        }
+    },
+});
 let router = express_1.default.Router();
 router.route('/token').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = yield req.cookies.refreshToken;
@@ -165,4 +192,81 @@ function authenticateToken(req, res, next) {
         }));
     });
 }
+router.route('/images').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { profileImage, bannerImage, email } = req.body;
+    console.log('body request', req.body);
+    let images;
+    try {
+        const user = yield prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            select: { profileImage: true, bannerImage: true },
+        });
+        console.log(user.profileImage);
+        console.log(user.bannerImage);
+        user.profileImage &&
+            fs.unlink(`uploads/${user.profileImage}`, function (err) {
+                if (err)
+                    return console.log(err);
+                console.log('user profile image deleted successfully');
+            });
+        user.bannerImage &&
+            fs.unlink(`uploads/${user.bannerImage}`, function (err) {
+                if (err)
+                    return console.log(err);
+                console.log('user banner image deleted successfully');
+            });
+        const updateUserImages = yield prisma.user.update({
+            where: {
+                email: email,
+            },
+            data: {
+                profileImage: profileImage,
+                bannerImage: bannerImage,
+            },
+        });
+        images = updateUserImages;
+    }
+    catch (err) {
+        return res.json(err);
+    }
+    return res.json({ images });
+}));
+const uploadImages = upload.array('image');
+router.route('/upload').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    uploadImages(req, res, function (err) {
+        if (err) {
+            return res.status(400).send({ message: err.message });
+        }
+        // Everything went fine.
+        const files = req.files;
+        console.log(files);
+        res.json(files);
+    });
+}));
+router.route('/upload').get((req, res) => {
+    res.sendFile('/uploads/');
+});
+router.route('/user').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    console.log('body request', req.body);
+    let userProfile;
+    try {
+        const user = yield prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            include: {
+                likes: true, // Return all fields
+            },
+        });
+        console.log(user);
+        userProfile = user;
+    }
+    catch (err) {
+        return res.json(err);
+    }
+    return res.json(userProfile);
+}));
 module.exports = router;

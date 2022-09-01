@@ -24,11 +24,61 @@
 
 /* white glassmorphism */
 .white-glassmorphism {
+  background: rgba(255, 255, 255, 0.051);
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid hwb(0 100% 0% / 0.302);
+}
+.white-glassmorphism-options {
+  background: rgba(255, 255, 255, 0.051);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 0px 1px 1px 1px solid hwb(0 100% 0% / 0.302);
+}
+.white-glassmorphism-collection {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 3px dashed hwb(0 100% 0% / 0.302);
+}
+.white-glassmorphism-bordernone {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 3px dashed hwb(0 100% 0% / 0.302);
+}
+
+.white-glassmorphism-percentage {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid hwb(0 100% 0% / 0.302);
+}
+.white-glassmorphism-percentage:focus-within {
+  border: 2px solid rgba(59, 131, 246, 0.646);
+}
+
+.collection-card {
+  background: linear-gradient(
+    180deg,
+    rgba(196, 196, 196, 0) 0.91%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+
+  z-index: 99;
+}
+
+.profile-image:hover {
+  opacity: 80%;
+}
+.profile-image:hover div {
+  display: none;
+}
+.profile-image:hover :nth-child(2) {
+  display: block;
 }
 
 .eth-card {
@@ -90,4 +140,16 @@ body
   > div.swal2-actions
   > button.swal2-confirm.swal2-styled.swal2-default-outline {
   border: solid 2px #2546bd;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
 }

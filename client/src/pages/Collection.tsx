@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
-import { collection, collectionItem } from '../adapters/marketItems';
+import { createCollection, getCollection } from '../adapters/marketItems';
 import NFTCard from '../components/NFTCard';
 import { Navbar } from '../components/Navbar';
 import { CgWebsite } from 'react-icons/cg';
@@ -29,12 +29,12 @@ const style = {
   divider: `border-r-2`,
   title: `text-5xl font-bold mb-4`,
   createdBy: `text-lg mb-4`,
-  statsContainer: `w-4/5 flex justify-between py-4 border border-[#151b22] rounded-xl mb-4`,
+  statsContainer: `w-4/5 flex justify-between py-4 border-4 border-white rounded-xl mb-4`,
   collectionStat: `w-1/4`,
   statValue: `text-3xl font-bold w-full flex items-center justify-center`,
   ethLogo: `h-6 mr-2`,
   statName: `text-lg w-full text-center mt-1`,
-  description: `text-[#8a939b] text-xl w-max-1/4 flex-wrap mt-4`,
+  description: `text-white text-xl w-max-1/4 flex-wrap mt-4`,
 };
 
 export const Collection: React.FC<CollectionsProps> = ({}) => {
@@ -43,6 +43,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
   const [nfts, setNfts] = useState([]);
   const [listings, setListings]: any = useState([]);
   const navigate = useNavigate();
+  const [collectionItem, setCollectionItem]: any = useState();
 
   const nftModule = useMemo(() => {
     if (!provider) return;
@@ -59,6 +60,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
       nfts.map((nft: any) => {
         if (nft.owner !== '0x0000000000000000000000000000000000000000') {
           activeNfts.push(nft);
+          console.log(nft);
         }
       });
       setNfts(activeNfts);
@@ -69,9 +71,13 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
   const marketPlaceModule = useMemo(() => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
+    const contract = sdk.getNFTCollection(
+      '0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8'
+    );
     console.log(
       sdk.getMarketplace('0x06f2DcAc14A483d2854Ee36D163B2d32bE2d8543')
     );
+    console.log(contract.sales);
     return sdk.getMarketplace('0x06f2DcAc14A483d2854Ee36D163B2d32bE2d8543');
   }, [provider]);
 
@@ -81,19 +87,29 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
       setListings(await marketPlaceModule.getActiveListings());
       await console.log(marketPlaceModule);
     })();
+    console.log(listings);
   }, [marketPlaceModule]);
 
   const handleSubmit = async (e: any) => {
-    await collection(id);
+    // await collection(id);
   };
 
   useEffect(() => {
-    console.log(collectionItem);
-    collection(id);
+    (async () => {
+      const collection = await getCollection(id);
+      await setCollectionItem(collection);
+    })();
   }, [id]);
 
   if (collectionItem) {
     console.log(collectionItem);
+  }
+  if (listings) {
+    console.log(listings);
+    listings.map((listing: any) => {
+      console.log(listing);
+      console.log(listing.tokenId.toNumber());
+    });
   }
 
   return (
@@ -105,7 +121,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
           alt="banner"
           src={
             collectionItem?.bannerImage
-              ? collectionItem.bannerImage
+              ? `http://localhost:3001/uploads/${collectionItem.bannerImage}`
               : 'https://via.placeholder.com/200'
           }
         />
@@ -116,14 +132,14 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
             className={style.profileImg}
             src={
               collectionItem?.profileImage
-                ? collectionItem.profileImage
+                ? `http://localhost:3001/uploads/${collectionItem.logoImage}`
                 : 'https://via.placeholder.com/200'
             }
             alt="profile image"
           />
         </div>
         <div className={style.endRow}>
-          <div className={style.socialIconsContainer}>
+          {/* <div className={style.socialIconsContainer}>
             <div className={style.socialIconsWrapper}>
               <div className={style.socialIconsContent}>
                 <div className={style.socialIcon}>
@@ -143,7 +159,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className={style.midRow}>
           <div className={style.title}>{collectionItem?.title}</div>
@@ -186,15 +202,18 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
           <div className={style.description}>{collectionItem?.description}</div>
         </div>
       </div>
-      <div className="flex flex-wrap">
-        {nfts.map((nftItem, id) => (
-          <NFTCard
-            key={id}
-            nftItem={nftItem}
-            title={collectionItem?.title}
-            listings={listings}
-          />
-        ))}
+      <div className="flex justify-center">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+          {nfts.map((nftItem, id) => (
+            <NFTCard
+              key={id}
+              nftItem={nftItem}
+              title={collectionItem?.title}
+              listings={listings}
+              collectionContractAddress={collectionItem.contractAddress}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

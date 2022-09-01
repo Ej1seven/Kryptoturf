@@ -7,6 +7,34 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
 const redis = new Redis(`${process.env.REDIS_URL}`);
+const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
+const storage = multer.diskStorage({
+  destination: function (req: any, file: any, cb: any) {
+    cb(null, 'uploads');
+  },
+  filename: function (req: any, file: any, cb: any) {
+    console.log(file);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({
+  storage: storage,
+  fileFilter: (req: any, file: any, cb: any) => {
+    if (
+      file.mimetype == 'image/png' ||
+      file.mimetype == 'image/jpg' ||
+      file.mimetype == 'image/jpeg'
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+    }
+  },
+});
 
 let router = express.Router();
 
@@ -166,4 +194,80 @@ async function authenticateToken(req: any, res: any, next: any) {
     }
   );
 }
+
+router.route('/images').post(async (req: Request, res: Response) => {
+  const { profileImage, bannerImage, email } = req.body;
+  console.log('body request', req.body);
+  let images: any;
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: { profileImage: true, bannerImage: true },
+    });
+    console.log(user.profileImage);
+    console.log(user.bannerImage);
+    user.profileImage &&
+      fs.unlink(`uploads/${user.profileImage}`, function (err: any) {
+        if (err) return console.log(err);
+        console.log('user profile image deleted successfully');
+      });
+    user.bannerImage &&
+      fs.unlink(`uploads/${user.bannerImage}`, function (err: any) {
+        if (err) return console.log(err);
+        console.log('user banner image deleted successfully');
+      });
+    const updateUserImages = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        profileImage: profileImage,
+        bannerImage: bannerImage,
+      },
+    });
+    images = updateUserImages;
+  } catch (err: any) {
+    return res.json(err);
+  }
+  return res.json({ images });
+});
+
+const uploadImages = upload.array('image');
+router.route('/upload').post(async (req: any, res: any) => {
+  uploadImages(req, res, function (err: any) {
+    if (err) {
+      return res.status(400).send({ message: err.message });
+    }
+    // Everything went fine.
+    const files = req.files;
+    console.log(files);
+    res.json(files);
+  });
+});
+router.route('/upload').get((req: any, res: any) => {
+  res.sendFile('/uploads/');
+});
+router.route('/user').post(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  console.log('body request', req.body);
+  let userProfile: any;
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      include: {
+        likes: true, // Return all fields
+      },
+    });
+    console.log(user);
+    userProfile = user;
+  } catch (err: any) {
+    return res.json(err);
+  }
+  return res.json(userProfile);
+});
+
 module.exports = router;

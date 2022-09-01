@@ -1,50 +1,90 @@
 import React, { useEffect, useState } from 'react';
 import { BiHeart } from 'react-icons/bi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, createSearchParams } from 'react-router-dom';
 import { FaEthereum } from 'react-icons/fa';
+import { addLike, getLikes, getCollection } from '../adapters/marketItems';
+import { getUserData, me } from '../adapters/user';
+import { useQuery } from 'react-query';
 
 const style = {
-  wrapper: `bg-[#303339] flex-auto w-[14rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer`,
+  wrapper: `bg-white flex-auto w-[18rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer`,
   imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
   nftImg: `w-full object-cover`,
   details: `p-3`,
-  info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
+  info: `flex justify-between text-black drop-shadow-xl`,
   infoLeft: `flex-0.6 flex-wrap`,
-  collectionName: `font-semibold text-sm text-[#8a939b]`,
+  collectionName: `font-semibold text-sm text-black`,
   assetName: `font-bold text-lg mt-2`,
   infoRight: `flex-0.4 text-right`,
-  priceTag: `font-semibold text-sm text-[#8a939b]`,
+  priceTag: `font-semibold text-sm text-black`,
   priceValue: `flex items-center text-xl font-bold mt-2`,
   ethLogo: `h-5 mr-2`,
-  likes: `text-[#8a939b] font-bold flex items-center w-full justify-end mt-3`,
+  likes: `text-black font-bold flex items-center w-full justify-end mt-3`,
   likeIcon: `text-xl mr-2`,
 };
 
-const NFTCard = ({ nftItem, title, listings }: any) => {
+const NFTCard = ({
+  nftItem,
+  title,
+  listings,
+  collectionContractAddress,
+}: any) => {
+  console.log(title);
   console.log(nftItem);
   console.log(nftItem.metadata.id.toNumber());
+  console.log(listings);
+  console.log(collectionContractAddress);
   const navigate = useNavigate();
   const [isListed, setIsListed] = useState(false);
   const [price, setPrice] = useState(0);
-
+  const [collection, setCollection]: any = useState();
+  const params = { isListed: `${isListed}`, collection: `${collection}` };
+  const { data, isError, refetch } = useQuery('me', me);
+  const [userData, setUserData]: any = useState([]);
+  useEffect(() => {
+    (async () => {
+      await me();
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
+      console.log(data);
+      setUserData(await getUserData(data.email));
+    })();
+  }, [data]);
   useEffect(() => {
     const listing = listings.find(
       (listing: any) =>
-        listing.asset.id.toNumber() === nftItem.metadata.id.toNumber()
+        listing.asset.id.toNumber() === nftItem.metadata.id.toNumber() &&
+        collectionContractAddress === listing.assetContractAddress
     );
     if (Boolean(listing)) {
       // console.log(listing);
       setIsListed(true);
       setPrice(listing.buyoutCurrencyValuePerToken.displayValue);
     }
-  }, [listings, nftItem]);
+    collectionContractAddress
+      ? setCollection(collectionContractAddress)
+      : setCollection(false);
+  }, [listings, nftItem, collectionContractAddress]);
+  const like = () => {
+    const likeData = {
+      collectionContractAddress: collectionContractAddress,
+      tokenId: nftItem.metadata.id.toNumber(),
+      nftName: title,
+    };
+    // addLike(likeData);
+    // getLikes(collectionContractAddress);
+    getCollection(collectionContractAddress);
+    console.log(userData);
+  };
   return (
     <div
       className={style.wrapper}
       onClick={() => {
         navigate({
           pathname: `/nfts/${nftItem.metadata.id}`,
-          search: `?isListed=${isListed}`,
+          search: `?${createSearchParams(params)}`,
         });
       }}
     >
@@ -73,7 +113,7 @@ const NFTCard = ({ nftItem, title, listings }: any) => {
         </div>
         <div className={style.likes}>
           <span className={style.likeIcon}>
-            <BiHeart />
+            <BiHeart onClick={like} />
           </span>
           {nftItem.likes}
         </div>
