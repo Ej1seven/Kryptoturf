@@ -137,7 +137,7 @@ router.route('/upload').get((req: any, res: any) => {
   res.sendFile('/uploads/');
 });
 router.route('/likes').post(async (req: Request, res: Response) => {
-  const { collectionContractAddress, tokenId, nftName } = req.body;
+  const { collectionContractAddress, tokenId, nftName, email } = req.body;
   console.log('body request', req.body);
   let post: any;
   try {
@@ -146,6 +146,7 @@ router.route('/likes').post(async (req: Request, res: Response) => {
         tokenId: tokenId,
         nftName: nftName,
         collectionContractAddress: collectionContractAddress,
+        email: email,
       },
     });
     post = like;
@@ -172,5 +173,22 @@ router.route('/likes/:id').get(async (req: Request, res: Response) => {
     return res.json(err);
   }
   return res.json(likes);
+});
+router.route('/likes/:id').delete(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log(id);
+  let deletedLike;
+  try {
+    const deleteLike = await prisma.like.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    deletedLike = deleteLike;
+  } catch (err: any) {
+    console.log(err);
+    return res.json(err);
+  }
+  return res.json(deletedLike);
 });
 module.exports = router;

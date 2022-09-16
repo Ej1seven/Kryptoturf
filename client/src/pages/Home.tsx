@@ -10,6 +10,7 @@ import {
 import { useQuery } from 'react-query';
 import { me } from '../adapters/user';
 import toast, { Toaster } from 'react-hot-toast';
+import axios from 'axios';
 
 interface HomeProps {}
 

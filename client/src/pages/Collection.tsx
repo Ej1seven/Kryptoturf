@@ -38,6 +38,7 @@ const style = {
 };
 
 export const Collection: React.FC<CollectionsProps> = ({}) => {
+  const URL = process.env.REACT_APP_PHOTO_API_URL;
   let { id }: any = useParams();
   const { provider } = useWeb3();
   const [nfts, setNfts] = useState([]);
@@ -75,16 +76,16 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
       '0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8'
     );
     console.log(
-      sdk.getMarketplace('0x06f2DcAc14A483d2854Ee36D163B2d32bE2d8543')
+      sdk.getMarketplace('0x487105F54635F1351998d3e7A07dd140ACD67758')
     );
     console.log(contract.sales);
-    return sdk.getMarketplace('0x06f2DcAc14A483d2854Ee36D163B2d32bE2d8543');
+    return sdk.getMarketplace('0x487105F54635F1351998d3e7A07dd140ACD67758');
   }, [provider]);
 
   useEffect(() => {
     if (!marketPlaceModule) return;
     (async () => {
-      setListings(await marketPlaceModule.getActiveListings());
+      setListings(await marketPlaceModule.getAllListings());
       await console.log(marketPlaceModule);
     })();
     console.log(listings);
@@ -121,7 +122,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
           alt="banner"
           src={
             collectionItem?.bannerImage
-              ? `http://localhost:3001/uploads/${collectionItem.bannerImage}`
+              ? `${URL}/${collectionItem.bannerImage}`
               : 'https://via.placeholder.com/200'
           }
         />
@@ -132,7 +133,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
             className={style.profileImg}
             src={
               collectionItem?.profileImage
-                ? `http://localhost:3001/uploads/${collectionItem.logoImage}`
+                ? `${URL}/${collectionItem.logoImage}`
                 : 'https://via.placeholder.com/200'
             }
             alt="profile image"

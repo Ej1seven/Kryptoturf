@@ -27,8 +27,11 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     // handleChange,
     isLoading,
   } = useContext(TransactionContext);
+  const photoURL = process.env.REACT_APP_PHOTO_API_URL;
+  const apiURL = process.env.REACT_APP_API_URL;
   const { data, isError, refetch } = useQuery('me', me);
   const queryClient = useQueryClient();
+  const [allNfts, setAllNfts]: any = useState([]);
   const [listings, setListings]: any = useState([]);
   const [userData, setUserData]: any = useState([]);
   const [collections, setCollections]: any = useState([]);
@@ -71,7 +74,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     await photoData.append('image', profileImage.raw);
     await photoData.append('image', bannerImage.raw);
     await axios
-      .post(`http://localhost:3001/userAuth/upload`, photoData, {
+      .post(`${apiURL}/userAuth/upload`, photoData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -126,7 +129,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   };
   let WALLET_PRIVATE_KEY: any = process.env.REACT_APP_WALLET_PRIVATE_KEY;
   const rpcUrl =
-    'https://eth-rinkeby.alchemyapi.io/v2/hKF-ScD-E399jeGhRfiT0VkwkUzeoJ8g';
+    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
   const wallet: any = new ethers.Wallet(
     WALLET_PRIVATE_KEY,
     ethers.getDefaultProvider(rpcUrl)
@@ -142,9 +145,10 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     if (!marketPlaceModule) return;
     let collectionsArray: any = [];
     let createdCollectionsArray: any = [];
+    let allNftsArray: any = [];
     (async () => {
       const marketplace = await marketPlaceModule.getMarketplace(
-        '0x06f2DcAc14A483d2854Ee36D163B2d32bE2d8543'
+        '0x487105F54635F1351998d3e7A07dd140ACD67758'
       );
       setListings(await marketplace.getActiveListings());
     })();
@@ -154,6 +158,15 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
         const contract = await sdk.getNFTCollection(
           collections[x].contractAddress
         );
+        const allNfts = await contract.getAll();
+        allNfts.map((nft) => {
+          let nftObject = {
+            nft: nft,
+            collectionContractAddress: collections[x].contractAddress,
+            createdBy: collections[x].createdBy,
+          };
+          allNftsArray.push(nftObject);
+        });
         const nfts = await contract.getOwned(currentAccount);
         // console.log(nfts);
         await nfts.map((nft) => {
@@ -176,11 +189,13 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       setCollectedNFTS(collectionsArray);
       setCreatedNFTS(createdCollectionsArray);
     }
+    setAllNfts(allNftsArray);
   }, [marketPlaceModule]);
   console.log(collectedNFTS);
   console.log(createdNFTS);
   console.log(listings);
   console.log(collections);
+  console.log(allNfts);
 
   let date: any = new Date(data?.createdAt);
   useEffect(() => {
@@ -198,8 +213,11 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   }, [data]);
   useEffect(() => {
     (async () => {
-      console.log(userData.bannerImage);
+      console.log(userData);
       console.log(userData.profileImage);
+      userData.likes.forEach((like: any) => {
+        console.log(like.nftName);
+      });
     })();
   }, [userData]);
   console.log(data);
@@ -213,7 +231,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
               {' '}
               <img
                 alt="banner"
-                src={`http://localhost:3001/uploads/${userData?.bannerImage}`}
+                src={`${photoURL}/${userData?.bannerImage}`}
                 className="w-full object-cover"
               />
             </>
@@ -248,7 +266,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
           <>
             <label htmlFor="upload-profile-image">
               <img
-                src={`http://localhost:3001/uploads/${userData?.profileImage}`}
+                src={`${photoURL}/${userData?.profileImage}`}
                 alt="dummy"
                 className=" rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px] border-[5px] border-black border-solid"
               />
@@ -404,17 +422,35 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
             )}
             {displayNFTS === 'liked' && (
               <>
-                {collectedNFTS.map((nftItem: any, id: any) => (
-                  <NFTCard
-                    key={id}
-                    nftItem={nftItem.nft}
-                    title={nftItem?.nft.metadata.name}
-                    listings={listings}
-                    collectionContractAddress={
-                      nftItem.collectionContractAddress
-                    }
-                  />
-                ))}
+                {/* <>
+                  {userData.likes.map((like: any, idx: any) => {
+                    return <p key={idx}>{like.nftName}</p>;
+                  })}
+                </> */}
+                {userData.likes.map((like: any, idx: any) => {
+                  return (
+                    <div key={idx}>
+                      {' '}
+                      {allNfts.map((nftItem: any, id: any) => (
+                        <>
+                          {like.nftName === nftItem?.nft.metadata.name && (
+                            <>
+                              <NFTCard
+                                key={id}
+                                nftItem={nftItem.nft}
+                                title={nftItem?.nft.metadata.name}
+                                listings={listings}
+                                collectionContractAddress={
+                                  nftItem.collectionContractAddress
+                                }
+                              />
+                            </>
+                          )}
+                        </>
+                      ))}
+                    </div>
+                  );
+                })}
               </>
             )}
             {displayNFTS === 'collections' && (

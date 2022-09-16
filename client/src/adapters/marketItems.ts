@@ -1,5 +1,6 @@
 import axios from 'axios';
-const URL = 'http://localhost:3001/marketItems';
+const apiURL = process.env.REACT_APP_API_URL;
+const URL = `${apiURL}/marketItems`;
 export let collectionItem: any;
 
 export async function createCollection(collection: {
@@ -59,6 +60,7 @@ export async function addLike(like: {
   collectionContractAddress: String;
   tokenId: Number;
   nftName: String;
+  email: String;
 }) {
   console.log(like);
   return await axios
@@ -68,6 +70,7 @@ export async function addLike(like: {
         collectionContractAddress: like.collectionContractAddress,
         tokenId: like.tokenId,
         nftName: like.nftName,
+        email: like.email,
       },
       { withCredentials: true }
     )
@@ -81,6 +84,15 @@ export async function getLikes(collectionContractAddress: String) {
   console.log(collectionContractAddress);
   return await axios
     .get(`${URL}/likes/${collectionContractAddress}`, { withCredentials: true })
+    .then((res): any => {
+      console.log(res.data);
+      return res.data;
+    });
+}
+export async function deleteLike(id: Number) {
+  console.log(id);
+  return await axios
+    .delete(`${URL}/likes/${id}`, { withCredentials: true })
     .then((res): any => {
       console.log(res.data);
       return res.data;

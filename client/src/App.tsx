@@ -22,10 +22,10 @@ import { Collections } from './pages/Collections';
 import { CreateCollection } from './pages/CreateCollection';
 
 /**
- * The chain ID 4 represents the Rinkeby network
+ * The chain ID 5 represents the Goerli network
  * The 'injected' connector is a web3 connection method used by Metamask
  */
-const supportedChainIds = [4];
+const supportedChainIds = [5];
 const connectors = {
   injected: {},
 };

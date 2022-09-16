@@ -212,7 +212,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
 
   //Use the network you created the initial project on
   const rpcUrl =
-    'https://eth-rinkeby.alchemyapi.io/v2/hKF-ScD-E399jeGhRfiT0VkwkUzeoJ8g';
+    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
   const wallet = new ethers.Wallet(
     WALLET_PRIVATE_KEY,
     ethers.getDefaultProvider(rpcUrl)

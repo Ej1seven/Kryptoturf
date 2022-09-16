@@ -249,22 +249,37 @@ router.route('/upload').get((req, res) => {
     res.sendFile('/uploads/');
 });
 router.route('/user').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
+    const { emailOrContractAddress } = req.body;
     console.log('body request', req.body);
     let userProfile;
     try {
-        const user = yield prisma.user.findUnique({
-            where: {
-                email: email,
-            },
-            include: {
-                likes: true, // Return all fields
-            },
-        });
+        const user = yield prisma.user.findUnique(emailOrContractAddress.includes('@')
+            ? {
+                where: {
+                    email: emailOrContractAddress,
+                },
+                include: {
+                    likes: true, // Return all fields
+                },
+            }
+            : {
+                where: {
+                    walletAddress: emailOrContractAddress,
+                },
+                include: {
+                    likes: true, // Return all fields
+                },
+            });
+        // const user = await User.findOne(
+        //   usernameOrEmail.includes('@')
+        //     ? { where: { email: usernameOrEmail } }
+        //     : { where: { username: usernameOrEmail } }
+        // );
         console.log(user);
         userProfile = user;
     }
     catch (err) {
+        console.log(err);
         return res.json(err);
     }
     return res.json(userProfile);

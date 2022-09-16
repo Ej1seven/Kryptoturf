@@ -49,6 +49,7 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
     // handleChange,
     isLoading,
   } = useContext(TransactionContext);
+  const apiURL = process.env.REACT_APP_PHOTO_API_URL;
   const { provider } = useWeb3();
   const { data, isError, refetch } = useQuery('me', me);
   // console.log(data.username);
@@ -176,7 +177,7 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
     process.env.REACT_APP_PRIMARY_FEE_RECIPIENT;
   //Use the network you created the initial project on
   const rpcUrl =
-    'https://eth-rinkeby.alchemyapi.io/v2/hKF-ScD-E399jeGhRfiT0VkwkUzeoJ8g';
+    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
   const wallet = new ethers.Wallet(
     WALLET_PRIVATE_KEY,
     ethers.getDefaultProvider(rpcUrl)
@@ -210,7 +211,7 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
     await photoData.append('image', profileImage.raw);
     await photoData.append('image', bannerImage.raw);
     await axios
-      .post(`http://localhost:3001/marketItems/upload`, photoData, {
+      .post(`${apiURL}/marketItems/upload`, photoData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

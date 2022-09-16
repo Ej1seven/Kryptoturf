@@ -18,33 +18,7 @@ model User {
   profileImage  String?
   bannerImage   String? 
   likes          Like[]
-  // NFTS NFTS[] 
 }
-
-// model NFTS {
-//   id       Int  @id @default(autoincrement())
-//   owner User? @relation(fields: [walletAddress], references: [walletAddress])
-//   walletAddress String @unique
-//   image Image?
-//   name          String   @unique 
-//   externalLink  String   @unique 
-//   description   String   @unique 
-//   collection    String   @unique 
-//   supply        String   @unique 
- 
-// }
-
-// model Image {
-//   id     Int  @id @default(autoincrement())
-//   nftData   NFTS? @relation(fields: [walletAddress], references: [walletAddress])
-//   walletAddress String @unique// relation scalar field (used in the `@relation` attribute above)
-//   name String @unique
-//   lastModified Int 
-//   lastModifiedDate DateTime
-//   size Int
-//   type String
-//   webkitRelativePath String
-// }
 
 model MarketItems {
   title          String   @unique
@@ -69,3 +43,15 @@ model Like {
   email String
 }
 
+// model NftTransactions {
+//   id String   @id @default(cuid())
+//   collectionContractAddress String   
+//   nftId String   
+//   event String   
+//   price String
+//   createdAt DateTime @default(now())
+//   from String 
+//   to String?
+//   blockNumber String 
+//   txHash String
+// }

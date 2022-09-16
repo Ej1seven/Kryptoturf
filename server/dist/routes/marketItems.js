@@ -132,7 +132,7 @@ router.route('/upload').get((req, res) => {
     res.sendFile('/uploads/');
 });
 router.route('/likes').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { collectionContractAddress, tokenId, nftName } = req.body;
+    const { collectionContractAddress, tokenId, nftName, email } = req.body;
     console.log('body request', req.body);
     let post;
     try {
@@ -141,6 +141,7 @@ router.route('/likes').post((req, res) => __awaiter(void 0, void 0, void 0, func
                 tokenId: tokenId,
                 nftName: nftName,
                 collectionContractAddress: collectionContractAddress,
+                email: email,
             },
         });
         post = like;
@@ -169,5 +170,23 @@ router.route('/likes/:id').get((req, res) => __awaiter(void 0, void 0, void 0, f
         return res.json(err);
     }
     return res.json(likes);
+}));
+router.route('/likes/:id').delete((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    console.log(id);
+    let deletedLike;
+    try {
+        const deleteLike = yield prisma.like.delete({
+            where: {
+                id: Number(id),
+            },
+        });
+        deletedLike = deleteLike;
+    }
+    catch (err) {
+        console.log(err);
+        return res.json(err);
+    }
+    return res.json(deletedLike);
 }));
 module.exports = router;

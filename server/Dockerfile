@@ -26,4 +26,4 @@ ENV NODE_ENV=production
 EXPOSE 8080
 CMD [ "node", "dist/server.js"]
 # At the end, set the user to use when running this image
-USER node
+USER root

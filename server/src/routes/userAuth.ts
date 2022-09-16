@@ -250,21 +250,38 @@ router.route('/upload').get((req: any, res: any) => {
   res.sendFile('/uploads/');
 });
 router.route('/user').post(async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const { emailOrContractAddress } = req.body;
   console.log('body request', req.body);
   let userProfile: any;
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-      include: {
-        likes: true, // Return all fields
-      },
-    });
+    const user = await prisma.user.findUnique(
+      emailOrContractAddress.includes('@')
+        ? {
+            where: {
+              email: emailOrContractAddress,
+            },
+            include: {
+              likes: true, // Return all fields
+            },
+          }
+        : {
+            where: {
+              walletAddress: emailOrContractAddress,
+            },
+            include: {
+              likes: true, // Return all fields
+            },
+          }
+    );
+    // const user = await User.findOne(
+    //   usernameOrEmail.includes('@')
+    //     ? { where: { email: usernameOrEmail } }
+    //     : { where: { username: usernameOrEmail } }
+    // );
     console.log(user);
     userProfile = user;
   } catch (err: any) {
+    console.log(err);
     return res.json(err);
   }
   return res.json(userProfile);

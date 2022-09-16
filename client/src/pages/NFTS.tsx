@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Navbar } from '../components/Navbar';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import { useWeb3 } from '@3rdweb/hooks';
@@ -15,9 +15,10 @@ import { FaEthereum } from 'react-icons/fa';
 import { BsCalendar3 } from 'react-icons/bs';
 import { DateRange } from 'react-date-range';
 import { format, addDays } from 'date-fns';
+import { TransactionContext } from '../context/TransactionContext';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
-
+import axios from 'axios';
 interface NFTSProps {}
 
 const ethPrice = require('eth-price');
@@ -54,6 +55,15 @@ const style = {
 };
 
 export const NFTS: React.FC<NFTSProps> = ({}) => {
+  const cheerio = require('cheerio');
+  const {
+    connectWallet,
+    currentAccount,
+    // formData,
+    sendTransaction,
+    // handleChange,
+    isLoading,
+  } = useContext(TransactionContext);
   let { id }: any = useParams();
   console.log(id);
   const [searchParams]: any = useSearchParams();
@@ -78,9 +88,24 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
   const [duration, setDuration] = useState('1 month');
   const [customDuration, setCustomDuration] = useState();
   const [days, setDays]: any = useState(0);
+  const [transactionReciept, setTransactionReciept]: any = useState({
+    collectionContractAddress: searchParams.get('collection'),
+    nftId: id,
+    event: null,
+    price: null,
+    from: currentAccount,
+    to: null,
+    blockNumber: null,
+    txHash: null,
+  });
+  let [transactionData, setTransactionData]: any = useState({
+    price: null,
+  });
   const navigate = useNavigate();
   console.log(searchParams.get('isListed'));
   console.log(searchParams.get('collection'));
+  console.log(selectedNft);
+  console.log(new Date());
 
   const enableToggleMenu = () => {
     setToggleMenu(true);
@@ -90,6 +115,55 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
     const sdk = new ThirdwebSDK(provider.getSigner());
     return sdk.getNFTDrop(searchParams.get('collection'));
   }, [provider]);
+
+  useEffect(() => {
+    let blockNumber;
+    (async () => {
+      let contractAddress = await searchParams.get('collection');
+
+      await axios
+        .get(
+          `https://api-goerli.etherscan.io/api?module=account&action=tokennfttx&contractaddress=${contractAddress}&sort=asc&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
+        )
+        .then(async (res) => {
+          const nftData = res.data;
+          console.log(nftData);
+          nftData.result.map((result: any) => {
+            if (result.tokenID === id) {
+              (async () => {
+                console.log('matching id!');
+                console.log(result.blockNumber);
+                console.log(result.hash);
+                let transactionHash = await result.hash;
+                await axios
+                  .get(
+                    `https://api-goerli.etherscan.io/api?module=account&action=txlistinternal&txhash=${transactionHash}&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
+                    // `https://api-goerli.etherscan.io/api?module=account&action=txlistinternal&txhash=${transactionHash}&sort=asc&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
+                  )
+                  .then(async (res: any) => {
+                    let priceValue =
+                      res.data.result[res.data.result.length - 1].value;
+                    console.log(priceValue.toFixed(2));
+                  });
+              })();
+            }
+          });
+          console.log(nftData.result[0].tokenID);
+          console.log(id);
+          return res.data;
+        });
+    })();
+    (async () => {
+      await axios
+        .get(
+          `https://api-goerli.etherscan.io/api?module=account&action=txlist&address=0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
+        )
+        .then((res) => {
+          console.log(res.data);
+          return res.data;
+        });
+    })();
+  }, []);
 
   useEffect(() => {
     if (!nftModule) return;
@@ -117,7 +191,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
 
-    return sdk.getMarketplace('0x06f2DcAc14A483d2854Ee36D163B2d32bE2d8543');
+    return sdk.getMarketplace('0x487105F54635F1351998d3e7A07dd140ACD67758');
   }, [provider]);
 
   useEffect(() => {
@@ -206,7 +280,19 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
     const listingId = await tx.id; // the id of the newly created listing
     console.log(receipt);
     console.log(listingId);
+    // setTransactionReciept({
+    //   collectionContractAddress: searchParams.get('collection'),
+    //   nftId: id,
+    //   event: 'List',
+    //   price: buyoutPricePerToken,
+    //   from: currentAccount,
+    //   to: null,
+    //   date: new Date(),
+    //   blockNumber: receipt.blockNumber,
+    //   txHash: receipt.transactionHash,
+    // });
   };
+  console.log(transactionReciept);
   console.log(eth);
   return (
     <div>
@@ -216,10 +302,16 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
           <div className={style.container}>
             <div className={style.topContent}>
               <div className={style.nftImgContainer}>
-                <NFTImage selectedNft={selectedNft} />
+                <NFTImage
+                  selectedNft={selectedNft}
+                  collectionContractAddress={searchParams.get('collection')}
+                />
               </div>
               <div className={style.detailsContainer}>
-                <GeneralDetails selectedNft={selectedNft} />
+                <GeneralDetails
+                  collectionContractAddress={searchParams.get('collection')}
+                  selectedNft={selectedNft}
+                />
                 <Purchase
                   isListed={searchParams.get('isListed')}
                   selectedNft={selectedNft}
@@ -406,7 +498,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
               handleChange={handleChange}
               value={null}
             /> */}
-              <div className="w-full flex flex-row justify-between">
+              {/* <div className="w-full flex flex-row justify-between">
                 <div className="w-3/4	">
                   <Input
                     placeholder="Fee Recipient"
@@ -416,7 +508,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
                     value={null}
                   />
                 </div>
-              </div>
+              </div> */}
               <div className="flex flex-row w-full mt-2 items-center">
                 <button
                   className="text-white w-1/2  mr-1 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer "

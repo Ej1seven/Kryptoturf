@@ -12,7 +12,13 @@ module.exports = {
       ],
     },
     rinkeby: {
-      url: 'https://eth-rinkeby.alchemyapi.io/v2/hKF-ScD-E399jeGhRfiT0VkwkUzeoJ8g',
+      url: 'https://eth-.alchemyapi.io/v2/hKF-ScD-E399jeGhRfiT0VkwkUzeoJ8g',
+      accounts: [
+        'e5cff1fcb3bb9263947919ac9cc412624884e542adf0efcde690f1a232c78516',
+      ],
+    },
+    goerli: {
+      url: 'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p',
       accounts: [
         'e5cff1fcb3bb9263947919ac9cc412624884e542adf0efcde690f1a232c78516',
       ],

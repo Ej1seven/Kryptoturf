@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaEthereum } from 'react-icons/fa';
 import { MdPhotoSizeSelectLarge } from 'react-icons/md';
 
+const URL = process.env.REACT_APP_PHOTO_API_URL;
+
 const style = {
   wrapper: ` flex-auto w-[18rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer`,
   imgContainer: `h-full w-full overflow-hidden flex justify-center items-center relative`,
@@ -51,7 +53,7 @@ const CollectionCard = ({ nftItem, title, listings }: any) => {
           <>
             {' '}
             <img
-              src={`http://localhost:3001/uploads/${nftItem.profileImage}`}
+              src={`${URL}/${nftItem.profileImage}`}
               alt="image"
               className={style.nftImg}
             />
@@ -77,7 +79,7 @@ const CollectionCard = ({ nftItem, title, listings }: any) => {
               <>
                 {' '}
                 <img
-                  src={`http://localhost:3001/uploads/${nftItem.logoImage}`}
+                  src={`${URL}/${nftItem.logoImage}`}
                   alt="image"
                   className={style.nftImg}
                 />

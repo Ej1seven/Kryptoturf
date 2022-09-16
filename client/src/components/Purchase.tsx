@@ -31,14 +31,16 @@ export const Purchase: React.FC<any> = ({
       setSelectedMarketNft(
         listings.find(
           (marketNft: any) =>
-            marketNft.asset?.id.toNumber() == selectedNft.metadata.id.toNumber()
+            marketNft.asset?.id.toNumber() ==
+              selectedNft.metadata.id.toNumber() &&
+            marketNft.asset?.name === selectedNft.metadata.name
         )
       );
       console.log(listings);
       console.log(selectedNft);
-      console.log(selectedMarketNft);
     })();
   }, [selectedNft, listings, isListed]);
+  console.log(selectedMarketNft);
 
   useEffect(() => {
     if (!selectedMarketNft || !selectedNft) return;
@@ -59,10 +61,11 @@ export const Purchase: React.FC<any> = ({
     marketModule = marketPlaceModule
   ) => {
     console.log(Number(listingId), quantityDesired, marketModule, 'david');
-    await marketModule.direct
+    const tx = await marketModule.direct
       .buyoutListing(Number(listingId), quantityDesired)
       .catch((error: any) => console.error(error));
-
+    const receipt = await tx.receipt; // the transaction receipt
+    console.log(receipt);
     confirmPurchase();
   };
   const listItem: any = async (

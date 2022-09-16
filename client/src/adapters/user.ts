@@ -133,18 +133,18 @@ export async function addImages(images: {
     });
 }
 
-export async function getUserData(email: String) {
-  console.log(email);
+export async function getUserData(emailOrContractAddress: String) {
+  console.log(emailOrContractAddress);
   return await axios
     .post(
       `${URL}/userAuth/user`,
       {
-        email: email,
+        emailOrContractAddress: emailOrContractAddress,
       },
       { withCredentials: true }
     )
     .then((res): any => {
       console.log(res.data);
-      return res.data.userProfile;
+      return res.data;
     });
 }

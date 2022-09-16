@@ -108,6 +108,8 @@ const style = {
 };
 
 export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
+  const apiURL = process.env.REACT_APP_API_URL;
+
   const {
     connectWallet,
     currentAccount,
@@ -223,7 +225,7 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
     process.env.REACT_APP_PRIMARY_FEE_RECIPIENT;
   //Use the network you created the initial project on
   const rpcUrl =
-    'https://eth-rinkeby.alchemyapi.io/v2/hKF-ScD-E399jeGhRfiT0VkwkUzeoJ8g';
+    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
   const wallet = new ethers.Wallet(
     WALLET_PRIVATE_KEY,
     ethers.getDefaultProvider(rpcUrl)
@@ -260,10 +262,12 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
     await photoData.append('image', bannerImage.raw);
     await photoData.append('image', logoImage.raw);
     await axios
-      .post(`http://localhost:3001/marketItems/upload`, photoData, {
+      .post(`${apiURL}/marketItems/upload`, photoData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Allow-Origin': 'https://kryptoturf.com',
         },
       })
       .then((res): any => {

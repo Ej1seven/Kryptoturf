@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiFillHeart } from 'react-icons/ai';
 import { MdRefresh } from 'react-icons/md';
 import { RiShareBoxLine } from 'react-icons/ri';
 import { FiMoreVertical } from 'react-icons/fi';
 import { GiShare } from 'react-icons/gi';
+import { getCollection, getCollections } from '../adapters/marketItems';
+import { getUserData, me } from '../adapters/user';
+import { useQuery } from 'react-query';
 
 interface GeneralDetailsProps {}
 
@@ -22,19 +25,59 @@ const style = {
   divider: `border-r-2 `,
 };
 
-export const GeneralDetails: React.FC<any> = ({ selectedNft }) => {
+export const GeneralDetails: React.FC<any> = ({
+  selectedNft,
+  collectionContractAddress,
+}) => {
+  const { data, isError, refetch } = useQuery('me', me);
+  const [collections, setCollections]: any = useState([]);
+  const [collectionData, setCollectionData]: any = useState();
+  const [owner, setOwner]: any = useState();
+  const [likes, setLikes]: any = useState([]);
+  useEffect(() => {
+    (async () => {
+      await me();
+    })();
+  }, []);
+  useEffect(() => {
+    let likesArray;
+    (async () => {
+      setOwner(await getUserData(selectedNft.owner));
+      setCollectionData(await getCollection(collectionContractAddress));
+    })();
+  }, [selectedNft]);
+  useEffect(() => {
+    let likesArray: any = [];
+    (async () => {
+      await collectionData.likes.forEach((likeData: any) => {
+        // console.log(selectedNft.metadata.name);
+        // console.log(likeData.nftName);
+        if (selectedNft.metadata.name === likeData.nftName) {
+          console.log(likeData);
+          likesArray.push(likeData);
+        }
+      });
+    })();
+    setLikes(likesArray);
+  }, [collectionData]);
+  console.log(collectionData);
+  console.log(selectedNft);
+  console.log(owner);
+  console.log(likes);
   return (
     <div className={style.wrapper}>
       <div className={style.infoContainer}>
-        <div className={style.accent}>Bored Ape Yacht Club</div>
+        <div className={style.accent}>{collectionData?.title}</div>
         <div className={style.nftTitle}>{selectedNft?.metadata.name}</div>
         <div className={style.otherInfo}>
           <div className={style.ownedBy}>
-            Owned by <span className={style.accent}>e88vault</span>
+            Owned by <span className={style.accent}>{owner?.username}</span>
           </div>
           <div className={style.likes}>
             {' '}
-            <AiFillHeart className={style.likeIcon} /> 2.3K favorites
+            <AiFillHeart className={style.likeIcon} />
+            {likes?.length}
+            {likes?.length === 1 ? <> like</> : <> likes </>}
           </div>
         </div>
       </div>
