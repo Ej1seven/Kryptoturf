@@ -19,6 +19,10 @@ import { TransactionContext } from '../context/TransactionContext';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import axios from 'axios';
+import { addTransaction, getTransactions } from '../adapters/marketItems';
+import { Attributes } from '../components/Attributes';
+import { me } from '../adapters/user';
+import { useQuery } from 'react-query';
 interface NFTSProps {}
 
 const ethPrice = require('eth-price');
@@ -52,10 +56,11 @@ const style = {
   topContent: `flex`,
   nftImgContainer: `flex-1 mr-4`,
   detailsContainer: `flex-[2] ml-4`,
+  attributesContainer: `h-[400px] w-full my-2`,
 };
 
 export const NFTS: React.FC<NFTSProps> = ({}) => {
-  const cheerio = require('cheerio');
+  const convert = require('ether-converter');
   const {
     connectWallet,
     currentAccount,
@@ -88,20 +93,8 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
   const [duration, setDuration] = useState('1 month');
   const [customDuration, setCustomDuration] = useState();
   const [days, setDays]: any = useState(0);
-  const [transactionReciept, setTransactionReciept]: any = useState({
-    collectionContractAddress: searchParams.get('collection'),
-    nftId: id,
-    event: null,
-    price: null,
-    from: currentAccount,
-    to: null,
-    blockNumber: null,
-    txHash: null,
-  });
-  let [transactionData, setTransactionData]: any = useState({
-    price: null,
-  });
   const navigate = useNavigate();
+  const { data, isError, refetch } = useQuery('me', me);
   console.log(searchParams.get('isListed'));
   console.log(searchParams.get('collection'));
   console.log(selectedNft);
@@ -113,57 +106,15 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
   const nftModule = useMemo(() => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
+
     return sdk.getNFTDrop(searchParams.get('collection'));
   }, [provider]);
 
   useEffect(() => {
-    let blockNumber;
     (async () => {
-      let contractAddress = await searchParams.get('collection');
-
-      await axios
-        .get(
-          `https://api-goerli.etherscan.io/api?module=account&action=tokennfttx&contractaddress=${contractAddress}&sort=asc&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
-        )
-        .then(async (res) => {
-          const nftData = res.data;
-          console.log(nftData);
-          nftData.result.map((result: any) => {
-            if (result.tokenID === id) {
-              (async () => {
-                console.log('matching id!');
-                console.log(result.blockNumber);
-                console.log(result.hash);
-                let transactionHash = await result.hash;
-                await axios
-                  .get(
-                    `https://api-goerli.etherscan.io/api?module=account&action=txlistinternal&txhash=${transactionHash}&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
-                    // `https://api-goerli.etherscan.io/api?module=account&action=txlistinternal&txhash=${transactionHash}&sort=asc&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
-                  )
-                  .then(async (res: any) => {
-                    let priceValue =
-                      res.data.result[res.data.result.length - 1].value;
-                    console.log(priceValue.toFixed(2));
-                  });
-              })();
-            }
-          });
-          console.log(nftData.result[0].tokenID);
-          console.log(id);
-          return res.data;
-        });
+      await me();
     })();
-    (async () => {
-      await axios
-        .get(
-          `https://api-goerli.etherscan.io/api?module=account&action=txlist&address=0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=E44UGWPZPXRWE7EY4P7CXQQEUYMVYS6WNY`
-        )
-        .then((res) => {
-          console.log(res.data);
-          return res.data;
-        });
-    })();
-  }, []);
+  });
 
   useEffect(() => {
     if (!nftModule) return;
@@ -191,14 +142,22 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
 
-    return sdk.getMarketplace('0x487105F54635F1351998d3e7A07dd140ACD67758');
+    return sdk.getMarketplace('0xf82886b727f5a1eC48f1E683072c28C468f62885');
   }, [provider]);
 
   useEffect(() => {
     if (!marketPlaceModule) return;
     (async () => {
       setListings(await marketPlaceModule.getAllListings());
+      // const gasCostInGwei =
+      const gasCostInGwei =
+        // await marketPlaceModule.estimator.currentGasPriceInGwei();
+        // console.log(gasCostInGwei);
+        await marketPlaceModule.interceptor.overrideNextTransaction(() => ({
+          gasLimit: 5000000,
+        }));
       console.log(listings);
+      // console.log(gasCostInGwei);
     })();
   }, [marketPlaceModule]);
 
@@ -278,21 +237,25 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
     const tx = await marketPlaceModule.direct.createListing(listing);
     const receipt = await tx.receipt; // the transaction receipt
     const listingId = await tx.id; // the id of the newly created listing
+    const transactionData: any = await {
+      collectionContractAddress: searchParams.get('collection'),
+      tokenId: Number(id),
+      event: receipt.events[0].event,
+      price: Number(buyoutPricePerToken),
+      from: receipt.from,
+      to: receipt.to,
+      blockNumber: Number(receipt.blockNumber),
+      txHash: receipt.transactionHash,
+    };
+    console.log(transactionData);
+    await addTransaction(transactionData);
     console.log(receipt);
     console.log(listingId);
-    // setTransactionReciept({
-    //   collectionContractAddress: searchParams.get('collection'),
-    //   nftId: id,
-    //   event: 'List',
-    //   price: buyoutPricePerToken,
-    //   from: currentAccount,
-    //   to: null,
-    //   date: new Date(),
-    //   blockNumber: receipt.blockNumber,
-    //   txHash: receipt.transactionHash,
-    // });
+    console.log(
+      'collectionContractAddress',
+      await searchParams.get('collection')
+    );
   };
-  console.log(transactionReciept);
   console.log(eth);
   return (
     <div>
@@ -319,10 +282,22 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
                   marketPlaceModule={marketPlaceModule}
                   collection={searchParams.get('collection')}
                   enableToggleMenu={enableToggleMenu}
+                  id={id}
+                  user={data}
                 />
               </div>
             </div>
-            <ItemActivity />
+            <div className={style.attributesContainer}>
+              <Attributes
+                selectedNft={selectedNft}
+                collectionContractAddress={searchParams.get('collection')}
+                id={id}
+              />
+            </div>
+            <ItemActivity
+              collectionContractAddress={searchParams.get('collection')}
+              id={id}
+            />
           </div>
         ) : (
           <div className="flex justify-center">

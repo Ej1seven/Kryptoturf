@@ -98,3 +98,85 @@ export async function deleteLike(id: Number) {
       return res.data;
     });
 }
+
+export async function addTransaction(transaction: {
+  collectionContractAddress: String;
+  tokenId: Number;
+  event: String;
+  price?: Number;
+  from?: String;
+  to?: String;
+  blockNumber: Number;
+  txHash: String;
+}) {
+  console.log(transaction);
+  return await axios
+    .post(
+      `${URL}/transactions`,
+      {
+        collectionContractAddress: transaction.collectionContractAddress,
+        tokenId: transaction.tokenId,
+        event: transaction.event,
+        price: transaction.price,
+        from: transaction.from,
+        to: transaction.to,
+        blockNumber: transaction.blockNumber,
+        txHash: transaction.txHash,
+      },
+      { withCredentials: true }
+    )
+    .then((res): any => {
+      console.log(res.data);
+      // collectionItem = res.data;
+      return res.data;
+    });
+}
+export async function getTransactions(
+  collectionContractAddress: String,
+  tokenId: String
+) {
+  console.log(collectionContractAddress);
+  console.log(tokenId);
+  return await axios
+    .get(`${URL}/transactions/${collectionContractAddress}/${tokenId}`, {
+      withCredentials: true,
+    })
+    .then((res): any => {
+      console.log(res.data);
+      return res.data;
+    });
+}
+export async function collectionTransactions(
+  collectionContractAddress: String
+) {
+  console.log(collectionContractAddress);
+  return await axios
+    .get(`${URL}/allTransactions/${collectionContractAddress}`, {
+      withCredentials: true,
+    })
+    .then((res): any => {
+      console.log(res.data);
+      return res.data;
+    });
+}
+
+export async function updateTradedVolume(
+  contractAddress: String,
+  volume: Number
+) {
+  console.log(contractAddress);
+  console.log(volume);
+  return await axios
+    .put(
+      `${URL}/collection`,
+      {
+        contractAddress: contractAddress,
+        volume: volume,
+      },
+      { withCredentials: true }
+    )
+    .then((res): any => {
+      console.log(res.data);
+      return res.data;
+    });
+}

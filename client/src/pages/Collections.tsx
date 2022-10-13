@@ -16,6 +16,7 @@ import { createCollection, getCollections } from '../adapters/marketItems';
 import { useNFTCollection } from '@thirdweb-dev/react';
 import CollectionCard from '../components/CollectionCard';
 import { Navbar } from '../components/Navbar';
+import NFTCard from '../components/NFTCard';
 interface CollectionsProps {}
 
 const style = {
@@ -50,24 +51,48 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
     isLoading,
   } = useContext(TransactionContext);
   const apiURL = process.env.REACT_APP_PHOTO_API_URL;
-  const { provider } = useWeb3();
   const { data, isError, refetch } = useQuery('me', me);
+  const [listings, setListings]: any = useState([]);
+  const [toggleNFTS, setToggleNFTS]: any = useState(false);
   // console.log(data.username);
   const [screenShot, setScreenshot] = useState(undefined);
   const [collections, setCollections]: any = useState([]);
   const [marketplaceCollections, setMarketplaceCollections] = useState([]);
+  const [allNfts, setAllNfts]: any = useState([]);
+  const { provider } = useWeb3();
 
   const marketPlaceModule = useMemo(() => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
     return sdk;
   }, [provider]);
+  let WALLET_PRIVATE_KEY: any = process.env.REACT_APP_WALLET_PRIVATE_KEY;
+  const REACT_APP_MODULE_ADDRESS: any = process.env.REACT_APP_MODULE_ADDRESS;
+  const REACT_APP_PRIMARY_FEE_RECIPIENT: any =
+    process.env.REACT_APP_PRIMARY_FEE_RECIPIENT;
+  //Use the network you created the initial project on
+  const rpcUrl =
+    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
+  const wallet = new ethers.Wallet(
+    WALLET_PRIVATE_KEY,
+    ethers.getDefaultProvider(rpcUrl)
+  );
+  const sdk = new ThirdwebSDK(wallet);
+  const getModule = sdk.getNFTCollection(
+    REACT_APP_MODULE_ADDRESS
+    //The address of you the module you created in ThirdWeb
+  );
 
   useEffect(() => {
     if (!marketPlaceModule) return;
     let collectionsArray: any = [];
     for (let x = 0; x <= collections.length - 1; x++) {
       (async () => {
+        const marketplace = await marketPlaceModule.getMarketplace(
+          '0xf82886b727f5a1eC48f1E683072c28C468f62885'
+        );
+        setListings(await marketplace.getActiveListings());
+
         const contract = await sdk.getNFTCollection(
           collections[x].contractAddress
         );
@@ -85,6 +110,32 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
       await setCollections(collections);
     })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      console.log(collections);
+      let allNftsArray: any = [];
+      for (let x = 0; x <= collections.length - 1; x++) {
+        (async () => {
+          console.log(collections[x]);
+          const contract = await sdk.getNFTCollection(
+            collections[x].contractAddress
+          );
+          const allNfts = await contract.getAll();
+          allNfts.map((nft) => {
+            let nftObject = {
+              nft: nft,
+              collectionContractAddress: collections[x].contractAddress,
+              createdBy: collections[x].createdBy,
+            };
+            allNftsArray.push(nftObject);
+          });
+        })();
+      }
+      setAllNfts(allNftsArray);
+    })();
+  }, [collections]);
+  console.log(allNfts);
   const [profileImage, setProfileImage] = useState({
     preview: '',
     raw: '',
@@ -171,22 +222,6 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
     console.log(e.target.value);
     setAttributes((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
-  let WALLET_PRIVATE_KEY: any = process.env.REACT_APP_WALLET_PRIVATE_KEY;
-  const REACT_APP_MODULE_ADDRESS: any = process.env.REACT_APP_MODULE_ADDRESS;
-  const REACT_APP_PRIMARY_FEE_RECIPIENT: any =
-    process.env.REACT_APP_PRIMARY_FEE_RECIPIENT;
-  //Use the network you created the initial project on
-  const rpcUrl =
-    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
-  const wallet = new ethers.Wallet(
-    WALLET_PRIVATE_KEY,
-    ethers.getDefaultProvider(rpcUrl)
-  );
-  const sdk = new ThirdwebSDK(wallet);
-  const getModule = sdk.getNFTCollection(
-    REACT_APP_MODULE_ADDRESS
-    //The address of you the module you created in ThirdWeb
-  );
 
   const createNFTCollection = async () => {
     console.log(REACT_APP_PRIMARY_FEE_RECIPIENT);
@@ -291,19 +326,9 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
       <Navbar />
       <div>
         <div className="w-full h-8 text-white font-bold text-4xl text-center">
-          Collections
+          {!toggleNFTS ? 'Collections' : 'NFTS'}
         </div>
         <div className="flex flex-row-reverse">
-          <div className="mx-4">
-            {' '}
-            <button
-              type="button"
-              onClick={createNFTCollection}
-              className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full white-glassmorphism cursor-pointer py-2 px-7"
-            >
-              Filter
-            </button>
-          </div>
           <div>
             {' '}
             <button
@@ -311,22 +336,50 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
               onClick={createNFTCollection}
               className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full white-glassmorphism cursor-pointer py-2 px-7"
             >
-              Sort
+              Sort By
+            </button>
+          </div>
+          <div className="mx-4">
+            {' '}
+            <button
+              type="button"
+              onClick={() => setToggleNFTS(!toggleNFTS)}
+              className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full white-glassmorphism cursor-pointer py-2 px-7"
+            >
+              {!toggleNFTS ? 'View NFTS' : 'View Collections'}
             </button>
           </div>
         </div>
       </div>
       <div className="flex justify-center">
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
-          {collections.map((nftItem: any, id: any) => (
-            <CollectionCard
-              key={id}
-              nftItem={nftItem}
-              className=""
-              // title={collectionItem?.title}
-              // listings={listings}
-            />
-          ))}
+          {!toggleNFTS ? (
+            <>
+              {' '}
+              {collections.map((nftItem: any, id: any) => (
+                <CollectionCard
+                  key={id}
+                  nftItem={nftItem}
+                  className=""
+                  // title={collectionItem?.title}
+                  // listings={listings}
+                />
+              ))}
+            </>
+          ) : (
+            <>
+              {' '}
+              {allNfts.map((nftItem: any, id: any) => (
+                <NFTCard
+                  key={id}
+                  nftItem={nftItem.nft}
+                  title={nftItem?.nft.metadata.name}
+                  listings={listings}
+                  collectionContractAddress={nftItem.collectionContractAddress}
+                />
+              ))}
+            </>
+          )}
         </div>
       </div>
     </div>

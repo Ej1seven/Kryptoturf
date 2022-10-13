@@ -43,6 +43,8 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
   const { provider } = useWeb3();
   const [nfts, setNfts] = useState([]);
   const [listings, setListings]: any = useState([]);
+  const [floorPrice, setFloorPrice]: any = useState();
+  const [owners, setOwners]: any = useState(0);
   const navigate = useNavigate();
   const [collectionItem, setCollectionItem]: any = useState();
 
@@ -69,6 +71,21 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
     })();
   }, [nftModule]);
 
+  useEffect(() => {
+    if (!nfts) return;
+    console.log(nfts.length);
+    let numberOfNftOwners: any = [];
+    let ownersCount: any;
+    nfts.map((nft: any) => {
+      numberOfNftOwners.push(nft.owner);
+    });
+    ownersCount = new Set(numberOfNftOwners).size;
+    setOwners(ownersCount);
+    console.log(ownersCount);
+  }, [nfts]);
+  console.log(nfts);
+  console.log(owners);
+
   const marketPlaceModule = useMemo(() => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
@@ -76,10 +93,10 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
       '0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8'
     );
     console.log(
-      sdk.getMarketplace('0x487105F54635F1351998d3e7A07dd140ACD67758')
+      sdk.getMarketplace('0xf82886b727f5a1eC48f1E683072c28C468f62885')
     );
-    console.log(contract.sales);
-    return sdk.getMarketplace('0x487105F54635F1351998d3e7A07dd140ACD67758');
+    console.log(contract);
+    return sdk.getMarketplace('0xf82886b727f5a1eC48f1E683072c28C468f62885');
   }, [provider]);
 
   useEffect(() => {
@@ -90,6 +107,21 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
     })();
     console.log(listings);
   }, [marketPlaceModule]);
+
+  useEffect(() => {
+    if (!listings) return;
+    console.log(listings);
+    let listingPrices: any = [];
+    listings.map((listing: any) => {
+      if (listing.assetContractAddress === id) {
+        listingPrices.push(
+          Number(listing.buyoutCurrencyValuePerToken.displayValue)
+        );
+      }
+    });
+    console.log(Math.min(...listingPrices));
+    setFloorPrice(Math.min(...listingPrices));
+  }, [listings]);
 
   const handleSubmit = async (e: any) => {
     // await collection(id);
@@ -178,15 +210,13 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
               <div className={style.statName}>items</div>
             </div>
             <div className={style.collectionStat}>
-              <div className={style.statValue}>
-                {collectionItem?.owners ? collectionItem.owners.length : ''}
-              </div>
+              <div className={style.statValue}>{owners}</div>
               <div className={style.statName}>owners</div>
             </div>
             <div className={style.collectionStat}>
               <div className={style.statValue}>
                 <FaEthereum className={style.ethLogo} />
-                {collectionItem?.floorPrice}
+                {floorPrice}
               </div>
               <div className={style.statName}>floor price</div>
             </div>

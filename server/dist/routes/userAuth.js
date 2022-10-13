@@ -101,6 +101,7 @@ router.route('/register').post((req, res) => __awaiter(void 0, void 0, void 0, f
                 email: email,
                 password: hashedPassword,
                 walletAddress: address,
+                turfCoins: 100,
             },
         });
         user = createUser;
@@ -283,5 +284,57 @@ router.route('/user').post((req, res) => __awaiter(void 0, void 0, void 0, funct
         return res.json(err);
     }
     return res.json(userProfile);
+}));
+router.route('/buyNFT').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { buyerAddress, sellerAddress, coins } = req.body;
+    console.log('body request', req.body);
+    let userProfile;
+    let buyingUser;
+    let sellingUser;
+    try {
+        const buyer = yield prisma.user.findUnique({
+            where: {
+                walletAddress: buyerAddress,
+            },
+        });
+        const seller = yield prisma.user.findUnique({
+            where: {
+                walletAddress: sellerAddress,
+            },
+        });
+        const buyerTurfCoins = buyer.turfCoins - coins;
+        const sellerTurfCoins = seller.turfCoins + coins;
+        const newBuyer = yield prisma.user.update({
+            where: {
+                walletAddress: buyerAddress,
+            },
+            data: {
+                turfCoins: buyerTurfCoins,
+            },
+        });
+        const newSeller = yield prisma.user.update({
+            where: {
+                walletAddress: sellerAddress,
+            },
+            data: {
+                turfCoins: sellerTurfCoins,
+            },
+        });
+        // const user = await User.findOne(
+        //   usernameOrEmail.includes('@')
+        //     ? { where: { email: usernameOrEmail } }
+        //     : { where: { username: usernameOrEmail } }
+        // );
+        buyingUser = newBuyer;
+        sellingUser = newSeller;
+        console.log(buyer);
+        console.log(seller);
+        // userProfile = user;
+    }
+    catch (err) {
+        console.log(err);
+        return res.json(err);
+    }
+    return res.json({ buyingUser, sellingUser });
 }));
 module.exports = router;

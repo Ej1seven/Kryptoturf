@@ -15,8 +15,11 @@ import { Navbar } from '../components/Navbar';
 import { MdPhotoSizeSelectActual } from 'react-icons/md';
 import { AiFillEdit } from 'react-icons/ai';
 import axios from 'axios';
+import { HiOutlineCurrencyDollar } from 'react-icons/hi';
 
 interface ProfileProps {}
+
+const ethPrice = require('eth-price');
 
 export const Profile: React.FC<ProfileProps> = ({}) => {
   const {
@@ -46,6 +49,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     preview: '',
     raw: '',
   });
+  const [ethToUsd, setEthToUsd]: any = useState(0);
+  const [eth, setEth]: any = useState();
+
   const handleProfilePhotoChange = (e: any) => {
     e.preventDefault();
     if (e.target.files.length) {
@@ -148,7 +154,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     let allNftsArray: any = [];
     (async () => {
       const marketplace = await marketPlaceModule.getMarketplace(
-        '0x487105F54635F1351998d3e7A07dd140ACD67758'
+        '0xf82886b727f5a1eC48f1E683072c28C468f62885'
       );
       setListings(await marketplace.getActiveListings());
     })();
@@ -207,6 +213,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   }, []);
   useEffect(() => {
     (async () => {
+      const eth = await ethPrice('usd');
+      const editedEth = await Number(eth[0].replace('USD: ', ''));
+      setEth(editedEth);
       console.log(data);
       setUserData(await getUserData(data.email));
     })();
@@ -218,9 +227,11 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       userData.likes.forEach((like: any) => {
         console.log(like.nftName);
       });
+      setEthToUsd(Number((data?.turfCoins * eth).toFixed(3)));
     })();
   }, [userData]);
   console.log(data);
+  console.log(ethToUsd);
   return (
     <div className="text-white">
       <Navbar />
@@ -315,7 +326,26 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
         onChange={handleProfilePhotoChange}
       />
       <div className="flex flex-col ml-4">
-        <div className="text-white text-2xl	">{data?.username}</div>
+        <div className="flex flex-row">
+          <div className="text-white text-2xl w-1/2">{data?.username}</div>
+          <div className="w-1/2 flex flex-col">
+            <div className="flex justify-end  flex-row pr-2">
+              <div className="text-white text-2xl font-bold text-[#2081e2]">
+                TURF Coins:
+                <span className="text-[#2081e2]">
+                  {' '}
+                  {`${userData?.turfCoins}`}
+                </span>
+              </div>
+              <HiOutlineCurrencyDollar className="text-[#2081e2]" />
+            </div>
+            <div className="flex justify-end pr-4">
+              {' '}
+              <p>${ethToUsd.toLocaleString('en-US')} USD</p>
+            </div>
+          </div>
+        </div>
+
         <div className="flex flex-row items-center">
           <div>
             <FaEthereum className="text-white mr-1" />

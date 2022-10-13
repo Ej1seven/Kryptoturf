@@ -7,6 +7,7 @@ import { HiMenu, HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose, AiOutlineSearch } from 'react-icons/ai';
 import { CgProfile } from 'react-icons/cg';
 import { MdAccountBalanceWallet } from 'react-icons/md';
+import { Wallet } from '../pages/Wallet';
 
 interface NavbarProps {}
 
@@ -19,6 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     refetchInterval: 0,
   });
   const [toggleMenu, setToggleMenu] = useState(false);
+  const [toggleWallet, setToggleWallet] = useState(false);
   const queryClient = useQueryClient();
   const NavbarItem = ({
     title,
@@ -42,8 +44,8 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   };
   const navigateTo: any = (e: any) => {
     switch (e.target.innerText) {
-      case 'Collection':
-        navigate('/collection/0xFB1C5578629F802Ee2393a05ADffc4c665DC3ea8');
+      case 'Explore':
+        navigate('/collections');
         break;
       case 'Stats':
         navigate('/stats');
@@ -82,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         ></input>
       </div>
       <ul className="text-white md:flex  list-none flex-row justify-between items-center flex-initial">
-        {['Collection', 'Stats', 'Resources', 'Create'].map((item, index) => (
+        {['Explore', 'Stats', 'Resources', 'Create'].map((item, index) => (
           <div className="hidden lg:block">
             <NavbarItem key={item + index} title={item} />
           </div>
@@ -93,10 +95,19 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
           </Link>
         </div>
         <div className=" text-3xl font-black px-4 hidden lg:block cursor-pointer">
-          <Link to="/wallet">
-            <MdAccountBalanceWallet />
-          </Link>
+          <MdAccountBalanceWallet onClick={() => setToggleWallet(true)} />
         </div>
+        {toggleWallet && (
+          <div className="flex relative">
+            {' '}
+            <div className="z-10 fixed top-0 -right-2 p-3 w-[30vw] h-screen shadow-2xl list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-in blue-glassmorphism ">
+              <div className="text-xl w-full my-2">
+                <AiOutlineClose onClick={() => setToggleWallet(false)} />
+              </div>
+              <Wallet />
+            </div>
+          </div>
+        )}
         <div className="flex relative">
           {toggleMenu ? (
             <AiOutlineClose
@@ -117,7 +128,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 <AiOutlineClose onClick={() => setToggleMenu(false)} />
               </li>
               {[
-                'Collection',
+                'Explore',
                 'Stats',
                 'Resources',
                 'Create',

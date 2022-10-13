@@ -59,6 +59,9 @@ app.get('/hello', (req, res) => {
 app.get('/wow', (req, res) => {
     res.json({ message: 'hey whats up erik 3' });
 });
+app.get('/new', (req, res) => {
+    res.json({ message: 'hey whats up erik 3' });
+});
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port 3001`);
 });

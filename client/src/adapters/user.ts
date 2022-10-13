@@ -148,3 +148,37 @@ export async function getUserData(emailOrContractAddress: String) {
       return res.data;
     });
 }
+export async function getAllUsers() {
+  return await axios
+    .get(`${URL}/userAuth/users`, { withCredentials: true })
+    .then((res): any => {
+      console.log(res.data);
+      return res.data;
+    });
+}
+export async function buyNFT(
+  buyerAddress: String,
+  sellerAddress: String,
+  coins: Number,
+  royaltyOwnerAddress: String,
+  royaltyFee: Number
+) {
+  console.log(buyerAddress);
+  console.log(sellerAddress);
+  return await axios
+    .post(
+      `${URL}/userAuth/buyNFT`,
+      {
+        buyerAddress: buyerAddress,
+        sellerAddress: sellerAddress,
+        coins: coins,
+        royaltyOwnerAddress: royaltyOwnerAddress,
+        royaltyFee: royaltyFee,
+      },
+      { withCredentials: true }
+    )
+    .then((res): any => {
+      console.log(res.data);
+      return res.data;
+    });
+}

@@ -4,6 +4,14 @@ import { validateRegister } from '../utils/validateRegister';
 import argon2 from 'argon2';
 import process from 'process';
 const { PrismaClient } = require('@prisma/client');
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
+});
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
 const redis = new Redis(`${process.env.REDIS_URL}`);
@@ -97,6 +105,7 @@ router.route('/register').post(async (req: Request, res: Response) => {
         email: email,
         password: hashedPassword,
         walletAddress: address,
+        turfCoins: 100,
       },
     });
     user = createUser;
@@ -122,8 +131,46 @@ router.route('/register').post(async (req: Request, res: Response) => {
       return res.json({ message: err.code });
     }
   }
+  console.log(user.id);
+  jwt.sign(
+    {
+      userId: user.id,
+    },
+    process.env.EMAIL_SECRET,
+    {
+      expiresIn: '1d',
+    },
+    (err: any, emailToken: any) => {
+      const url = `${process.env.REACT_APP_API_URL}/userAuth/confirmation/${emailToken}`;
+
+      transporter.sendMail({
+        to: email,
+        subject: 'Confirm Email',
+        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      });
+    }
+  );
   return res.json({ user });
 });
+
+router
+  .route('/confirmation/:token')
+  .get(async (req: Request, res: Response) => {
+    try {
+      const { userId } = jwt.verify(req.params.token, process.env.EMAIL_SECRET);
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          confirmed: true,
+        },
+      });
+    } catch (e) {
+      res.send('error');
+    }
+    return res.redirect(`${process.env.CORS_ORIGIN}/login`);
+  });
 
 router.route('/login').post(async (req: Request, res: Response) => {
   res.header('Access-Control-Allow-Origin', 'https://kryptoturf.com');
@@ -135,6 +182,9 @@ router.route('/login').post(async (req: Request, res: Response) => {
   );
   if (!user) {
     res.json({ message: "that username doesn't exist" });
+  }
+  if (!user.confirmed) {
+    res.json({ message: 'Please confirm your email to login' });
   }
   const valid = await argon2.verify(user.password, password);
   if (!valid) {
@@ -285,6 +335,99 @@ router.route('/user').post(async (req: Request, res: Response) => {
     return res.json(err);
   }
   return res.json(userProfile);
+});
+router.route('/buyNFT').post(async (req: Request, res: Response) => {
+  const {
+    buyerAddress,
+    sellerAddress,
+    royaltyOwnerAddress,
+    royaltyFee,
+    coins,
+  } = req.body;
+  console.log('body request', req.body);
+  let buyingUser: any;
+  let sellingUser: any;
+  let royaltyUser: any;
+  try {
+    const buyer = await prisma.user.findUnique({
+      where: {
+        walletAddress: buyerAddress,
+      },
+    });
+    const seller = await prisma.user.findUnique({
+      where: {
+        walletAddress: sellerAddress,
+      },
+    });
+    const buyerTurfCoins = buyer.turfCoins - coins;
+    let sellerTurfCoins: any;
+    if (sellerAddress !== royaltyOwnerAddress) {
+      const royaltyOwner = await prisma.user.findUnique({
+        where: {
+          walletAddress: royaltyOwnerAddress,
+        },
+      });
+      const royaltyFeeConverted = (royaltyFee / 100) * coins;
+      const royaltyOwnerTurfCoins =
+        royaltyOwner.turfCoins + royaltyFeeConverted;
+      sellerTurfCoins = seller.turfCoins + coins - royaltyFeeConverted;
+      const newRoyaltyUser = await prisma.user.update({
+        where: {
+          walletAddress: royaltyOwnerAddress,
+        },
+        data: {
+          turfCoins: royaltyOwnerTurfCoins,
+        },
+      });
+      royaltyUser = newRoyaltyUser;
+    } else {
+      sellerTurfCoins = seller.turfCoins + coins;
+    }
+
+    const newBuyer = await prisma.user.update({
+      where: {
+        walletAddress: buyerAddress,
+      },
+      data: {
+        turfCoins: buyerTurfCoins,
+      },
+    });
+    const newSeller = await prisma.user.update({
+      where: {
+        walletAddress: sellerAddress,
+      },
+      data: {
+        turfCoins: sellerTurfCoins,
+      },
+    });
+    // const user = await User.findOne(
+    //   usernameOrEmail.includes('@')
+    //     ? { where: { email: usernameOrEmail } }
+    //     : { where: { username: usernameOrEmail } }
+    // );
+    buyingUser = newBuyer;
+    sellingUser = newSeller;
+    console.log(buyer);
+    console.log(seller);
+    // userProfile = user;
+  } catch (err: any) {
+    console.log(err);
+    return res.json(err);
+  }
+  return res.json({ buyingUser, sellingUser, royaltyUser });
+});
+
+router.route('/users').get(async (req: Request, res: Response) => {
+  let allUsers: any;
+  try {
+    const users = await prisma.user.findMany();
+    allUsers = users;
+    console.log(users);
+  } catch (err: any) {
+    console.log(err);
+    return res.json(err);
+  }
+  return res.json(allUsers);
 });
 
 module.exports = router;

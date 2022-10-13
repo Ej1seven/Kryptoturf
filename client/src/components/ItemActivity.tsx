@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CgArrowsExchangeV } from 'react-icons/cg';
 import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import { dummyEvents } from '../static/dummyEvents';
 import { EventItem } from './EventItem';
+import { getTransactions } from '../adapters/marketItems';
+import { Pagination } from './Pagination';
 
 interface ItemActivityProps {}
 
@@ -15,13 +17,32 @@ const style = {
   filter: `flex items-center border border-[#151b22] mx-4 my-6 px-3 py-4 rounded-xl bg-[#363840]`,
   filterTitle: `flex-1`,
   tableHeader: `flex w-full bg-[#262b2f] border-y border-[#151b22] mt-8 px-4 py-1`,
+  tableColumn: `w-1/5`,
   eventItem: `flex px-4`,
   ethLogo: `h-5 mr-2`,
   accent: `text-[#2081e2]`,
 };
 
-export const ItemActivity: React.FC<ItemActivityProps> = ({}) => {
+export const ItemActivity: React.FC<any> = ({
+  collectionContractAddress,
+  id,
+}) => {
   const [toggle, setToggle] = useState(true);
+  const [nftTransactions, setNftTransactions]: any = useState();
+  const [currentPage, setCurrentPage]: any = useState(1);
+  const [postPerPage, setPostPerPage]: any = useState(5);
+  const lastPostIndex = currentPage + postPerPage;
+  const firstPostIndex = lastPostIndex - postPerPage;
+  const currentPost = nftTransactions?.slice(firstPostIndex - 1, lastPostIndex);
+  console.log(collectionContractAddress);
+  console.log(id);
+  console.log(nftTransactions);
+  console.log(currentPost);
+  useEffect(() => {
+    (async () => {
+      setNftTransactions(await getTransactions(collectionContractAddress, id));
+    })();
+  }, []);
   return (
     <div className={style.wrapper}>
       <div className={style.title} onClick={() => setToggle(!toggle)}>
@@ -45,23 +66,23 @@ export const ItemActivity: React.FC<ItemActivityProps> = ({}) => {
             </div>
           </div>
           <div className={style.tableHeader}>
-            <div /*className={`${style.tableHeaderElement} flex-[2]`}*/>
-              Event
-            </div>
-            <div /*className={`${style.tableHeaderElement} flex-[2]`}*/>
-              Price
-            </div>
-            <div /*className={`${style.tableHeaderElement} flex-[2]`}*/>
-              From
-            </div>
-            <div /*className={`${style.tableHeaderElement} flex-[2]`}*/>To</div>
-            <div /*className={`${style.tableHeaderElement} flex-[2]`}*/>
-              Date
-            </div>
+            <div className={style.tableColumn}>Event</div>
+            <div className={style.tableColumn}>Price</div>
+            <div className={style.tableColumn}>From</div>
+            <div className={style.tableColumn}>To</div>
+            <div className={style.tableColumn}>Date</div>
           </div>
-          {dummyEvents.map((event: any, id: any) => (
-            <EventItem key={id} event={event} />
-          ))}
+          <div>
+            {currentPost?.map((transaction: any, id: any) => (
+              <EventItem key={id} transaction={transaction} />
+            ))}
+          </div>
+          <Pagination
+            totalPosts={nftTransactions?.length}
+            postPerPage={postPerPage}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+          />
         </div>
       )}
     </div>

@@ -19,12 +19,16 @@ const upload = multer({
     if (
       file.mimetype == 'image/png' ||
       file.mimetype == 'image/jpg' ||
-      file.mimetype == 'image/jpeg'
+      file.mimetype == 'image/jpeg' ||
+      file.mimetype == 'image/avif' ||
+      file.mimetype == 'image/gif'
     ) {
       cb(null, true);
     } else {
       cb(null, false);
-      return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+      return cb(
+        new Error('Only .png, .jpg, .jpeg, .avif, and .gif format allowed!')
+      );
     }
   },
 });
@@ -121,6 +125,33 @@ router.route('/collection').post(async (req: Request, res: any) => {
   return res.json({ collection });
 });
 
+router.route('/collection').put(async (req: Request, res: any) => {
+  const { contractAddress, volume } = req.body;
+  console.log('body request', req.body);
+  let newCollection: any;
+  try {
+    const collection = await prisma.MarketItems.findUnique({
+      where: {
+        contractAddress: contractAddress,
+      },
+    });
+
+    const updateCollection = await prisma.MarketItems.update({
+      where: {
+        contractAddress: contractAddress,
+      },
+      data: {
+        volumeTraded: collection.volumeTraded + volume,
+      },
+    });
+    newCollection = updateCollection;
+  } catch (err: any) {
+    console.log(err);
+    return res.json(err);
+  }
+  return res.json({ newCollection });
+});
+
 const uploadImages = upload.array('image');
 router.route('/upload').post(async (req: any, res: any) => {
   uploadImages(req, res, function (err: any) {
@@ -191,4 +222,84 @@ router.route('/likes/:id').delete(async (req: Request, res: Response) => {
   }
   return res.json(deletedLike);
 });
+router.route('/transactions').post(async (req: Request, res: Response) => {
+  const {
+    collectionContractAddress,
+    tokenId,
+    event,
+    price,
+    from,
+    to,
+    blockNumber,
+    txHash,
+  } = req.body;
+  console.log('body request', req.body);
+  let transaction: any;
+  try {
+    const transactionData = await prisma.NftTransactions.create({
+      data: {
+        collectionContractAddress: collectionContractAddress,
+        tokenId: tokenId,
+        event: event,
+        price: price,
+        from: from,
+        to: to,
+        blockNumber: blockNumber,
+        txHash: txHash,
+      },
+    });
+    transaction = transactionData;
+  } catch (err: any) {
+    console.log(err);
+    return res.json(err);
+  }
+  return res.json(transaction);
+});
+router
+  .route('/transactions/:collectionContractAddress/:tokenId')
+  .get(async (req: Request, res: Response) => {
+    const { collectionContractAddress, tokenId } = req.params;
+
+    console.log('body request', req.params);
+    let tokenTransactions: any;
+    try {
+      const transactions = await prisma.NftTransactions.findMany({
+        where: {
+          AND: [
+            {
+              collectionContractAddress: collectionContractAddress,
+            },
+            {
+              tokenId: Number(tokenId),
+            },
+          ],
+        },
+      });
+      tokenTransactions = transactions;
+    } catch (err: any) {
+      console.log(err);
+      return res.json(err);
+    }
+    return res.json(tokenTransactions);
+  });
+router
+  .route('/allTransactions/:collectionContractAddress')
+  .get(async (req: Request, res: Response) => {
+    const { collectionContractAddress } = req.params;
+
+    console.log('body request', req.params);
+    let collectionTransactions: any;
+    try {
+      const transactions = await prisma.NftTransactions.findMany({
+        where: {
+          collectionContractAddress: collectionContractAddress,
+        },
+      });
+      collectionTransactions = transactions;
+    } catch (err: any) {
+      console.log(err);
+      return res.json(err);
+    }
+    return res.json(collectionTransactions);
+  });
 module.exports = router;

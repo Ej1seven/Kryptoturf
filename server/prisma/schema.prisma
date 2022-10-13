@@ -18,6 +18,8 @@ model User {
   profileImage  String?
   bannerImage   String? 
   likes          Like[]
+  turfCoins     Float?
+  confirmed     Boolean? @default(false)
 }
 
 model MarketItems {
@@ -25,33 +27,35 @@ model MarketItems {
   contractAddress String   @unique
   description    String?   
   createdBy      String   
-  volumeTraded   Int?      
+  volumeTraded   Float?      
   floorPrice     Int?      
   owners         String[]
   profileImage   String?
   bannerImage    String?
   logoImage      String?
   likes          Like[]
+  nftTransactions NftTransactions[]
 }
 model Like {
   id  Int    @id @default(autoincrement())
   MarketItems MarketItems? @relation(fields: [collectionContractAddress], references: [contractAddress])
   tokenId Int
   nftName  String
-  collectionContractAddress String
+  collectionContractAddress String 
   User User? @relation(fields: [email], references: [email])
   email String
 }
 
-// model NftTransactions {
-//   id String   @id @default(cuid())
-//   collectionContractAddress String   
-//   nftId String   
-//   event String   
-//   price String
-//   createdAt DateTime @default(now())
-//   from String 
-//   to String?
-//   blockNumber String 
-//   txHash String
-// }
+model NftTransactions {
+  id String   @id @default(cuid())
+  MarketItems MarketItems? @relation(fields: [collectionContractAddress], references: [contractAddress])
+  collectionContractAddress String   
+  tokenId Int   
+  event String   
+  price Float?
+  createdAt DateTime @default(now())
+  from String? 
+  to String?
+  blockNumber Int 
+  txHash String
+}
