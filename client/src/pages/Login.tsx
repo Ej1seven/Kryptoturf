@@ -5,6 +5,7 @@ import { Loader } from '../components/Loader';
 import { useNavigate } from 'react-router-dom';
 import { useIsAuth } from '../utils/useIsAuth';
 import Swal from 'sweetalert2';
+import { Navbar } from '../components';
 
 interface LoginProps {}
 const Input = ({
@@ -26,7 +27,7 @@ const Input = ({
     step="0.0001"
     value={value}
     onChange={(e) => handleChange(e, name)}
-    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism cursor-pointer max-w-[400px]"
   />
 );
 
@@ -45,11 +46,30 @@ export const Login: React.FC<LoginProps> = ({}) => {
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
   const handleSubmit = async (e: any) => {
+    let error: any = null;
     const { usernameOrEmail, password } = await formData;
     e.preventDefault();
 
-    if (!usernameOrEmail || !password) return;
-    await login(usernameOrEmail, password);
+    if (!usernameOrEmail || !password)
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Please fill out the required fields',
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
+    await login(usernameOrEmail, password).catch((err) => (error = err));
+    if (error) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Wrong password or username',
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
+    }
     await me();
     await queryClient.invalidateQueries('me');
   };
@@ -62,43 +82,56 @@ export const Login: React.FC<LoginProps> = ({}) => {
     }
   }, [data, navigate]);
   return (
-    <div className="flex justify-center">
-      <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism  lg:mt-72 md:mt-64 mt-60">
-        <p className="text-white text-2xl text-left w-full pb-8">Sign In</p>
-
-        <Input
-          placeholder="Username or Email"
-          name="usernameOrEmail"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <Input
-          placeholder="Password"
-          name="password"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <div className="h-[1px] w-full bg-gray-400 my-2" />
-        {isLoading ? (
+    <div className=" overflow-hidden">
+      <Navbar />
+      {isLoading ? (
+        <div className="h-screen w-screen flex items-center justify-center">
           <Loader />
-        ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer"
-          >
-            Login
-          </button>
-        )}
-        <p className="text-white text-right w-full pt-2">Forgot Password?</p>
-
-        <div className="flex flex-col justify-start	text-white  w-full pb-2">
-          <p>Need an account?</p>
-          <p className="underline">Sign up</p>
         </div>
-      </div>
+      ) : (
+        <div className="flex justify-center items-center h-screen w-screen">
+          <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism">
+            <p className="text-white text-2xl text-left w-full pb-8">Sign In</p>
+
+            <Input
+              placeholder="Username or Email"
+              name="usernameOrEmail"
+              type="text"
+              handleChange={handleChange}
+              value={null}
+            />
+            <Input
+              placeholder="Password"
+              name="password"
+              type="password"
+              handleChange={handleChange}
+              value={null}
+            />
+            <div className="h-[1px] w-full bg-gray-400 my-2 max-w-[400px]" />
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="text-white w-full mt-2 p-2 rounded-full cursor-pointer btn-gradient-border max-w-[400px]"
+              >
+                Login
+              </button>
+            )}
+            {/* <p className="text-white text-right w-full pt-2">Forgot Password?</p> */}
+            <div className="flex flex-col justify-start	text-white  w-full py-2">
+              <p>Need an account?</p>
+              <p
+                className="underline cursor-pointer"
+                onClick={() => navigate('/register')}
+              >
+                Sign up
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

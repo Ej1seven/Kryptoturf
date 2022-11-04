@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CgArrowsExchangeV } from 'react-icons/cg';
 import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
-import { dummyEvents } from '../static/dummyEvents';
 import { EventItem } from './EventItem';
 import { getTransactions } from '../adapters/marketItems';
 import { Pagination } from './Pagination';

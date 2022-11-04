@@ -5,6 +5,8 @@ import { Loader } from '../components/Loader';
 import { useWeb3 } from '@3rdweb/hooks';
 import { useNavigate } from 'react-router-dom';
 import { TransactionContext } from '../context/TransactionContext';
+import { Navbar } from '../components';
+import Swal from 'sweetalert2';
 
 interface RegisterProps {}
 const Input = ({
@@ -26,7 +28,7 @@ const Input = ({
     step="0.0001"
     value={value}
     onChange={(e) => handleChange(e, name)}
-    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+    className="my-2 w-full max-w-[400px] rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism cursor-pointer"
   />
 );
 
@@ -37,7 +39,7 @@ export const Register: React.FC<RegisterProps> = ({}) => {
   const { connectWallet, currentAccount } = useContext(TransactionContext);
   const navigate = useNavigate();
   const { ethereum } = window;
-  const { data, isError, refetch } = useQuery('me', me);
+  const { data } = useQuery('me', me);
   const { address } = useWeb3();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -51,6 +53,7 @@ export const Register: React.FC<RegisterProps> = ({}) => {
   };
   const handleSubmit = async (e: any) => {
     const { username, email, password } = formData;
+    let error: any = null;
     console.log(address);
     if (!address) {
       let connectWalletPrompt = window.confirm(
@@ -64,8 +67,18 @@ export const Register: React.FC<RegisterProps> = ({}) => {
     }
     console.log(address);
     e.preventDefault();
-    if (!username || !email || !password || !address) return;
+    if (!username || !email || !password || !address)
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Please fill out the required fields',
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
+    setIsLoading(true);
     await register(username, email, password, address);
+    setIsLoading(false);
     if (user) {
       console.log(user);
       navigate('/login');
@@ -90,53 +103,63 @@ export const Register: React.FC<RegisterProps> = ({}) => {
     }
   });
   return (
-    <div className="flex justify-center">
-      <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism  lg:mt-72 md:mt-64 mt-60">
-        <p className="text-white text-2xl text-left w-full pb-8">Sign Up</p>
-
-        <Input
-          placeholder="Username"
-          name="username"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <Input
-          placeholder="Email"
-          name="email"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <Input
-          placeholder="Password"
-          name="password"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        {!currentAccount && (
-          <button
-            type="button"
-            onClick={connectWallet}
-            className="flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
-          >
-            <p className="text-white text-base font-semibold">Connect Wallet</p>
-          </button>
-        )}
-        <div className="h-[1px] w-full bg-gray-400 my-2" />
-        {isLoading ? (
+    <div className=" overflow-hidden">
+      <Navbar />
+      {isLoading ? (
+        <div className="h-screen w-screen flex items-center justify-center">
           <Loader />
-        ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer"
-          >
-            Register
-          </button>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="flex justify-center items-center h-screen w-screen">
+          <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism">
+            <p className="text-white text-2xl text-left w-full pb-8">Sign Up</p>
+            <Input
+              placeholder="Username"
+              name="username"
+              type="text"
+              handleChange={handleChange}
+              value={null}
+            />
+            <Input
+              placeholder="Email"
+              name="email"
+              type="email"
+              handleChange={handleChange}
+              value={null}
+            />
+            <Input
+              placeholder="Password"
+              name="password"
+              type="text"
+              handleChange={handleChange}
+              value={null}
+            />
+            {!currentAccount && (
+              <button
+                type="button"
+                onClick={connectWallet}
+                className="flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
+              >
+                <p className="text-white text-base font-semibold">
+                  Connect Wallet
+                </p>
+              </button>
+            )}
+            <div className="h-[1px] w-full bg-gray-400 my-2 max-w-[400px]" />
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="text-white w-full mt-2 p-2 rounded-full cursor-pointer btn-gradient-border max-w-[400px]"
+              >
+                Register
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

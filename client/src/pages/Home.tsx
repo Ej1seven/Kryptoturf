@@ -10,32 +10,22 @@ import {
 import { useQuery } from 'react-query';
 import { me } from '../adapters/user';
 import toast, { Toaster } from 'react-hot-toast';
-import axios from 'axios';
 
 interface HomeProps {}
 
-const style = {
-  wrapper: ``,
-  walletConnectWrapper: `flex flex-col justify-center items-center h-screen w-screen bg-[#3b3d42] `,
-  button: `border border-[#282b2f] bg-[#2081e2] p-[0.8rem] text-xl font-semibold rounded-lg cursor-pointer text-black`,
-  details: `text-lg text-center text=[#282b2f] font-semibold mt-4`,
-};
-
 export const Home: React.FC<HomeProps> = ({}) => {
-  const { data, isLoading, isError, refetch } = useQuery('me', me);
-  console.log(process.env);
+  /*me query checks if the user is logged in. If the user is logged in the server responds 
+    with the user data */
+  const { data } = useQuery('me', me);
   useEffect(() => {
+    /*If the user is logged in a toast message will prompt */
     if (data?.id) {
-      // if the user is not logged in the router will take the user to the login page
-      //once the user logs in the router with proceed forward by taking the end user to their intended page
-      // navigate('/');
       toast.success(`Welcome back ${data.username}`, {
         style: {
           background: '#04111d',
           color: '#fff',
         },
       });
-      console.log(data.username);
     }
   }, [data]);
   return (

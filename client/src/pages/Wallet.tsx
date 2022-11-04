@@ -3,6 +3,7 @@ import { FaEthereum } from 'react-icons/fa';
 import { HiOutlineCurrencyDollar } from 'react-icons/hi';
 import { TiArrowSortedDown } from 'react-icons/ti';
 import { getUserData } from '../adapters/user';
+import { Navbar } from '../components';
 import { shortenAddress } from '../utils/shortenAddress';
 
 interface WalletProps {}
@@ -30,33 +31,36 @@ export const Wallet: React.FC<any> = ({}) => {
   console.log(walletTurfCoinsBalance);
   console.log(walletAddress);
   return (
-    <div className="flex flex-col w-full">
-      <div className="flex flex-row w-full items-center px-4">
-        <div className="flex justify-start w-1/2">
-          <div className="text-lg">My Wallet</div>
-        </div>
-        <div className="flex justify-end w-1/2">
-          <div className="text-lg">{walletAddress}</div>
-        </div>
-      </div>
-      <div className="border-white border-[1px] h-32 w-3/4 mx-auto mt-8 rounded-md flex flex-col">
-        <div className="w-full text-bold h-1/2 border-b border-white flex justify-center items-center text-lg">
-          <p>Total Balance</p>
-        </div>
-        <div className="flex flex-row w-full h-1/2">
-          <div className="w-1/2 border-r-[1px] border-white flex flex-row items-center">
-            {' '}
-            <FaEthereum className="mx-2" />
-            <p className="mr-2">ETH</p>
-            <p>{Math.round(100 * walletEthereumBalance) / 100}</p>
+    <div className="overflow-hidden">
+      <Navbar />
+      <div className="flex flex-col w-full text-white mt-4">
+        <div className="flex flex-row w-full items-center px-4">
+          <div className="flex justify-start w-1/2">
+            <div className="text-lg">My Wallet</div>
           </div>
-          <div className="w-1/2 flex flex-col justify-center items-center">
-            <div className="flex flex-row justify-center items-center ">
+          <div className="flex justify-end w-1/2">
+            <div className="text-lg">{walletAddress}</div>
+          </div>
+        </div>
+        <div className="border-white border-[1px] h-32 w-3/4 mx-auto mt-8 rounded-md flex flex-col">
+          <div className="w-full text-bold h-1/2 border-b border-white flex justify-center items-center text-lg">
+            <p>Total Balance</p>
+          </div>
+          <div className="flex flex-row w-full h-1/2">
+            <div className="w-1/2 border-r-[1px] border-white flex flex-row items-center">
               {' '}
-              <HiOutlineCurrencyDollar className="mx-1" />
-              <p className="mr-2">TURF Coins</p>
+              <FaEthereum className="mx-2" />
+              <p className="mr-2">ETH</p>
+              <p>{Math.round(100 * walletEthereumBalance) / 100}</p>
             </div>
-            <p>{Math.round(100 * walletTurfCoinsBalance) / 100}</p>
+            <div className="w-1/2 flex flex-col justify-center items-center">
+              <div className="flex flex-row justify-center items-center ">
+                {' '}
+                <HiOutlineCurrencyDollar className="mx-1" />
+                <p className="mr-2">TURF Coins</p>
+              </div>
+              <p>{Math.round(100 * walletTurfCoinsBalance) / 100}</p>
+            </div>
           </div>
         </div>
       </div>

@@ -3,20 +3,18 @@ import React from 'react';
 interface UserItemProps {}
 
 const style = {
-  eventItem: `flex px-4 my-2 font-medium w-full white-glassmorphism`,
+  eventItem: `flex px-4 my-2 font-medium w-full white-and-blue-glassmorphism`,
   event: `flex items-center`,
   eventIcon: `mr-2 text-xl text-[#e5e8eb]`,
   eventName: `text-lg font-semibold`,
-  // eventPrice: `flex items-center`,
-  // eventPriceValue: `text-lg`,
   ethLogo: `h-5 mr-2`,
   accent: `text-[#2081e2] w-1/5 text-base flex items-center`,
   profileImg: `w-20 h-20 object-cover rounded-md border-2 border-[#202225] `,
 };
 
 export const UserItem: React.FC<any> = ({ user }) => {
+  /*URL path to pull collection photos from the database */
   const URL = process.env.REACT_APP_PHOTO_API_URL;
-  console.log(user);
   return (
     <div className={style.eventItem}>
       <div className="w-8 text-[#2081e2] text-base flex items-center">

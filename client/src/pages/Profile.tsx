@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { addImages, getUserData, me } from '../adapters/user';
 import { TransactionContext } from '../context/TransactionContext';
 import { shortenAddress } from '../utils/shortenAddress';
@@ -22,36 +22,47 @@ interface ProfileProps {}
 const ethPrice = require('eth-price');
 
 export const Profile: React.FC<ProfileProps> = ({}) => {
-  const {
-    connectWallet,
-    currentAccount,
-    // formData,
-    sendTransaction,
-    // handleChange,
-    isLoading,
-  } = useContext(TransactionContext);
+  /*currentAccount - gets the account of the user currently connected to Metamask */
+  const { currentAccount } = useContext(TransactionContext);
+  /*URL path to save profile photo to the database */
   const photoURL = process.env.REACT_APP_PHOTO_API_URL;
+  /*URL path to save collection photos to the database */
   const apiURL = process.env.REACT_APP_API_URL;
-  const { data, isError, refetch } = useQuery('me', me);
-  const queryClient = useQueryClient();
+  /*me query checks if the user is logged in. If the user is logged in the server responds 
+  with the user data. isLoading represents the processing time to pull the user data. isError is triggered
+  if the server has issues pulling the data*/
+  const { data } = useQuery('me', me);
+  /*Pulls all the NFTs from each collection and puts then into the allNFTS array */
   const [allNfts, setAllNfts]: any = useState([]);
+  /*listing - provides all the NFTS that a actively listed on the marketplace for sale */
   const [listings, setListings]: any = useState([]);
+  /*Stores the user data retrieved from the server through the getUserData() request. */
   const [userData, setUserData]: any = useState([]);
+  /*Pulls all the collections from the database and puts them in the collections array */
   const [collections, setCollections]: any = useState([]);
+  /*Pulls all the collections from the database and filters the NFTs owned by current user */
   const [collectedNFTS, setCollectedNFTS]: any = useState([]);
+  /*Pulls all the collections from the database and filters the NFTs created by current user */
   const [createdNFTS, setCreatedNFTS]: any = useState([]);
+  /*Toggles between the following NFT categories - (Collected, Created, Selling, Liked, Collections) */
   const [displayNFTS, setDisplayNFTS]: any = useState('collected');
+  /*Sets the collection featured image. The preview image will be displayed immediately on the front-end. 
+  The raw image will be sent to the server and stored in the uploads folder. */
   const [profileImage, setProfileImage] = useState({
     preview: '',
     raw: '',
   });
+  /*Sets the collection banner image. The preview image will be displayed immediately on the front-end. 
+  The raw image will be sent to the server and stored in the uploads folder. */
   const [bannerImage, bannerSetImage] = useState({
     preview: '',
     raw: '',
   });
+  /*Converts the Ethereum value to US dollars */
   const [ethToUsd, setEthToUsd]: any = useState(0);
+  /*Sets Ethereum value that will be used when listing an NFT for sale */
   const [eth, setEth]: any = useState();
-
+  /*Sets the profile photo image */
   const handleProfilePhotoChange = (e: any) => {
     e.preventDefault();
     if (e.target.files.length) {
@@ -61,9 +72,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       });
     }
   };
+  /*Sets the banner photo image */
   const handleBannerPhotoChange = (e: any) => {
     e.preventDefault();
-
     if (e.target.files.length) {
       bannerSetImage({
         preview: URL.createObjectURL(e.target.files[0]),
@@ -71,12 +82,11 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       });
     }
   };
+  /*Saves the banner and profile images to the database */
   const saveChanges = async () => {
     let profileImageFilePath: any;
     let bannerImageFilePath: any;
     let photoData = new FormData();
-    console.log(profileImage.raw);
-    console.log(bannerImage.raw);
     await photoData.append('image', profileImage.raw);
     await photoData.append('image', bannerImage.raw);
     await axios
@@ -87,38 +97,35 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
         },
       })
       .then((res): any => {
-        console.log(res.data);
         let imageFilePath = res.data;
+        /*After the images are saved to the uploads folder the server responds with a file path for each photo.
+          We map through file paths and save them to their respective variable. Later we will attach the file paths to their collections
+          so they can be referenced in the future. */
         imageFilePath.map((image: any, index: any) => {
-          console.log(profileImage);
           if (profileImage.raw && index < 1) {
             profileImageFilePath = image.path
+              /*edits the file path so it can be pulled from the front-end */
               .split('uploads\\')
               .join('')
               .trim();
           } else {
             bannerImageFilePath = image.path.split('uploads\\').join('').trim();
           }
-          console.log(index);
-          console.log('profile image', profileImageFilePath);
-          console.log('banner image', bannerImageFilePath);
         });
         return res.data;
       });
     (async () => {
+      /*saves the image data to the database */
       const imageData = await {
         profileImage: profileImageFilePath,
         bannerImage: bannerImageFilePath,
         email: data.email,
       };
-      console.log(imageData);
       await addImages(imageData);
       setUserData(await getUserData(data.email));
-      // await queryClient.setQueryData('me', updatedUserData);
-      // await queryClient.invalidateQueries('me');
-      // await me();
     })();
   };
+  /*Discards the uploaded image data */
   const discardChanges = () => {
     if (profileImage.preview) {
       setProfileImage({
@@ -133,15 +140,23 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       });
     }
   };
+  //Use the network you created the initial project on
+  const RPC_URL = process.env.REACT_APP_RPC_URL;
+  /*Gets the  Metamask wallet private key from the marketplace owner. 
+    The wallet private key is needed by ThirdWeb to provide access marketplace data  */
   let WALLET_PRIVATE_KEY: any = process.env.REACT_APP_WALLET_PRIVATE_KEY;
-  const rpcUrl =
-    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
+  /*The Wallet class inherits Signer and can sign transactions and messages using a private key
+ as a standard Externally Owned Account (EOA).*/
   const wallet: any = new ethers.Wallet(
     WALLET_PRIVATE_KEY,
-    ethers.getDefaultProvider(rpcUrl)
+    ethers.getDefaultProvider(RPC_URL)
   );
+  /*Connects to ThirdWebSDK using the wallet object */
   const sdk = new ThirdwebSDK(wallet);
+  /*A Provider is an abstraction of a connection to the Ethereum network, providing a concise,
+   consistent interface to standard Ethereum node functionality.*/
   const { provider } = useWeb3();
+  /*Retrieves the marketplace data from ThirdwebSDK */
   const marketPlaceModule = useMemo(() => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
@@ -154,13 +169,12 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     let allNftsArray: any = [];
     (async () => {
       const marketplace = await marketPlaceModule.getMarketplace(
-        '0xf82886b727f5a1eC48f1E683072c28C468f62885'
+        '0xF6CcFB6EE02a4d8BE306Ec34A0E511C9B8c6c1a5'
       );
       setListings(await marketplace.getActiveListings());
     })();
     for (let x = 0; x <= collections.length - 1; x++) {
       (async () => {
-        console.log(collections[x]);
         const contract = await sdk.getNFTCollection(
           collections[x].contractAddress
         );
@@ -174,7 +188,6 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
           allNftsArray.push(nftObject);
         });
         const nfts = await contract.getOwned(currentAccount);
-        // console.log(nfts);
         await nfts.map((nft) => {
           let nftObject = {
             nft: nft,
@@ -184,25 +197,14 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
           if (nftObject.createdBy === data.username) {
             createdCollectionsArray.push(nftObject);
           }
-          console.log(nftObject);
           collectionsArray.push(nftObject);
         });
-        // console.log(contract);
-        // const metadata = await contract.metadata.get();
-        // await collectionsArray.push(metadata);
       })();
-      // setMarketplaceCollections(collectionsArray);
       setCollectedNFTS(collectionsArray);
       setCreatedNFTS(createdCollectionsArray);
     }
     setAllNfts(allNftsArray);
   }, [marketPlaceModule]);
-  console.log(collectedNFTS);
-  console.log(createdNFTS);
-  console.log(listings);
-  console.log(collections);
-  console.log(allNfts);
-
   let date: any = new Date(data?.createdAt);
   useEffect(() => {
     (async () => {
@@ -216,30 +218,21 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       const eth = await ethPrice('usd');
       const editedEth = await Number(eth[0].replace('USD: ', ''));
       setEth(editedEth);
-      console.log(data);
       setUserData(await getUserData(data.email));
     })();
   }, [data]);
   useEffect(() => {
     (async () => {
-      console.log(userData);
-      console.log(userData.profileImage);
-      userData.likes.forEach((like: any) => {
-        console.log(like.nftName);
-      });
       setEthToUsd(Number((data?.turfCoins * eth).toFixed(3)));
     })();
   }, [userData]);
-  console.log(data);
-  console.log(ethToUsd);
   return (
-    <div className="text-white">
+    <div className="text-white overflow-hidden">
       <Navbar />
       <label htmlFor="upload-banner-image">
-        <div className="h-[44vh] w-screen overflow-hidden flex justify-center items-center">
+        <div className="h-[300px] w-screen overflow-hidden flex justify-center items-center">
           {userData?.bannerImage && !bannerImage.preview ? (
             <>
-              {' '}
               <img
                 alt="banner"
                 src={`${photoURL}/${userData?.bannerImage}`}
@@ -252,9 +245,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                 <img
                   src={bannerImage.preview}
                   alt="dummy"
-                  // width="300"
-                  // height="200"
-                  className="object-cover w-full h-[44vh]"
+                  className="object-cover w-full h-[300px]"
                 />
               ) : (
                 <div className="w-full h-[44vh] bg-black opacity-30	hover:opacity-100 flex justify-center items-center">
@@ -289,8 +280,6 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
               <img
                 src={profileImage.preview}
                 alt="dummy"
-                // width="300"
-                // height="200"
                 className=" rounded-full w-[150px] h-[150px] overflow-hidden relative -top-[75px] left-[15px] border-[5px] border-black border-solid "
               />
             ) : (
@@ -330,7 +319,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
           <div className="text-white text-2xl w-1/2">{data?.username}</div>
           <div className="w-1/2 flex flex-col">
             <div className="flex justify-end  flex-row pr-2">
-              <div className="text-white text-2xl font-bold text-[#2081e2]">
+              <div className="text-white exSMMAX:text-lg text-2xl font-bold text-[#2081e2]">
                 TURF Coins:
                 <span className="text-[#2081e2]">
                   {' '}
@@ -355,11 +344,14 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
             <div className="ml-6">Joined {format(date, 'LLLL yyyy')}</div>
           )}
         </div>
-        <div className="flex flex-row w-3/4 justify-evenly mx-auto my-10">
+        <div className="flex flex-row md:w-3/4 w-full justify-evenly mx-auto my-10">
           <div
             onClick={() => {
               setDisplayNFTS('collected');
             }}
+            className={`${
+              displayNFTS === 'collected' && 'underline'
+            } cursor-pointer`}
           >
             Collected
           </div>
@@ -367,6 +359,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
             onClick={() => {
               setDisplayNFTS('created');
             }}
+            className={`${
+              displayNFTS === 'created' && 'underline'
+            } cursor-pointer`}
           >
             Created
           </div>
@@ -374,6 +369,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
             onClick={() => {
               setDisplayNFTS('selling');
             }}
+            className={`${
+              displayNFTS === 'selling' && 'underline'
+            } cursor-pointer`}
           >
             Selling
           </div>
@@ -381,6 +379,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
             onClick={() => {
               setDisplayNFTS('liked');
             }}
+            className={`${
+              displayNFTS === 'liked' && 'underline'
+            } cursor-pointer`}
           >
             Liked
           </div>
@@ -388,6 +389,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
             onClick={() => {
               setDisplayNFTS('collections');
             }}
+            className={`${
+              displayNFTS === 'collections' && 'underline'
+            } cursor-pointer`}
           >
             Collections
           </div>
@@ -452,11 +456,6 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
             )}
             {displayNFTS === 'liked' && (
               <>
-                {/* <>
-                  {userData.likes.map((like: any, idx: any) => {
-                    return <p key={idx}>{like.nftName}</p>;
-                  })}
-                </> */}
                 {userData.likes.map((like: any, idx: any) => {
                   return (
                     <div key={idx}>
@@ -490,13 +489,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                     {collection.createdBy === data?.username && (
                       <>
                         {' '}
-                        <CollectionCard
-                          key={id}
-                          nftItem={collection}
-                          className=""
-                          // title={collectionItem?.title}
-                          // listings={listings}
-                        />
+                        <CollectionCard key={id} collectionItem={collection} />
                       </>
                     )}
                   </>

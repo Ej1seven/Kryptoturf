@@ -1,123 +1,77 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useWeb3 } from '@3rdweb/hooks';
-import { me } from '../adapters/user';
-import { useQuery } from 'react-query';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ethers } from 'ethers';
-import fs from 'fs';
-import { TransactionContext } from '../context/TransactionContext';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
-import { Loader } from '../components/Loader';
-import { HiMenuAlt4, HiOutlinePhotograph } from 'react-icons/hi';
-import { IoIosAdd } from 'react-icons/io';
-import { AiOutlineClose } from 'react-icons/ai';
-import { Description } from '@ethersproject/properties';
-import axios from 'axios';
-import { createCollection, getCollections } from '../adapters/marketItems';
-import { useNFTCollection } from '@thirdweb-dev/react';
+import { getCollections } from '../adapters/marketItems';
 import CollectionCard from '../components/CollectionCard';
 import { Navbar } from '../components/Navbar';
 import NFTCard from '../components/NFTCard';
+import { Loader } from '../components/Loader';
+import { useWeb3 } from '@3rdweb/hooks';
+
 interface CollectionsProps {}
 
-const style = {
-  bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
-  bannerImage: `w-full object-cover`,
-  infoContainer: `w-screen px-4`,
-  midRow: `w-full flex justify-center text-white`,
-  endRow: `w-full flex justify-end text-white`,
-  profileImg: `w-40 h-40 object-cover rounded-full border-2 border-[#202225] mt-[-4rem]`,
-  socialIconsContainer: `flex text-3xl mb-[-2rem]`,
-  socialIconsWrapper: `w-44`,
-  socialIconsContent: `flex container justify-between text-[1.4rem] border-2 rounded-lg px-2`,
-  socialIcon: `my-2`,
-  divider: `border-r-2`,
-  title: `text-5xl font-bold mb-4`,
-  createdBy: `text-lg mb-4`,
-  statsContainer: `w-4/5 flex justify-between py-4 border border-[#151b22] rounded-xl mb-4`,
-  collectionStat: `w-1/4`,
-  statValue: `text-3xl font-bold w-full flex items-center justify-center`,
-  ethLogo: `h-6 mr-2`,
-  statName: `text-lg w-full text-center mt-1`,
-  description: `text-[#8a939b] text-xl w-max-1/4 flex-wrap mt-4`,
-};
-
 export const Collections: React.FC<CollectionsProps> = ({}) => {
-  const {
-    connectWallet,
-    currentAccount,
-    // formData,
-    sendTransaction,
-    // handleChange,
-    isLoading,
-  } = useContext(TransactionContext);
-  const apiURL = process.env.REACT_APP_PHOTO_API_URL;
-  const { data, isError, refetch } = useQuery('me', me);
+  /*listing - provides all the NFTS that a actively listed on the marketplace for sale */
   const [listings, setListings]: any = useState([]);
+  /*Display a spinning loading icon when data is loaded*/
+  const [isLoading, setIsLoading] = useState(false);
+  /*Toggles between the collections page and NFTs page */
   const [toggleNFTS, setToggleNFTS]: any = useState(false);
-  // console.log(data.username);
-  const [screenShot, setScreenshot] = useState(undefined);
+  /*Pulls all the collections from the database and puts them in the collections array */
   const [collections, setCollections]: any = useState([]);
-  const [marketplaceCollections, setMarketplaceCollections] = useState([]);
+  /*Pulls all the NFTs from each collection and puts then into the allNFTS array */
   const [allNfts, setAllNfts]: any = useState([]);
+  /*Gets the  Metamask wallet private key from the marketplace owner. 
+    The wallet private key is needed by ThirdWeb to provide access marketplace data  */
+  let WALLET_PRIVATE_KEY: any = process.env.REACT_APP_WALLET_PRIVATE_KEY;
+  //Use the network you created the initial project on
+  const RPC_URL = process.env.REACT_APP_RPC_URL;
+  /*Marketplace address used by ThirdWeb SDK */
+  const MARKETPLACE_ADDRESS: any = process.env.REACT_APP_MARKETPLACE_ADDRESS;
+  /*The Wallet class inherits Signer and can sign transactions and messages using a private key
+ as a standard Externally Owned Account (EOA).*/
+  const wallet = new ethers.Wallet(
+    WALLET_PRIVATE_KEY,
+    ethers.getDefaultProvider(RPC_URL)
+  );
+  /*Connects to ThirdWebSDK using the wallet object */
+  const sdk = new ThirdwebSDK(wallet);
+  /*A Provider is an abstraction of a connection to the Ethereum network, providing a concise,
+   consistent interface to standard Ethereum node functionality.*/
   const { provider } = useWeb3();
-
+  /*Retrieves the marketplace data from ThirdwebSDK */
   const marketPlaceModule = useMemo(() => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
     return sdk;
   }, [provider]);
-  let WALLET_PRIVATE_KEY: any = process.env.REACT_APP_WALLET_PRIVATE_KEY;
-  const REACT_APP_MODULE_ADDRESS: any = process.env.REACT_APP_MODULE_ADDRESS;
-  const REACT_APP_PRIMARY_FEE_RECIPIENT: any =
-    process.env.REACT_APP_PRIMARY_FEE_RECIPIENT;
-  //Use the network you created the initial project on
-  const rpcUrl =
-    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
-  const wallet = new ethers.Wallet(
-    WALLET_PRIVATE_KEY,
-    ethers.getDefaultProvider(rpcUrl)
-  );
-  const sdk = new ThirdwebSDK(wallet);
-  const getModule = sdk.getNFTCollection(
-    REACT_APP_MODULE_ADDRESS
-    //The address of you the module you created in ThirdWeb
-  );
-
-  useEffect(() => {
-    if (!marketPlaceModule) return;
-    let collectionsArray: any = [];
-    for (let x = 0; x <= collections.length - 1; x++) {
-      (async () => {
-        const marketplace = await marketPlaceModule.getMarketplace(
-          '0xf82886b727f5a1eC48f1E683072c28C468f62885'
-        );
-        setListings(await marketplace.getActiveListings());
-
-        const contract = await sdk.getNFTCollection(
-          collections[x].contractAddress
-        );
-        const metadata = await contract.metadata.get();
-        await collectionsArray.push(metadata);
-      })();
-      setMarketplaceCollections(collectionsArray);
-    }
-  }, [marketPlaceModule]);
-  console.log(marketplaceCollections);
-
+  /*Retrieves all the collections from the database during page load*/
   useEffect(() => {
     (async () => {
+      setIsLoading(true);
+      /*getCollections - GET statement that retrieves all the data from the database. */
       const collections = await getCollections();
       await setCollections(collections);
     })();
   }, []);
-
+  /*Once the marketplace data is pulled from Thirdweb, the following useEffect hook retrieves
+   all the active listings on the marketplace from ThirdWeb */
   useEffect(() => {
+    if (!marketPlaceModule) return;
     (async () => {
-      console.log(collections);
-      let allNftsArray: any = [];
+      const marketplace = await marketPlaceModule.getMarketplace(
+        MARKETPLACE_ADDRESS
+      );
+      setListings(await marketplace.getActiveListings());
+    })();
+  }, [marketPlaceModule]);
+  /*Once the collections are pulled from the database, the following useEffect hook pulls all the NFTs
+   from each collection and puts then into the allNFTS array  */
+  useEffect(() => {
+    let allNftsArray: any = [];
+    (async () => {
       for (let x = 0; x <= collections.length - 1; x++) {
         (async () => {
-          console.log(collections[x]);
           const contract = await sdk.getNFTCollection(
             collections[x].contractAddress
           );
@@ -133,255 +87,61 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
         })();
       }
       setAllNfts(allNftsArray);
+      setIsLoading(false);
     })();
   }, [collections]);
-  console.log(allNfts);
-  const [profileImage, setProfileImage] = useState({
-    preview: '',
-    raw: '',
-  });
-  const [bannerImage, bannerSetImage] = useState({
-    preview: '',
-    raw: '',
-  });
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    fee_recipient: '',
-    seller_fee_basis_points: '',
-  });
-  const [attributes, setAttributes] = useState({
-    trait_type: '',
-    value: '',
-  });
-  const [toggleMenu, setToggleMenu] = useState(false);
-
-  // useEffect(() => {
-  //   const url = `http://localhost:5000/fetchImage/${imageName}`;
-  // });
-  const handlePhotoChange = (e: any) => {
-    if (e.target.files.length) {
-      setProfileImage({
-        preview: URL.createObjectURL(e.target.files[0]),
-        raw: e.target.files[0],
-      });
-    }
-  };
-  const handleBannerPhotoChange = (e: any) => {
-    if (e.target.files.length) {
-      bannerSetImage({
-        preview: URL.createObjectURL(e.target.files[0]),
-        raw: e.target.files[0],
-      });
-    }
-  };
-  const handleChange = (e: any, name: any) => {
-    e.preventDefault();
-    if (name === 'seller_fee_basis_points' && e.target.value > 10) {
-      const numsArr = Array.from(String(e.target.value), Number);
-      console.log(numsArr.pop());
-      console.log(numsArr[0]);
-      e.target.value = numsArr[0];
-    }
-    console.log(e.target.value);
-    setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
-  };
-  const percentageKeyPress = (e: any, name: any) => {
-    console.log(e.charCode);
-    if (e.charCode == 46 || e.charCode == 45 || e.charCode == 43) {
-      e.preventDefault();
-    }
-    let percentageInputLength = formData.seller_fee_basis_points.length;
-    console.log(Number(e.target.value));
-    console.log(percentageInputLength);
-    if (percentageInputLength === 1) {
-      if (Number(e.target.value) !== 1) {
-        e.preventDefault();
-        console.log('not working');
-      }
-      // console.log(e.target.value);
-      // if (Number(e.target.value) !== 1) {
-      //   e.preventDefault();
-      //   console.log('not 1');
-      // }
-    }
-    if (percentageInputLength === 2) {
-      console.log(e.target.value);
-      e.preventDefault();
-      // if (Number(e.target.value) !== 10) {
-      //   e.preventDefault();
-      //   console.log('not 10');
-      // }
-    }
-    // if (percentageInputLength === 3) {
-    //   console.log(e.target.value);
-    //   e.preventDefault();
-    // }
-  };
-  const handleAttributeChange = (e: any, name: any) => {
-    console.log(e.target.value);
-    setAttributes((prevState) => ({ ...prevState, [name]: e.target.value }));
-  };
-
-  const createNFTCollection = async () => {
-    console.log(REACT_APP_PRIMARY_FEE_RECIPIENT);
-    const { name, description, fee_recipient, seller_fee_basis_points } =
-      formData;
-    const basisPoints = Number(seller_fee_basis_points) * 100;
-    console.log(basisPoints);
-    let profileImageFilePath: any;
-    let bannerImageFilePath: any;
-    // const imageData = new FormData(formData);
-    // imageData.append('File', image.raw);
-    const collectionData = {
-      name: name,
-      description: description,
-      image: profileImage.raw,
-      fee_recipient: fee_recipient,
-      // external_link: external_link,
-    };
-    let photoData = new FormData();
-    console.log(profileImage.raw);
-    console.log(bannerImage.raw);
-    await photoData.append('image', profileImage.raw);
-    await photoData.append('image', bannerImage.raw);
-    await axios
-      .post(`${apiURL}/marketItems/upload`, photoData, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((res): any => {
-        console.log(res.data);
-        let imageFilePath = res.data;
-        imageFilePath.map((image: any, index: any) => {
-          console.log(profileImage);
-          if (profileImage.raw && index < 1) {
-            profileImageFilePath = image.path
-              .split('uploads\\')
-              .join('')
-              .trim();
-          } else {
-            bannerImageFilePath = image.path.split('uploads\\').join('').trim();
-          }
-          console.log(index);
-          console.log('profile image', profileImageFilePath);
-          console.log('banner image', bannerImageFilePath);
-        });
-        return res.data;
-      });
-
-    // let collectionId = 100;
-    // console.log(image.raw);
-    // collection(image.raw);
-    console.log(currentAccount);
-    await sdk.deployer
-      .deployNFTCollection({
-        name: name,
-        description: description,
-        primary_sale_recipient: currentAccount,
-        image: profileImage.raw,
-        fee_recipient: fee_recipient,
-        seller_fee_basis_points: basisPoints,
-        platform_fee_recipient: process.env.REACT_APP_PRIMARY_FEE_RECIPIENT,
-        platform_fee_basis_points: 300,
-      })
-      .then(async (res) => {
-        let contractAddress = await res;
-        const collectionData = await {
-          title: name,
-          contractAddress: contractAddress,
-          description: description,
-          createdBy: data.username,
-          owners: data.username,
-          profileImage: profileImageFilePath,
-          bannerImage: bannerImageFilePath,
-        };
-        console.log(collectionData);
-        await createCollection(collectionData);
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-  };
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    console.log(profileImage.raw);
-    // const formData = new FormData();
-    // formData.append('image', image.raw);
-
-    // await fetch('YOUR_URL', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data',
-    //   },
-    //   body: formData,
-    // });
-  };
-
   return (
     <div className="overflow-hidden">
       <Navbar />
-      <div>
-        <div className="w-full h-8 text-white font-bold text-4xl text-center">
-          {!toggleNFTS ? 'Collections' : 'NFTS'}
+      {isLoading ? (
+        <div className="h-screen w-screen flex items-center justify-center">
+          <Loader />
         </div>
-        <div className="flex flex-row-reverse">
+      ) : (
+        <>
           <div>
-            {' '}
-            <button
-              type="button"
-              onClick={createNFTCollection}
-              className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full white-glassmorphism cursor-pointer py-2 px-7"
-            >
-              Sort By
-            </button>
+            <div className="w-full h-8 text-white font-bold text-4xl text-center">
+              {!toggleNFTS ? 'Collections' : 'NFTS'}
+            </div>
+            <div className="flex flex-row-reverse smMAX:justify-center">
+              <div className="mx-4 smMAX:mt-4">
+                <button
+                  type="button"
+                  onClick={() => setToggleNFTS(!toggleNFTS)}
+                  className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full white-and-blue-glassmorphism cursor-pointer py-2 px-7"
+                >
+                  {!toggleNFTS ? 'View NFTS' : 'View Collections'}
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="mx-4">
-            {' '}
-            <button
-              type="button"
-              onClick={() => setToggleNFTS(!toggleNFTS)}
-              className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full white-glassmorphism cursor-pointer py-2 px-7"
-            >
-              {!toggleNFTS ? 'View NFTS' : 'View Collections'}
-            </button>
+          <div className="flex justify-center">
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+              {!toggleNFTS ? (
+                <>
+                  {collections.map((collectionItem: any, id: any) => (
+                    <CollectionCard key={id} collectionItem={collectionItem} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  {allNfts.map((nftItem: any, id: any) => (
+                    <NFTCard
+                      key={id}
+                      nftItem={nftItem.nft}
+                      title={nftItem?.nft.metadata.name}
+                      listings={listings}
+                      collectionContractAddress={
+                        nftItem.collectionContractAddress
+                      }
+                    />
+                  ))}
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
-      <div className="flex justify-center">
-        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
-          {!toggleNFTS ? (
-            <>
-              {' '}
-              {collections.map((nftItem: any, id: any) => (
-                <CollectionCard
-                  key={id}
-                  nftItem={nftItem}
-                  className=""
-                  // title={collectionItem?.title}
-                  // listings={listings}
-                />
-              ))}
-            </>
-          ) : (
-            <>
-              {' '}
-              {allNfts.map((nftItem: any, id: any) => (
-                <NFTCard
-                  key={id}
-                  nftItem={nftItem.nft}
-                  title={nftItem?.nft.metadata.name}
-                  listings={listings}
-                  collectionContractAddress={nftItem.collectionContractAddress}
-                />
-              ))}
-            </>
-          )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

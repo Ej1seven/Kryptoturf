@@ -1,23 +1,18 @@
 import React from 'react';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsArrowLeftSquareFill } from 'react-icons/bs';
 
 interface PaginationProps {}
-
+/*Pagination component is used to toggle between pages */
 export const Pagination: React.FC<any> = ({
   totalPosts,
   postPerPage,
   setCurrentPage,
   currentPage,
 }) => {
-  console.log(currentPage);
-  console.log(totalPosts);
-  console.log(postPerPage);
   let pages = [];
   for (let i = 1; i <= Math.ceil(totalPosts / postPerPage); i++) {
     pages.push(i);
   }
-  console.log(pages);
   return (
     <div className="flex flex-row justify-center">
       <button
@@ -36,17 +31,5 @@ export const Pagination: React.FC<any> = ({
         <BiRightArrow />
       </button>
     </div>
-
-    /*  
-          // <button
-          //   key={index}
-          //   onClick={() => setCurrentPage(page)}
-          //   className={page == currentPage ? 'active' : ''}
-          // >
-          //   {currentPage}
-          // </button> */
   );
 };
-{
-  /* {pages.map((page, index) => { })} */
-}

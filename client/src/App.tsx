@@ -1,19 +1,10 @@
-import {
-  Navbar,
-  Welcome,
-  Footer,
-  Services,
-  Transactions,
-  Loader,
-  Login,
-} from './components';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { ThirdwebWeb3Provider } from '@3rdweb/hooks';
+import { Login } from './components';
 import { Home } from './pages/Home';
 import { Register } from './pages/Register';
 import { Collection } from './pages/Collection';
 import { NFTS } from './pages/NFTS';
-import { ThirdwebWeb3Provider } from '@3rdweb/hooks';
-// import { ChainId, ThirdwebProvider } from '@thirdweb-dev/react';
 import { Stats } from './pages/Stats';
 import { Resources } from './pages/Resources';
 import { CreateNFT } from './pages/CreateNFT';
@@ -37,9 +28,6 @@ const App = () => {
     <ThirdwebWeb3Provider
       supportedChainIds={supportedChainIds}
       connectors={connectors}
-
-      // supportedChains={supportedChainIds}
-      // walletConnectors={connectors}
     >
       <div className="min-h-screen">
         <Router>

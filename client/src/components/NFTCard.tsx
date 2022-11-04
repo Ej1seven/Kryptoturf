@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useNavigate, createSearchParams } from 'react-router-dom';
 import { FaEthereum } from 'react-icons/fa';
-import {
-  addLike,
-  getLikes,
-  getCollection,
-  deleteLike,
-} from '../adapters/marketItems';
+import { addLike, deleteLike } from '../adapters/marketItems';
 import { getUserData, me } from '../adapters/user';
 import { useQuery } from 'react-query';
 
 const style = {
-  wrapper: `bg-white flex-auto w-[18rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer`,
+  wrapper: `bg-white flex-auto w-[18rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointe btn-glow`,
   imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
   nftImg: `w-full object-cover`,
   details: `p-3`,
@@ -34,71 +29,73 @@ const NFTCard = ({
   listings,
   collectionContractAddress,
 }: any) => {
-  console.log(title);
-  console.log(nftItem);
-  console.log(nftItem.metadata.id.toNumber());
-  console.log(listings);
-  console.log(collectionContractAddress);
+  /*useNavigate() allows you to route to other pages */
   const navigate = useNavigate();
+  /*Determines if the NFT is listed on the marketplace. If so, the listing price will display on the NFT card. */
   const [isListed, setIsListed] = useState(false);
+  /*Display the listing price for the NFT */
   const [price, setPrice] = useState(0);
+  /*the collectionContractAddress passed down from the parent variable will be stored in the collection variable. */
   const [collection, setCollection]: any = useState();
+  /*Sets the params for the url that will navigate the user to the nft details page. 
+    EX: /nfts/0?isListed=true&collection=0xaa399341fb5d9D765F863b1222c5837839820851 */
   const params = { isListed: `${isListed}`, collection: `${collection}` };
-  const { data, isError, refetch } = useQuery('me', me);
+  /*me query checks if the user is logged in.*/
+  const { data } = useQuery('me', me);
+  /*Stores the user data retrieved from the server through the getUserData() request. */
   const [userData, setUserData]: any = useState([]);
+  /*Sets the like button to true or false */
   const [toggleLikeButton, setToggleLikeButton]: any = useState(false);
+  /*The likeId is used to determine if the current user previously liked the NFT. */
   const [likeId, setLikeId]: any = useState();
-
+  /*This useEffect() is used to determine if the user is logged in. */
   useEffect(() => {
     (async () => {
       await me();
-      // listings.map((listing: any) => {
-      //   console.log(listing.asset.id.toNumber());
-      // });
     })();
   }, []);
+  /*If the user is logged in, we grab the users data using the getUserData() GET request. */
   useEffect(() => {
     (async () => {
-      console.log(data);
       setUserData(await getUserData(data.email));
     })();
   }, [data]);
+  /*After we get the user data we determine if the user has previously liked the NFT card. */
   useEffect(() => {
     (async () => {
-      console.log(userData);
-      console.log(nftItem.metadata.name);
       await userData.likes.forEach((like: any) => {
-        console.log(like.nftName);
+        /*If the user has liked the current NFT then set the like button to true and set likeId.
+          The likeId is needed just in case the user decides to remove his like from the NFT card. */
         if (like.nftName === nftItem.metadata.name) {
           setToggleLikeButton(true);
-          console.log('match');
           setLikeId(Number(like.id));
         }
       });
     })();
   }, [userData]);
-  console.log(userData);
   useEffect(() => {
+    /*Checks if the current NFT is listed on the marketplace */
     const listing = listings.find(
       (listing: any) =>
         listing.asset.id.toNumber() === nftItem.metadata.id.toNumber() &&
         collectionContractAddress === listing.assetContractAddress
     );
+    /*If the NFT is listed on the marketplace setIsListed is set to true and 
+      the listing price is displayed */
     if (Boolean(listing)) {
-      // console.log(listing);
       setIsListed(true);
       setPrice(listing.buyoutCurrencyValuePerToken.displayValue);
     }
+    /*If the NFT is a part of a collection then add the collection contract address to 
+      the collection variable.*/
     collectionContractAddress
       ? setCollection(collectionContractAddress)
       : setCollection(false);
-    listings.map((listing: any) => {
-      console.log(listing.asset.name);
-      console.log(Number(listing.asset.id.toNumber()));
-    });
   }, [listings, nftItem, collectionContractAddress]);
+  /*If the user clickes the like button then a like will either be added or removed from the NFT. */
   const like = async () => {
-    console.log(likeId);
+    /*me() will determine is the user is logged in after pressing the like button. 
+      If the user is not logged in then the like state will not save. */
     await me();
     const likeData = {
       collectionContractAddress: collectionContractAddress,
@@ -106,18 +103,13 @@ const NFTCard = ({
       nftName: nftItem.metadata.name,
       email: data.email,
     };
-    if (toggleLikeButton) {
-      await deleteLike(likeId);
-    } else {
-      await addLike(likeData);
-    }
+    /*If the toggleLikeButton is true remove the like from the users data */
+    toggleLikeButton && (await deleteLike(likeId));
+    /*If the toggleLikeButton is false add the like to the users data */
+    !toggleLikeButton && (await addLike(likeData));
     await setToggleLikeButton(!toggleLikeButton);
+    /*Retrieve the users data after the like field is updated */
     setUserData(await getUserData(data.email));
-    // await addLike(likeData);
-    // getLikes(collectionContractAddress);
-    // getCollection(collectionContractAddress);
-    // setUserData(await getUserData(data.email));
-    console.log('like button clicked');
   };
   return (
     <div>

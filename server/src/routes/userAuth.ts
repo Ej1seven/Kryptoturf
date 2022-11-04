@@ -4,6 +4,7 @@ import { validateRegister } from '../utils/validateRegister';
 import argon2 from 'argon2';
 import process from 'process';
 const { PrismaClient } = require('@prisma/client');
+var hbs = require('nodemailer-express-handlebars');
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -18,6 +19,16 @@ const redis = new Redis(`${process.env.REDIS_URL}`);
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const handlebarOptions = {
+  viewEngine: {
+    extName: '.handlebars',
+    partialsDir: path.resolve('./views'),
+    defaultLayout: false,
+  },
+  viewPath: path.resolve('src/views'),
+  extName: '.handlebars',
+};
+transporter.use('compile', hbs(handlebarOptions));
 const storage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
     cb(null, 'uploads');
@@ -45,23 +56,32 @@ const upload = multer({
 });
 
 let router = express.Router();
-
+/*Determines if the refresh token is active or expired. If the refresh token is expired or null the server will respond with error message "RefreshTokenNotFound"*/
 router.route('/token').get(async (req: any, res: Response) => {
+  /*Retrieves the refresh token from the front-end which is stored in a cookie. */
   const refreshToken = await req.cookies.refreshToken;
+  /*If the refresh token is not found then the server will respond with error message "RefreshTokenNotFound"*/
   if (refreshToken === null) return await res.sendStatus(401);
+  /*refreshTokens retrieves all items from redis with the "refreshTokens" key. 0 indicates the first element on the list and -1 is the last element on the list*/
   const refreshTokens = await redis.lrange('refreshTokens', 0, -1);
+  /*If the refresh token is not found then the server will respond will respond with error message "RefreshTokenNotFound" */
   if (!refreshTokens.includes(refreshToken))
     return res.json('RefreshTokenNotFound');
+  /*If the refresh token is found then JWT authenticates the token by comparing it to the 
+    REFRESH_TOKEN_SECRET environment variable */
   await jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     async (err: any, user: any) => {
       if (err) return res.json(err);
+      /*If the refresh token is authenticated then a new access token and refresh token will be created */
       const accessToken = await jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
       const newRefreshToken = await jwt.sign(
         user,
         process.env.REFRESH_TOKEN_SECRET
       );
+      /*The new refresh token is pushed to redis and the server sends a new refresh and access token
+      to the front-end through a cookie. The server also sends the user data. */
       await redis.rpush('refreshTokens', newRefreshToken);
       res
         .status(202)
@@ -78,6 +98,7 @@ router.route('/token').get(async (req: any, res: Response) => {
         .json(user);
     }
   );
+  /*Redis removes the old refresh token after adding the new one. */
   await redis.lrem('refreshTokens', 0, refreshToken);
 });
 
@@ -143,11 +164,46 @@ router.route('/register').post(async (req: Request, res: Response) => {
     (err: any, emailToken: any) => {
       const url = `${process.env.REACT_APP_API_URL}/userAuth/confirmation/${emailToken}`;
 
-      transporter.sendMail({
+      var mail = {
+        from: process.env.GMAIL_USER,
         to: email,
         subject: 'Confirm Email',
-        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+        template: 'email',
+        context: {
+          url: url,
+          name: user.username,
+        },
+        attachments: [
+          {
+            filename: 'logo.png',
+            path: path.resolve('src/views/logo.png'),
+            cid: 'logo',
+          },
+          {
+            filename: 'github.png',
+            path: path.resolve('src/views/github.png'),
+            cid: 'github',
+          },
+          {
+            filename: 'linkedin.png',
+            path: path.resolve('src/views/linkedin.png'),
+            cid: 'linkedin',
+          },
+        ],
+      };
+
+      transporter.sendMail(mail, function (error: any, info: any) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent:' + info.response);
+        }
       });
+      // transporter.sendMail({
+      //   to: email,
+      //   subject: 'Confirm Email',
+      //   html: `Please click button to confirm your email: <a href="${url}">${url}</a>`,
+      // });
     }
   );
   return res.json({ user });
@@ -181,14 +237,14 @@ router.route('/login').post(async (req: Request, res: Response) => {
       : { where: { username: usernameOrEmail } }
   );
   if (!user) {
-    res.json({ message: "that username doesn't exist" });
+    return res.json({ message: "that username doesn't exist" });
   }
   if (!user.confirmed) {
-    res.json({ message: 'Please confirm your email to login' });
+    return res.json({ message: 'Please confirm your email to login' });
   }
   const valid = await argon2.verify(user.password, password);
   if (!valid) {
-    res.json({ message: 'incorrect password' });
+    return res.json({ message: 'incorrect password' });
   }
   const accessToken = await generateAccessToken(user);
   const refreshToken = await generateRefreshToken(user);
@@ -209,6 +265,9 @@ router.route('/login').post(async (req: Request, res: Response) => {
 
   // return res.json(user);
 });
+/*authenticates the JWT access token and determines if the token is active or expired.
+  If the access token is null then the server will respond with error message "TokenExpiredError".
+  If the access token is active then the server will respond with the user data */
 router.route('/me').get(authenticateToken, async (req: any, res: any) => {
   res.json(req.user);
 });

@@ -18,6 +18,7 @@
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.8.0",
+    "nodemailer-express-handlebars": "^5.0.0",
     "nodemon": "^2.0.15",
     "postgres": "^3.0.5",
     "ts-node": "^10.7.0",

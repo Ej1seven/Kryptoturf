@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ethers, Transaction } from 'ethers';
-import {
-  contractABI,
-  contractAddress,
-  contractAddressTwo,
-} from '../utils/constants';
+import { contractABI, contractAddress } from '../utils/constants';
 import Swal from 'sweetalert2';
 
 declare global {
@@ -27,32 +23,25 @@ interface TransactionContextValue {
 export const TransactionContext = React.createContext<TransactionContextValue>(
   undefined!
 );
-
+/*The following statement detects if the web browser has Metamask installed */
 const { ethereum } = window;
+/*If the user does have Metamask installed the page will reload if the user changes to another network. For example, if the user changed from Goerli to Mumbia the page will reload.  */
 if (ethereum) {
   ethereum.on('chainChanged', (_chainId: any) => window.location.reload());
 }
 
 const getEthereumContract = async () => {
   let transactionContract;
-  const chainId = await ethereum.request({
-    method: 'eth_chainId',
-  });
+  /*The ethers.js library aims to be a complete and compact library for interacting with the Ethereum Blockchain and its ecosystem. The following statement provides a connection to the Ethereum network.*/
   const provider = new ethers.providers.Web3Provider(ethereum);
+  /*A Signer in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network to execute state changing operations. The provider.getSigner(address) in ethers.js, takes in an address and creates a JsonRpcSigner instance, which uses the appropriate methods in from field when submitting a transaction*/
   const signer = provider.getSigner();
-  if (chainId === '0x3') {
-    transactionContract = new ethers.Contract(
-      contractAddress,
-      contractABI,
-      signer
-    );
-  } else {
-    transactionContract = new ethers.Contract(
-      contractAddressTwo,
-      contractABI,
-      signer
-    );
-  }
+  /*A Contract is an abstraction of code that has been deployed to the blockchain. transactionContract will  trigger its code to be run with the input of the transaction data.  */
+  transactionContract = new ethers.Contract(
+    contractAddress,
+    contractABI,
+    signer
+  );
   return transactionContract;
 };
 
@@ -83,8 +72,11 @@ export const TransactionProvider: React.FC = ({ children }) => {
           confirmButtonColor: '#2952e3',
         });
       const transactionContract = await getEthereumContract();
+      /* availableTransactions - gets all the transactions tied the to contract that has matching contractAddress,
+        contractABI, and signer */
       const availableTransactions =
         await transactionContract.getAllTransactions();
+      /*Structures all the transactions to display addressTo, addressFrom, timestamp, message, keyword, and amount */
       const structuredTransactions = availableTransactions.map(
         (transaction: any) => ({
           addressTo: transaction.reciever,
@@ -97,15 +89,18 @@ export const TransactionProvider: React.FC = ({ children }) => {
           amount: parseInt(transaction.amount._hex) / 10 ** 18,
         })
       );
-      console.log(availableTransactions);
-      console.log(structuredTransactions);
+      /*Adds the structured transactions to an array which will used in the <Transactions /> component 
+      to display each transaction on individual cards*/
       setTransactions(structuredTransactions);
     } catch (error) {
       console.log(error);
     }
   };
+  /*checkIfWalletIsConnected- checks if the user's Metamask account is currently connected to Krytoturf */
   const checkIfWalletIsConnected = async () => {
     try {
+      /*If the user is not connected to their Metamask account a modal will appear instructing the user
+        to please install Metamask */
       if (!ethereum)
         return Swal.fire({
           icon: 'info',
@@ -114,6 +109,8 @@ export const TransactionProvider: React.FC = ({ children }) => {
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
+      /*Checks how many accounts are connected to Kryptoturf and sets the first account to 
+        currentAccount. */
       const accounts = await ethereum.request({ method: 'eth_accounts' });
       if (accounts.length) {
         setCurrentAccount(accounts[0]);
@@ -121,25 +118,23 @@ export const TransactionProvider: React.FC = ({ children }) => {
       } else {
         console.log('No accounts found');
       }
-      console.log(accounts);
     } catch (error) {
-      console.log(error);
       throw new Error('No ethereum object.');
     }
   };
-
+  /*Checks is the connected account has any transactions */
   const checkIfTransactionsExist = async () => {
     try {
       const transactionContract = await getEthereumContract();
+      /*Gets the total number of transactions created by the user */
       const transactionCount = await transactionContract.getTransactionCount();
-
+      /*sets the total number of transcation in local storage */
       window.localStorage.setItem('transactionCount', transactionCount);
     } catch (error) {
-      console.log(error);
       throw new Error('No ethereum object.');
     }
   };
-
+  /*Connects the users Metamask wallet to Kryptoturf */
   const connectWallet = async () => {
     try {
       if (!ethereum)
@@ -153,14 +148,12 @@ export const TransactionProvider: React.FC = ({ children }) => {
       const accounts = await ethereum.request({
         method: 'eth_requestAccounts',
       });
-      console.log(accounts);
       setCurrentAccount(accounts[0]);
     } catch (error) {
-      console.log(error);
       throw new Error('No ethereum object.');
     }
   };
-
+  /*sends the users transactions data to the blockchain */
   const sendTransaction = async () => {
     try {
       if (!ethereum)
@@ -172,9 +165,10 @@ export const TransactionProvider: React.FC = ({ children }) => {
           confirmButtonColor: '#2952e3',
         });
       const { addressTo, amount, keyword, message } = formData;
-      console.log(addressTo);
       const transactionContract = await getEthereumContract();
+      /*parsedAmount takes the ether value and converts it to a BigNumber*/
       const parsedAmount = ethers.utils.parseEther(amount);
+      /*Sends the transaction to the blockchain with the following params: from, to, gas fee, and value. */
       await ethereum.request({
         method: 'eth_sendTransaction',
         params: [
@@ -186,7 +180,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
           },
         ],
       });
-
+      /*Adds the transaction to the blockchain. */
       const transactionHash = await transactionContract.addToBlockchain(
         addressTo,
         parsedAmount,
@@ -194,18 +188,18 @@ export const TransactionProvider: React.FC = ({ children }) => {
         keyword
       );
       setIsLoading(true);
-      console.log(`loading - ${transactionHash.hash}`);
       await transactionHash.wait();
       setIsLoading(false);
-      console.log(`success - ${transactionHash.hash}`);
+      /*After the transaction has been added to the blockchain transactionCount gets the new transaction count. */
       const transactionCount = await transactionContract.getTransactionCount();
-
+      /*Sets the new transaction count */
       setTransactionCount(transactionCount.toNumber());
+      return 'success';
     } catch (error) {
-      console.log(error);
+      return error;
     }
   };
-
+  /*When TransactionContext is first loaded it checks if the users wallet is connected and how many transactions exist. */
   useEffect(() => {
     checkIfWalletIsConnected();
     checkIfTransactionsExist();

@@ -1,13 +1,12 @@
-import { useContract, useNFT } from '@thirdweb-dev/react';
-import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import React, { useEffect, useState } from 'react';
 import { getCollection } from '../adapters/marketItems';
+import useMarkeplaceData from '../hooks/useMarketplaceData';
 import { shortenAddress } from '../utils/shortenAddress';
 
 interface AttributesProps {}
 
 const style = {
-  attributesOptions: `h-1/4 flex items-center justify-center hover:bg-white hover:text-[#2081e2]`,
+  attributesOptions: `h-1/4 flex items-center justify-center hover:bg-white hover:text-[#2081e2] text-center`,
 };
 
 export const Attributes: React.FC<any> = ({
@@ -15,23 +14,34 @@ export const Attributes: React.FC<any> = ({
   collectionContractAddress,
   id,
 }) => {
+  /*Collection Data pulled from the database */
   const [collectionData, setCollectionData]: any = useState();
+  /*Toggles between the following NFT data - Details, About, Description, Properties */
   const [nftAttributes, setNftAttributes]: any = useState('Details');
+  /*Gets the creator royalty fee from Thirdweb */
   const [nftRoyaltyDetails, setNftRoyaltyDetails]: any = useState();
+  /*Gets the marketplace data from Thirdweb */
+  const { marketPlaceModule } = useMarkeplaceData(id);
+  /*When the component first loads we get the NFT royalty information by providing the 
+    token ID to Thirdweb. Thirdweb then responds with the royalty value in points
+    which we divide by 100 to get the percentage value. Lastly we retrieve the collection data from the database and set it to the collection data variable. */
   useEffect(() => {
-    const sdk = new ThirdwebSDK('goerli');
-    const contract = sdk.getNFTCollection(collectionContractAddress);
-    let likesArray;
     (async () => {
-      const royaltyFee: any = await contract.royalties.getTokenRoyaltyInfo(id);
-      console.log(royaltyFee);
-      setNftRoyaltyDetails(royaltyFee.seller_fee_basis_points / 100);
-      setCollectionData(await getCollection(collectionContractAddress));
+      const collectionData: any = await getCollection(
+        collectionContractAddress
+      );
+      setCollectionData(collectionData);
     })();
   }, []);
-  console.log(selectedNft);
-  console.log(collectionData);
-  console.log(nftRoyaltyDetails);
+  useEffect(() => {
+    (async () => {
+      const contract = await marketPlaceModule?.getNFTCollection(
+        collectionContractAddress
+      );
+      const royaltyFee: any = await contract?.royalties.getTokenRoyaltyInfo(id);
+      setNftRoyaltyDetails(royaltyFee.seller_fee_basis_points / 100);
+    })();
+  }, [collectionData, marketPlaceModule]);
   return (
     <div className="h-full p-1 flex flex-row ">
       <div className="h-2/3 w-1/3 my-auto white-glassmorphism-nft-attributes">
@@ -76,8 +86,8 @@ export const Attributes: React.FC<any> = ({
           Details
         </div>
       </div>
-      <div className="h-2/3 w-2/3 my-auto ml-4 flex justify-center">
-        <div className="flex flex-col h-full w-2/3 items-center white-glassmorphism-nft-attributes p-2 overflow-hidden">
+      <div className="h-2/3 w-2/3 my-auto sm:ml-4 flex justify-center">
+        <div className="flex flex-col h-full w-full sm:w-2/3 ml-2 sm:ml-0 items-center white-glassmorphism-nft-attributes p-2 overflow-hidden">
           {nftAttributes === 'Details' && (
             <>
               <p className="text-lg mb-2">Details</p>

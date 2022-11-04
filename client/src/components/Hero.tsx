@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import art from '../../src/images/hero-nft-art.jpg';
 
 interface HeroProps {}
@@ -21,6 +22,8 @@ const style = {
 };
 
 export const Hero: React.FC<HeroProps> = ({}) => {
+  /*useNavigate() allows you to route to other pages */
+  const navigate = useNavigate();
   return (
     <div className={style.wrapper}>
       <div className={style.container}>
@@ -30,11 +33,23 @@ export const Hero: React.FC<HeroProps> = ({}) => {
               Discover, collect, and sell extraordinary NFTs
             </div>
             <div className={style.description}>
-              OpenSea is the world&apos;s first and largest NFT marketplace
+              Kryptoturf is a web3 NFT Marketplace, where users have the ability
+              to create, trade, and collect NFTs without the need to spend their
+              own money.
             </div>
             <div className={style.ctaContainer}>
-              <button className={style.accentedButton}>Explore</button>
-              <button className={style.button}>Create</button>
+              <button
+                className={style.accentedButton}
+                onClick={() => navigate('/collections')}
+              >
+                Explore
+              </button>
+              <button
+                className={style.button}
+                onClick={() => navigate('/create')}
+              >
+                Create
+              </button>
             </div>
           </div>
           <div className={style.cardContainer}>

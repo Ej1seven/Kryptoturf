@@ -19,6 +19,16 @@ export async function register(
       address: address,
     })
     .then((res): any => {
+      console.log(res.data);
+      if (res.data === 'invalid email')
+        return Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: res.data,
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
       if (res.data.message)
         return Swal.fire({
           icon: 'error',
@@ -38,16 +48,16 @@ export async function register(
           confirmButtonColor: '#2952e3',
         });
       if (res.data.user.username === username) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'You have successfully created an account. Please login!',
-          background: '#19191a',
-          color: '#fff',
-          confirmButtonColor: '#2952e3',
-        });
         user = res.data.user;
       }
+      return Swal.fire({
+        icon: 'success',
+        title: 'Congrats!',
+        text: `You have successfully created a new account. A confirmation email has been sent to ${email}. Please confirm your email before attempting to login.`,
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
     });
 }
 export async function login(usernameOrEmail: String, password: String) {
@@ -84,8 +94,9 @@ export async function logout() {
       return res.data;
     });
 }
+/* me() checks JWT and determines if the access token is active or expired. When the access and refresh tokens expires the user 
+   will be logged out of their account.*/
 export async function me() {
-  // console.log(usernameOrEmail, password);
   return await axios
     .get(`${URL}/userAuth/me`, {
       withCredentials: true,
@@ -98,7 +109,8 @@ export async function me() {
       return res.data;
     });
 }
-
+/*token() checks JWT and determines if the refresh token is active or expired. If the refresh token is active then
+ it will create a new access token and the user will remain logged in. If the refresh token is expired then the user will be logged out.*/
 export async function token() {
   return await axios
     .get(`${URL}/userAuth/token`, {

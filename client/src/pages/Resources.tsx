@@ -3,22 +3,19 @@ import { Navbar } from '../components/Navbar';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import {
-  RiArrowDownCircleFill,
-  RiArrowLeftCircleFill,
-  RiArrowRightCircleFill,
-} from 'react-icons/ri';
+import { RiArrowLeftCircleFill, RiArrowRightCircleFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
-import docArt1 from '../../src/images/docArt1.svg';
-import docArt2 from '../../src/images/docArt2.svg';
-import docArt3 from '../../src/images/docArt3.svg';
-import docArt4 from '../../src/images/docArt4.svg';
-import docArt5 from '../../src/images/docArt5.svg';
-import docArt6 from '../../src/images/docArt6.svg';
-import docArt7 from '../../src/images/docArt7.svg';
-import docArt8 from '../../src/images/docArt8.svg';
-import docArt10 from '../../src/images/docArt10.svg';
-import docArt11 from '../../src/images/docArt11.svg';
+import docArt1 from '../../src/images/docArt1-min.png';
+import docArt2 from '../../src/images/docArt2-min.png';
+import docArt3 from '../../src/images/docArt3-min.png';
+import docArt4 from '../../src/images/docArt4-min.png';
+import docArt5 from '../../src/images/docArt5-min.png';
+import docArt6 from '../../src/images/docArt6-min.png';
+import docArt7 from '../../src/images/docArt7-min.png';
+import docArt8 from '../../src/images/docArt8-min.png';
+import docArt10 from '../../src/images/docArt10-min.png';
+import docArt11 from '../../src/images/docArt11-min.png';
+import docArt12 from '../../src/images/docArt12-min.png';
 
 interface ResourcesProps {}
 const style = {
@@ -29,16 +26,17 @@ const style = {
   title: `relative text-center md:text-left text-white text-4xl  pt-8 md:pt-0 sm:text-[46px] font-semibold`,
   description: `text-[#8a939b] container-[400px] text-2xl  text-center md:text-left mt-[0.8rem] mb-[2.5rem]`,
   ctaContainer: `flex justify-center md:justify-start mb-8 md:mb-0`,
-  accentedButton: `lg:w-36 md:w-34 sm:w-32 w-28 h-12 mt-5 text-lg font-semibold bg-[#2181e2]  rounded-lg text-white text-center hover:bg-[#42a0ff] cursor-pointer`,
+  accentedButton: `mx-auto md:mx-0 lg:w-36 md:w-34 sm:w-32 w-28 h-12 smMAX:h-14 mt-5 text-lg font-semibold bg-[#2181e2]  rounded-lg text-white text-center hover:bg-[#42a0ff] cursor-pointer`,
   button: ` relative text-lg font-semibold   bg-[#363840] rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
-  cardContainer: `rounded-lg w-1/2 h-3/4 bg-[#313338] shadow-black shadow-lg shadow-inner px-4 pt-8 -rotate-12 scale-75 -translate-y-6 translate-x-9 slide-in-left`,
-  infoContainer: `h-28 pt-6 pb-4 pr-4 flex flex-row`,
+  cardContainer: `rounded-lg w-1/2 h-full md:h-3/4 bg-[#313338] shadow-black shadow-lg shadow-inner px-4 pt-8 -rotate-12 scale-75 -translate-y-6 translate-x-9 slide-in-left`,
+  infoContainer: `h-28 pt-6 smMAX:pt-8 pb-4 smMAX:pr-0 pr-4 flex flex-row`,
   author: `flex flex-col justify-center ml-4 w-full `,
   name: `info-container-box-shadow h-4 w-full`,
   infoIcon: `flex justify-end items-center flex-1 text-[#8a939b] text-3xl font-bold info-container-box-shadow`,
 };
 
 export const Resources: React.FC<any> = ({}) => {
+  /*Each slide on the slide represents a different option. When the user clicks the slide a popup modal will appear with the following text. */
   const messagePop = (option: Number) => {
     let title: any;
     let text: any;
@@ -82,6 +80,10 @@ export const Resources: React.FC<any> = ({}) => {
       title = 'How can I view my Profile?';
       text = `<p>You can view your profile by clicking the profile icon located on the far right side of the navigation bar.</p)`;
     }
+    if (option === 11) {
+      title = 'How can I get more GoerliETH??';
+      text = `<p>In order to create, list, or buy NFTs you must use Ethereum Goerli ETH. There are many faucets you can request Ethereum Goerli ETH. The two faucets I use the most are <a href="https://faucets.chain.link/">https://faucets.chain.link</a> and <a href="https://goerlifaucet.com/">https://goerlifaucet.com</a> </p)`;
+    }
     return Swal.fire({
       icon: 'question',
       title: title,
@@ -102,10 +104,8 @@ export const Resources: React.FC<any> = ({}) => {
           color: 'white',
           position: 'absolute',
           display: 'inline',
-          // height: '85%',
           zIndex: '10',
           marginLeft: '10px',
-          // marginTop: '100px',
           fontSize: '60px',
         }}
         onClick={onClick}
@@ -125,16 +125,15 @@ export const Resources: React.FC<any> = ({}) => {
           top: '0',
           bottom: '0',
           right: '0',
-          // height: '85%',
           zIndex: '20',
           marginRight: '10px',
-          // marginTop: '100px',
           fontSize: '60px',
         }}
         onClick={onClick}
       />
     );
   };
+  /*The setting for the react-slick slideshow */
   const settings = {
     dots: true,
     infinite: false,
@@ -152,8 +151,6 @@ export const Resources: React.FC<any> = ({}) => {
         settings: {
           slidesToShow: 3,
           slidesToScroll: 3,
-          // infinite: true,
-          // dots: true,
         },
       },
       {
@@ -174,15 +171,15 @@ export const Resources: React.FC<any> = ({}) => {
     ],
   };
   const ref = useRef<null | HTMLDivElement>(null);
+  /*When the user clicks the Start Learning button page will auto-scroll down to the slideshow */
   const handleClick = () => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
   return (
     <div className="">
-      {' '}
       <Navbar />
-      <div className="h-screen w-screen flex items-center">
-        <div className="w-1/2 ml-4 pb-20 flex justify-end">
+      <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center">
+        <div className="mt-4 md:mt-0 w-5/6 md:w-1/2 md:ml-4 sm:ml-0 pb-20 flex justify-end">
           <div className={style.cardContainer}>
             <img
               className="rounded-lg w-full"
@@ -190,31 +187,31 @@ export const Resources: React.FC<any> = ({}) => {
               alt=""
             />
             <div className={style.infoContainer}>
-              <div className="w-[36px] h-[36px] rounded-full info-container-box-shadow"></div>
+              <div className="md:w-[36px] md:h-[36px] sm:w-[24px] sm:h-[24px] nft-card-image rounded-full info-container-box-shadow"></div>
 
-              <div className="h-14  ml-3 rounded-b-lg justify-between text-white w-3/4 flex flex-col ">
-                <div className="animate-pulse info-container-box-shadow h-4 w-full" />
-                <div className="animate-pulse info-container-box-shadow h-4 w-2/3" />
+              <div className="h-14  smMAX:h-10 ml-3 rounded-b-lg justify-between text-white w-3/4 flex flex-col ">
+                <div className="animate-pulse info-container-box-shadow h-4 smMAX:h-2 w-full" />
+                <div className="animate-pulse info-container-box-shadow h-4 smMAX:h-2 w-2/3" />
               </div>
             </div>
           </div>
-          <div className="rounded-lg w-1/2 h-3/4 bg-[#313338] shadow-black shadow-lg shadow-inner px-4 pt-8 rotate-12 slide-in-right ">
+          <div className="rounded-lg w-1/2 h-full md:h-3/4 bg-[#313338] shadow-black shadow-lg shadow-inner px-4 pt-8 rotate-12 slide-in-right ">
             <img
               className="rounded-lg w-full"
               src="https://i.seadn.io/gae/Td8uHW4V1GjkLFT0CPF1OmNI0OL6A8EFDYqq6oU5lSfw4xYjycovaFmwcP1ckMWdHgGAj-ShUlo72N8NbsguuMLnUmQSu5bUIn9i?auto=format"
               alt=""
             />
             <div className={style.infoContainer}>
-              <div className="w-[36px] h-[36px] rounded-full info-container-box-shadow"></div>
+              <div className="md:w-[36px] md:h-[36px] sm:w-[24px] sm:h-[24px] nft-card-image rounded-full info-container-box-shadow"></div>
 
-              <div className="h-14  ml-3 rounded-b-lg justify-between text-white w-3/4 flex flex-col ">
-                <div className="animate-pulse info-container-box-shadow h-4 w-full" />
-                <div className="animate-pulse info-container-box-shadow h-4 w-2/3" />
+              <div className="h-14 smMAX:h-10 ml-3 rounded-b-lg justify-between text-white w-3/4 flex flex-col ">
+                <div className="animate-pulse info-container-box-shadow h-4 smMAX:h-2 w-full" />
+                <div className="animate-pulse info-container-box-shadow h-4 smMAX:h-2 w-2/3" />
               </div>
             </div>
           </div>
         </div>
-        <div className="w-1/3 ml-8 flex items-center">
+        <div className="w-3/4 md:w-1/3 ml-8 flex items-center">
           <div className=" flex flex-col text-white ">
             <p className="text-4xl text-bold">
               It's time to explore the world of NFTS!
@@ -234,9 +231,13 @@ export const Resources: React.FC<any> = ({}) => {
       <div ref={ref}>
         <Slider {...settings}>
           <div onClick={() => messagePop(1)} className="">
-            <div className="border-2 border-white rounded-lg help-message-one h-80">
+            <div className="border-2 border-white rounded-lg help-message-one h-80 cursor-pointer">
               {' '}
-              <img className="my-16" src={docArt1} alt="" />
+              <img
+                className="my-16 2xl:w-1/2 2xl:mx-auto"
+                src={docArt1}
+                alt=""
+              />
             </div>
 
             <p className="text-white text-center">
@@ -244,9 +245,13 @@ export const Resources: React.FC<any> = ({}) => {
             </p>
           </div>
           <div onClick={() => messagePop(2)} className="">
-            <div className="border-2 border-white rounded-lg help-message-two h-80">
+            <div className="border-2 border-white rounded-lg help-message-two h-80 cursor-pointer">
               {' '}
-              <img className="w-3/4 mx-auto my-16" src={docArt2} alt="" />
+              <img
+                className="w-3/4 mx-auto my-16 2xl:w-1/2"
+                src={docArt2}
+                alt=""
+              />
             </div>
 
             <p className="text-white text-center">
@@ -254,70 +259,107 @@ export const Resources: React.FC<any> = ({}) => {
             </p>
           </div>
           <div onClick={() => messagePop(3)} className="">
-            <div className="border-2 border-white rounded-lg help-message-three h-80">
+            <div className="border-2 border-white rounded-lg help-message-three h-80 cursor-pointer">
               {' '}
-              <img className="w-3/4 mx-auto my-16" src={docArt3} alt="" />
+              <img
+                className="w-3/4 mx-auto my-16 2xl:w-1/2"
+                src={docArt3}
+                alt=""
+              />
             </div>
             <p className="text-white text-center">What are Turf coins?</p>
           </div>
           <div onClick={() => messagePop(4)} className="">
-            <div className="border-2 border-white rounded-lg help-message-four h-80">
+            <div className="border-2 border-white rounded-lg help-message-four h-80 cursor-pointer">
               {' '}
-              <img className="my-16" src={docArt4} alt="" />
+              <img
+                className="my-16 2xl:w-1/2 2xl:mx-auto"
+                src={docArt4}
+                alt=""
+              />
             </div>
             <p className="text-white text-center">
               Can I transfer my Ethereum to another Metamask account?
             </p>
           </div>
           <div onClick={() => messagePop(5)} className="">
-            <div className="border-2 border-white rounded-lg help-message-five h-80">
+            <div className="border-2 border-white rounded-lg help-message-five h-80 cursor-pointer">
               {' '}
-              <img className="mx-auto my-16" src={docArt5} alt="" />
+              <img className="mx-auto my-16 2xl:w-1/2" src={docArt5} alt="" />
             </div>
             <p className="text-white text-center">
               How can I view my wallet funds and TURF coins?
             </p>
           </div>
           <div onClick={() => messagePop(6)} className="">
-            <div className="border-2 border-white rounded-lg help-message-one h-80">
+            <div className="border-2 border-white rounded-lg help-message-one h-80 cursor-pointer">
               {' '}
-              <img className="w-3/4 mx-auto my-16" src={docArt6} alt="" />
+              <img
+                className="w-3/4 mx-auto my-16 2xl:w-1/2"
+                src={docArt6}
+                alt=""
+              />
             </div>
             <p className="text-white text-center">How do I create an NFT?</p>
           </div>
           <div onClick={() => messagePop(7)} className="">
-            <div className="border-2 border-white rounded-lg help-message-two h-80">
+            <div className="border-2 border-white rounded-lg help-message-two h-80 cursor-pointer">
               {' '}
-              <img className="w-3/4 mx-auto my-16" src={docArt7} alt="" />
+              <img
+                className="w-3/4 mx-auto my-162xl:w-1/2"
+                src={docArt7}
+                alt=""
+              />
             </div>
             <p className="text-white text-center">
               How do I create an Collection?
             </p>
           </div>
           <div onClick={() => messagePop(8)} className="">
-            <div className="border-2 border-white rounded-lg help-message-three h-80">
+            <div className="border-2 border-white rounded-lg help-message-three h-80 cursor-pointer">
               {' '}
-              <img className="w-3/4 mx-auto" src={docArt8} alt="" />
+              <img className="w-3/4 mx-auto 2xl:w-1/2" src={docArt8} alt="" />
             </div>
             <p className="text-white text-center">
               Why is my collection named "Untitled Collection"?
             </p>
           </div>
           <div onClick={() => messagePop(9)} className="">
-            <div className="border-2 border-white rounded-lg help-message-four h-80">
+            <div className="border-2 border-white rounded-lg help-message-four h-80 cursor-pointer">
               {' '}
-              <img className="w-3/4 mx-auto my-16" src={docArt10} alt="" />
+              <img
+                className="w-3/4 mx-auto my-16 2xl:w-1/2"
+                src={docArt10}
+                alt=""
+              />
             </div>
             <p className="text-white text-center">
               How do I list an NFT on the marketplace?
             </p>
           </div>
           <div onClick={() => messagePop(10)} className="">
-            <div className="border-2 border-white rounded-lg help-message-five h-80">
+            <div className="border-2 border-white rounded-lg help-message-five h-80 cursor-pointer">
               {' '}
-              <img className="w-3/4 mt-8 mx-auto" src={docArt11} alt="" />
+              <img
+                className="w-3/4 mt-8 mx-auto 2xl:w-1/2"
+                src={docArt11}
+                alt=""
+              />
             </div>
             <p className="text-white text-center">How can I view my Profile?</p>
+          </div>
+          <div onClick={() => messagePop(11)} className="">
+            <div className="border-2 border-white rounded-lg help-message-five h-80 cursor-pointer">
+              {' '}
+              <img
+                className="w-3/4 mt-8 mx-auto 2xl:w-1/2"
+                src={docArt12}
+                alt=""
+              />
+            </div>
+            <p className="text-white text-center">
+              How can I get more GoerliETH?
+            </p>
           </div>
           <div></div>
         </Slider>

@@ -7,4 +7,5 @@ module.exports = {
       assert: require.resolve('assert/'),
     },
   },
+  devtool: 'inline-source-map',
 };

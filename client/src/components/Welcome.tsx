@@ -1,13 +1,14 @@
 import React, { useContext } from 'react';
-import { AiFillPlayCircle } from 'react-icons/ai';
 import { SiEthereum } from 'react-icons/si';
 import { BsInfoCircle } from 'react-icons/bs';
-
+import Swal from 'sweetalert2';
 import { TransactionContext } from '../context/TransactionContext';
 import { Loader } from './';
 import { shortenAddress } from '../utils/shortenAddress';
+import { useNavigate } from 'react-router-dom';
 
 interface WelcomeProps {}
+/*custom input component used on the ethereum transfer form */
 const Input = ({
   placeholder,
   name,
@@ -27,7 +28,7 @@ const Input = ({
     step="0.0001"
     value={value}
     onChange={(e) => handleChange(e, name)}
-    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism cursor-pointer"
   />
 );
 
@@ -43,13 +44,52 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
     handleChange,
     isLoading,
   } = useContext(TransactionContext);
+  const navigate = useNavigate();
   const handleSubmit = (e: any) => {
+    /*destructures the following fields from the form object */
     const { addressTo, amount, keyword, message } = formData;
     e.preventDefault();
-
-    if (!addressTo || !amount || !keyword || !message) return;
-
-    sendTransaction();
+    /*All fields must be filled out before submitting form. If not, an error message will popup */
+    if (!addressTo || !amount || !keyword || !message)
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'All fields must be filled out to send Ethereum!',
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
+    (async () => {
+      /*sendTransaction() - send transfer transaction to the blockchain */
+      const transactionResponse = await sendTransaction();
+      /*If the transaction fails to go through a modal pops up 
+        with the corresponding error message */
+      if (transactionResponse.code) {
+        return Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${transactionResponse.message}`,
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        });
+      }
+      /*If the transaction is successful a modal pops up informing the user the transaction was successful. The page reloads and the new transaction is visible in the <Transactions /> section on the homepage */
+      if (transactionResponse === 'success') {
+        return Swal.fire({
+          icon: 'success',
+          title: 'Transaction Complete',
+          text: `You've successfully transferred ${amount} ETH to account ${addressTo}`,
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
+      }
+    })();
   };
   return (
     <div className="flex w-full justify-center items-center">
@@ -61,7 +101,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
           </h1>
           <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
             Explore the crypto world. Buy and sell cryptocurrencies easily on
-            Krypto.
+            Kryptoturf.
           </p>
           {!currentAccount && (
             <button
@@ -139,7 +179,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer"
+                className="text-white w-full mt-2 p-2 rounded-full cursor-pointer btn-gradient-border"
               >
                 Send Now
               </button>

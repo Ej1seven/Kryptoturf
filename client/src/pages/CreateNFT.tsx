@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ethers } from 'ethers';
-import fs from 'fs';
 import { TransactionContext } from '../context/TransactionContext';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import { Loader } from '../components/Loader';
@@ -12,6 +11,11 @@ import { getCollections } from '../adapters/marketItems';
 import { me } from '../adapters/user';
 import { useQuery } from 'react-query';
 import { createCollection } from '../adapters/marketItems';
+import { Navbar } from '../components';
+import toast, { Toaster } from 'react-hot-toast';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import useMarkeplaceData from '../hooks/useMarketplaceData';
 
 interface CreateNFTProps {}
 const Input = ({
@@ -33,7 +37,7 @@ const Input = ({
     step="0.0001"
     value={value}
     onChange={(e) => handleChange(e, name)}
-    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism md:w-3/4 cursor-pointer"
   />
 );
 const CollectionInput = ({
@@ -62,15 +66,11 @@ const CollectionInput = ({
     step="0.0001"
     value={value}
     onChange={(e) => handleChange(e, name)}
-    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism md:w-3/4 cursor-pointer"
     onKeyUp={(e) => searchCollections(e)}
     onClick={(e) => toggleCollectionsDropdown(e)}
   />
 );
-
-const commonStyles =
-  'min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white';
-
 const style = {
   wrapper: `flex-auto w-[14rem] h-[15rem]  rounded-2xl overflow-hidden cursor-pointer border-[#3d4f7c] border-[1px] white-glassmorphism`,
   imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
@@ -89,75 +89,27 @@ const style = {
 };
 
 export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
-  const {
-    connectWallet,
-    currentAccount,
-    // formData,
-    sendTransaction,
-    // handleChange,
-    isLoading,
-  } = useContext(TransactionContext);
-  const { provider } = useWeb3();
+  /*useNavigate() allows you to route to other pages */
+  const navigate = useNavigate();
+  /*currentAccount - gets the account of the user currently connected to Metamask */
+  const { currentAccount } = useContext(TransactionContext);
+  /*Display a spinning loading icon when the collection data is being sent to the blockchain and database*/
+  const [isLoading, setIsLoading] = useState(false);
+  /*Pulls all the collections from the database and puts them in the collections array */
   const [collections, setCollections]: any = useState([]);
+  /*Contains all the  collections on the marketplace*/
   const [marketplaceCollections, setMarketplaceCollections] = useState([]);
+  /*Contains all the collections owned by the current user */
   const [collectionsOwnedByUser, setCollectionsOwnedByUser]: any = useState([
     { name: '', contractAddress: '' },
   ]);
-  const [collectionInput, setCollectionInput] = useState();
-  const [collectionsInputActive, setCollectionsInputActive] = useState(false);
+  /*toggles the collections dropdown menu */
   const [displayCollections, setDisplayCollections] = useState(false);
-  const [collectionAddress, setCollectionAddress] = useState('');
-  const { data, isError, refetch } = useQuery('me', me);
-  const marketPlaceModule = useMemo(() => {
-    if (!provider) return;
-    const sdk = new ThirdwebSDK(provider.getSigner());
-    return sdk;
-  }, [provider]);
-  useEffect(() => {
-    if (!marketPlaceModule) return;
-    let collectionsArray: any = [];
-    for (let x = 0; x <= collections.length - 1; x++) {
-      (async () => {
-        const contract = await sdk.getNFTCollection(
-          collections[x].contractAddress
-        );
-        console.log(contract);
-        const metadata = await contract.metadata.get();
-        await collectionsArray.push(metadata);
-      })();
-      setMarketplaceCollections(collectionsArray);
-    }
-  }, [marketPlaceModule]);
-  useEffect(() => {
-    if (!marketplaceCollections) return;
-    let ownedCollections: any = [];
-    (async () => {
-      const username = await data.username;
-      console.log(username);
-      for (let x = 0; x <= collections.length - 1; x++) {
-        console.log(collections[x].createdBy);
-        if (collections[x].createdBy === username) {
-          ownedCollections.push({
-            name: collections[x].title,
-            contractAddress: collections[x].contractAddress,
-          });
-          console.log('match!');
-        }
-      }
-      setCollectionsOwnedByUser(ownedCollections);
-    })();
-  }, [collections]);
-  console.log(marketplaceCollections);
-  console.log(collections);
-  console.log(collectionsOwnedByUser);
-  console.log(collectionsOwnedByUser.length);
-
-  useEffect(() => {
-    (async () => {
-      const collections = await getCollections();
-      await setCollections(collections);
-    })();
-  }, []);
+  /*Checks if the user is logged in and returns the user data */
+  const { data } = useQuery('me', me);
+  /*Gets the marketplace data from Thirdweb */
+  const { marketPlaceModule } = useMarkeplaceData();
+  /*Sets the uploaded image properties */
   const [image, setImage] = useState({
     preview: '',
     raw: '',
@@ -171,6 +123,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
       walletAddress: '',
     },
   });
+  /*Sets the formData properties */
   const [formData, setFormData] = useState({
     name: '',
     externalLink: '',
@@ -178,10 +131,12 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
     collection: '',
     supply: '',
   });
+  /*Sets the attributes */
   const [attributes, setAttributes] = useState({
     trait_type: '',
     value: '',
   });
+  /*Sets the image properties */
   const handlePhotoChange = (e: any) => {
     if (e.target.files.length) {
       setImage({
@@ -199,63 +154,138 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
       });
     }
   };
+  const confirmNFT = (toastHandler = toast) =>
+    toastHandler.success(`NFT succesfully created!`, {
+      style: {
+        background: '#04111d',
+        color: '#fff',
+      },
+    });
+  /*Sets the form data */
   const handleChange = (e: any, name: any) => {
-    console.log(e.target.value);
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
+  /*Sets the attributes data */
   const handleAttributeChange = (e: any, name: any) => {
-    console.log(e.target.value);
     setAttributes((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
+  /*Gets the  Metamask wallet private key from the marketplace owner. 
+    The wallet private key is needed by ThirdWeb to provide access marketplace data  */
   let WALLET_PRIVATE_KEY: any = process.env.REACT_APP_WALLET_PRIVATE_KEY;
-  const REACT_APP_MODULE_ADDRESS: any = process.env.REACT_APP_MODULE_ADDRESS;
-
   //Use the network you created the initial project on
-  const rpcUrl =
-    'https://eth-goerli.g.alchemy.com/v2/4ht15HX4e4b3kFaopvBKras7Ueaphi4p';
+  const RPC_URL = process.env.REACT_APP_RPC_URL;
+  //Use the network you created the initial project on
   const wallet = new ethers.Wallet(
     WALLET_PRIVATE_KEY,
-    ethers.getDefaultProvider(rpcUrl)
+    ethers.getDefaultProvider(RPC_URL)
   );
+  /*Connects to ThirdWebSDK using the wallet object */
   const sdk = new ThirdwebSDK(wallet);
-
-  const createNFTCollection = async () => {
-    await sdk.deployer
-      .deployNFTCollection({
-        name: 'My Collection One',
-        primary_sale_recipient: currentAccount,
-      })
-      .then(async (res) => {
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-  };
-
+  /*The following useEffect function maps through all the collections in the database and makes sure they are listed on the marketplace */
+  useEffect(() => {
+    if (!marketPlaceModule) return;
+    let collectionsArray: any = [];
+    for (let x = 0; x <= collections.length - 1; x++) {
+      (async () => {
+        const contract = await sdk.getNFTCollection(
+          collections[x].contractAddress
+        );
+        const metadata = await contract.metadata.get();
+        await collectionsArray.push(metadata);
+      })();
+      setMarketplaceCollections(collectionsArray);
+    }
+  }, [marketPlaceModule]);
+  /*The following useEffect function maps through all the collections in the database and checks which collections are owned by the current user. */
+  useEffect(() => {
+    if (!marketplaceCollections) return;
+    let ownedCollections: any = [];
+    (async () => {
+      const username = await data.username;
+      for (let x = 0; x <= collections.length - 1; x++) {
+        if (collections[x].createdBy === username) {
+          ownedCollections.push({
+            name: collections[x].title,
+            contractAddress: collections[x].contractAddress,
+          });
+        }
+      }
+      setCollectionsOwnedByUser(ownedCollections);
+    })();
+  }, [collections]);
+  /*The following useEffect function gets all the collections from the database */
+  useEffect(() => {
+    (async () => {
+      const collections = await getCollections();
+      await setCollections(collections);
+    })();
+  }, []);
+  /*Mints the NFT to Kryptoturf marketplace */
   const mintNFT = async () => {
-    const { name, externalLink, description, collection, supply } = formData;
+    setIsLoading(true);
+    let error: any = null;
+    const { name, externalLink, description } = formData;
+    /*If the user has not entered a name an error message will popup when they click the create button */
+    if (!name) {
+      setIsLoading(false);
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `Please enter a name for your NFT`,
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
+    }
+    /*If the user has not uploaded an image an error message will popup when they click the create button */
+    if (!image.raw) {
+      setIsLoading(false);
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `Please upload an image for your NFT`,
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
+    }
+    /*If the user is not logged into their account an error message will popup when they 
+      attempt to create a NFT. */
+    if (!data?.id) {
+      setIsLoading(false);
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `You must first login to create a NFT`,
+        background: '#19191a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      });
+    }
+    /*Determines if the user entered any attributes for the NFT. If not the array will return undefined */
     rows.shift();
+    /*Creates a randon number which will be a part of the Untitled Collection
+    if the NFT the user creates is not a part of a already created collection */
     let val = Math.floor(1000 + Math.random() * 9000000);
+    /*Sets the name for the untitled collection */
     let untitledCollection = `Untitled Collection #${val}`;
-    console.log(untitledCollection);
+    let untitledCollectionContractAddress: any = null;
+    /*If the NFT is a part of a already created collection collectionName will hold the value */
     let collectionName;
+    /*collectionInput gets the name of the collection selected by the user from the dropdown list then 
+      mints the NFT to the selected collection */
     let collectionInput: any = document.getElementById('collection');
-    console.log(collectionInput.value);
     for (let x = 0; x <= collectionsOwnedByUser.length - 1; x++) {
       if (
         collectionInput.value.toLowerCase() ===
         collectionsOwnedByUser[x].name.toLowerCase()
       ) {
-        console.log('match', collectionInput.value);
         collectionName = collectionsOwnedByUser[x].name;
-        // setCollectionAddress(collectionsOwnedByUser[x].contractAddress);
+        /*Gets the collection contract address from the ThirdWeb */
         const getModule = await sdk.getNFTCollection(
-          // REACT_APP_MODULE_ADDRESS
-          //The address of you the module you created in ThirdWeb
-          // '0x0b75d3533Eb2ef516e5237FD20d59d2BAc8549B5'
           collectionsOwnedByUser[x].contractAddress
         );
+        /*Mints the NFT to the database */
         const mint = await getModule.mintTo(currentAccount, {
           name: name,
           description: description,
@@ -263,28 +293,56 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
           image: image.raw,
           external_url: externalLink,
         });
-        const receipt = mint.receipt;
+        const receipt = mint.receipt; //the receipt from the transaction
         const tokenId = mint.id; // the id of the NFT minted
-        await mint.data();
-        console.log(receipt);
-        console.log(tokenId);
+        await mint.data().catch((err) => {
+          error = err;
+        });
+        setIsLoading(false);
+        /*If there is an error minting the NFT a error message will popup */
+        if (error) {
+          return Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${error.message}`,
+            background: '#19191a',
+            color: '#fff',
+            confirmButtonColor: '#2952e3',
+          });
+        }
+        /*If the NFT mint is successful then a success message will popup */
+        return Swal.fire({
+          icon: 'success',
+          title: 'Congrats!',
+          text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        }).then((result) => {
+          console.log(untitledCollectionContractAddress);
+          if (result.isConfirmed) {
+            let collectionInput: any = document.getElementById('collection');
+            confirmNFT();
+            navigate(
+              `/collection/${collectionsOwnedByUser[x].contractAddress}`
+            );
+          }
+        });
       }
     }
     console.log(collectionName);
+    /*if the user did not select a collection they created then first check if they already have an Untitled Collection. If so, mint the new NFT to this collection. If the user does not already have an Untitled Collection create a new one and mint the NFT to it */
     if (!collectionName) {
-      console.log('new collection');
-      console.log(currentAccount);
+      /*Map through the collections owned by the user and check to see if they already have a Untitled Collection. If so mint the NFT to the collection. */
       for (let x = 0; x <= collectionsOwnedByUser.length - 1; x++) {
         if (
           collectionsOwnedByUser[x].name
             .toLowerCase()
             .includes('untitled collection')
         ) {
-          console.log('match', collectionsOwnedByUser[x].name);
+          untitledCollectionContractAddress =
+            collectionsOwnedByUser[x].contractAddress;
           const getModule = await sdk.getNFTCollection(
-            // REACT_APP_MODULE_ADDRESS
-            //The address of you the module you created in ThirdWeb
-            // '0x0b75d3533Eb2ef516e5237FD20d59d2BAc8549B5'
             collectionsOwnedByUser[x].contractAddress
           );
           const mint = await getModule.mintTo(currentAccount, {
@@ -296,137 +354,129 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
           });
           const receipt = mint.receipt;
           const tokenId = mint.id; // the id of the NFT minted
-          await mint.data();
-          console.log(receipt);
-          return console.log(tokenId);
+          await mint.data().catch((err) => {
+            error = err;
+          });
+          setIsLoading(false);
+          /*If there is an error minting the NFT a error message will popup */
+          if (error) {
+            return Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: `${error.message}`,
+              background: '#19191a',
+              color: '#fff',
+              confirmButtonColor: '#2952e3',
+            });
+          }
+          /*If the NFT mint is successful then a success message will popup */
+          return Swal.fire({
+            icon: 'success',
+            title: 'Congrats!',
+            text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+            background: '#19191a',
+            color: '#fff',
+            confirmButtonColor: '#2952e3',
+          }).then((result) => {
+            console.log(untitledCollectionContractAddress);
+            if (result.isConfirmed) {
+              confirmNFT();
+              navigate(`/collection/${untitledCollectionContractAddress}`);
+            }
+          });
         }
       }
-      (async () => {
-        await sdk.deployer
-          .deployNFTCollection({
-            name: untitledCollection,
-            primary_sale_recipient: currentAccount,
-          })
-          .then(async (res) => {
-            let contractAddress = await res;
-            const collectionData = await {
-              title: untitledCollection,
-              contractAddress: contractAddress,
-              createdBy: data.username,
-              owners: data.username,
-            };
-            const getModule = await sdk.getNFTCollection(
-              // REACT_APP_MODULE_ADDRESS
-              //The address of you the module you created in ThirdWeb
-              // '0x0b75d3533Eb2ef516e5237FD20d59d2BAc8549B5'
-              contractAddress
-            );
+      /*If an Untitled Collection has not already been created deploy a new Untitled Collection then mint the NFT to that collection */
+      if (!untitledCollectionContractAddress) {
+        (async () => {
+          await sdk.deployer
+            .deployNFTCollection({
+              name: untitledCollection,
+              primary_sale_recipient: currentAccount,
+            })
+            .then(async (res) => {
+              let contractAddress = await res;
+              untitledCollectionContractAddress = await contractAddress;
+              const collectionData = await {
+                title: untitledCollection,
+                contractAddress: contractAddress,
+                createdBy: data.username,
+                owners: data.username,
+              };
+              const getModule = await sdk.getNFTCollection(contractAddress);
 
-            console.log(collectionData);
-            await createCollection(collectionData);
-            const mint = await getModule.mintTo(currentAccount, {
-              name: name,
-              description: description,
-              attributes: rows,
-              image: image.raw,
-              external_url: externalLink,
+              await createCollection(collectionData);
+              const mint = await getModule.mintTo(currentAccount, {
+                name: name,
+                description: description,
+                attributes: rows,
+                image: image.raw,
+                external_url: externalLink,
+              });
+              const receipt = mint.receipt;
+              const tokenId = mint.id; // the id of the NFT minted
+              await mint.data();
+            })
+            .catch((err) => {
+              error = err;
             });
-            const receipt = mint.receipt;
-            const tokenId = mint.id; // the id of the NFT minted
-            await mint.data();
-            console.log(receipt);
-            console.log(tokenId);
-            // await setCollectionAddress(contractAddress);
-            // await console.log(getModule);
-          })
-          .catch((error) => {
-            console.log(error.message);
+          setIsLoading(false);
+          /*If there is an error minting the NFT a error message will popup */
+          if (error) {
+            return Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: `${error.message}`,
+              background: '#19191a',
+              color: '#fff',
+              confirmButtonColor: '#2952e3',
+            });
+          }
+          /*If the NFT mint is successful then a success message will popup */
+          return Swal.fire({
+            icon: 'success',
+            title: 'Congrats!',
+            text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+            background: '#19191a',
+            color: '#fff',
+            confirmButtonColor: '#2952e3',
+          }).then((result) => {
+            console.log(untitledCollectionContractAddress);
+            if (result.isConfirmed) {
+              confirmNFT();
+              navigate(`/collection/${untitledCollectionContractAddress}`);
+            }
           });
-      })();
+        })();
+      }
     }
-    // const nftData = {
-    //   name: name,
-    //   description: description,
-    //   attributes: rows,
-    //   externalLink,
-    //   collection,
-    //   supply,
-    // };
-    // console.log(rows);
-    // console.log(collectionAddress);
-    // console.log(image.raw);
-    // console.log(image.properties.name);
-    // console.log(image.properties.lastModified);
-    // console.log(image.properties.size);
-    // console.log(image.properties.walletAddress);
-    // // console.log(image.raw);
-    // console.log(name);
-    // console.log(description);
-    // console.log(externalLink);
-    // console.log(collection);
-    // console.log(supply);
   };
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    console.log(image.raw);
-    // const formData = new FormData();
-    // formData.append('image', image.raw);
-
-    // await fetch('YOUR_URL', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data',
-    //   },
-    //   body: formData,
-    // });
-  };
-
+  /*Sets the rows on the attributes dropdown menu */
   const [rows, setRows] = useState([{}]);
+  /*The titles for the two columns on the attributes chart are Type and Name */
   const columnsArray = ['Type', 'Name']; // pass columns here dynamically
+  /*Toggles the attributes popup menu */
   const [toggleMenu, setToggleMenu] = useState(false);
-
+  /*Adds a new row to the attributes menu */
   const handleAddRow = () => {
-    const { trait_type, value } = attributes;
     setRows([...rows, attributes]);
   };
+  /*Saves the attributes created by the user */
   const saveAttributes = () => {
-    const { trait_type, value } = attributes;
     setAttributes(attributes);
     setRows([...rows, attributes]);
     setToggleMenu(false);
   };
-
-  const postResults = () => {
-    console.log(rows); // there you go, do as you please
-  };
+  /*Deletes the selected row */
   const handleRemoveSpecificRow = (idx: any) => {
     const tempRows = [...rows]; // to avoid  direct state mutation
     tempRows.splice(idx, 1);
     setRows(tempRows);
   };
-
-  const updateState = (e: any) => {
-    let prope = e.target.attributes.column.value; // the custom column attribute
-    let index = e.target.attributes.index.value; // index of state array -rows
-    let fieldValue = e.target.value; // value
-
-    const tempRows = [...rows]; // avoid direct state mutation
-    const tempObj: any = rows[index]; // copy state object at index to a temporary object
-    tempObj[prope] = fieldValue; // modify temporary object
-
-    // return object to rows` clone
-    tempRows[index] = tempObj;
-    setRows(tempRows); // update state
-  };
-
+  /*Filters the collections on the dropdown menu to match the input provided by the user */
   const searchCollections = (e: any) => {
     let input = e.target.value;
     input = input.toLowerCase();
-    console.log(input);
-    // if (input.length === 0) {
-    //   setDisplayCollections(true);
-    // }
     let collections = document.getElementsByClassName('collection');
     for (let i = 0; i < collections.length; i++) {
       if (
@@ -438,301 +488,264 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
       }
     }
   };
-
+  /*Toggles the collections dropdown menu */
   const toggleCollectionsDropdown = (e: any) => {
-    // let collectionInput: any = document.getElementById('collection');
-    // if(e.target !== )
     let val = Math.floor(1000 + Math.random() * 9000000);
-    console.log(val);
-    console.log(e.target);
-    console.log(document.activeElement);
     setDisplayCollections(!displayCollections);
   };
+  /*Changes the collection input to the selected item */
   const changeCollectionInput = (e: any) => {
-    console.log(e.target.outerText);
     let collectionInput: any = document.getElementById('collection');
-    console.log(collectionInput.value);
     collectionInput.value = e.target.outerText;
+    console.log(collectionInput.value);
   };
   let collectionInputElement: any = document.getElementById('collection');
+  /*Recognizes when the user has selected a different collection and hides the dropdown afterwards */
   document.addEventListener('click', (event) => {
     const isClickInside = collectionInputElement.contains(event.target);
-
     if (!isClickInside) {
       setDisplayCollections(false);
     }
   });
   return (
-    <div className="flex justify-center outer-container">
-      <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism  lg:mt-72 md:mt-64 mt-60">
-        <p className="text-white text-3xl text-left w-full pb-8 text-center">
-          Create New Item
-        </p>
-        <label htmlFor="upload-button">
-          {image.preview ? (
-            <img
-              src={image.preview}
-              alt="dummy"
-              width="300"
-              height="300"
-              className="my-10 mx-5"
-            />
-          ) : (
-            <div className={style.wrapper}>
-              <HiOutlinePhotograph
-                // className="w-full object-cover"
-                color="white"
-                size={'14rem'}
-              />
-            </div>
-          )}
-          <h5
-            onClick={handlePhotoChange}
-            className="text-white w-full mt-10 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer text-center"
-          >
-            Upload your photo
-          </h5>
-        </label>
-
-        <input
-          type="file"
-          id="upload-button"
-          style={{ display: 'none' }}
-          onChange={handlePhotoChange}
-        />
-        <br />
-        <Input
-          placeholder="Name"
-          name="name"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <Input
-          placeholder="External link"
-          name="externalLink"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <Input
-          placeholder="Description"
-          name="description"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <CollectionInput
-          id="collection"
-          placeholder="Collection"
-          name="collection"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-          searchCollections={searchCollections}
-          toggleCollectionsDropdown={toggleCollectionsDropdown}
-        />
-        {displayCollections && (
-          <>
-            {' '}
-            {collectionsOwnedByUser.length > 0 && (
-              <div className="w-full white-glassmorphism-options ">
-                {collectionsOwnedByUser.map((collection: any, index: any) => {
-                  console.log(index);
-                  console.log(collectionsOwnedByUser.length - 1);
-                  if (index !== collectionsOwnedByUser.length - 1) {
-                    return (
-                      <div
-                        className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection"
-                        onClick={(e) => changeCollectionInput(e)}
-                      >
-                        {collection.name}
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div
-                        className="w-full  p-2 outline-none bg-transparent text-white text-sm border-none collection"
-                        onClick={(e) => changeCollectionInput(e)}
-                      >
-                        {collection.name}
-                      </div>
-                    );
-                  }
-                })}
-              </div>
-            )}
-          </>
-        )}
-
-        <Input
-          placeholder="Supply"
-          name="supply"
-          type="text"
-          handleChange={handleChange}
-          value={null}
-        />
-        <div
-          onClick={() => setToggleMenu(true)}
-          className=" w-full content-center text-white flex flex-row border-[#3d4f7c]"
-        >
-          {' '}
-          <div className="w-11/12 flex flex-row justify-start">
-            <div>
-              <HiMenuAlt4 fontSize={28} className=" mx-2 cursor-pointer" />
-            </div>
-            <div>
-              {' '}
-              <button> Properties</button>
-            </div>
-          </div>
-          <IoIosAdd size={'2rem'} />
-        </div>
-        <div className="h-[1px] w-full bg-gray-400 my-2" />
-        {isLoading ? (
+    <div className=" overflow-hidden">
+      <Toaster position="top-center" reverseOrder={false} />
+      <Navbar />
+      {isLoading ? (
+        <div className="h-screen w-screen flex items-center justify-center">
           <Loader />
-        ) : (
-          <button
-            type="button"
-            onClick={mintNFT}
-            className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer "
-          >
-            Create
-          </button>
-        )}
-      </div>
-      {toggleMenu && (
-        <>
-          {/* <!-- Main modal --> */}
-          <div
-            id="defaultModal"
-            aria-hidden="true"
-            className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full "
-          >
-            <div className="relative p-4 w-full max-w-2xl h-full md:h-auto m-auto">
-              {/* <!-- Modal content --> */}
-              <div className="relative bg-white rounded-lg shadow bg-[#19191a] ">
-                {/* <!-- Modal header --> */}
-                <div className="flex flex-col justify-between items-start p-4 rounded-t border-b dark:border-gray-600">
-                  <div className=" w-full flex flex-row">
-                    <h3 className="w-11/12 ml-[8%] text-xl font-semibold text-gray-900 dark:text-white text-center">
-                      Add Properties{' '}
-                    </h3>
-                    <AiOutlineClose
-                      fontSize={28}
-                      className="text-white cursor-pointer relative"
-                      onClick={() => setToggleMenu(false)}
-                    />
-                  </div>
-                  {/* <!-- Modal body --> */}
-                  <div className="p-6 space-y-6 w-full text-white">
-                    <table className="table-auto w-full">
-                      <thead>
-                        <tr className="w-full">
-                          <th className="w-1/12	"></th>
-                          <th className="w-2/5">Type</th>
-                          <th className="w-2/5">Name</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rows.map((item, idx) => (
-                          <tr className="w-full" key={idx}>
-                            <td className="">
-                              <>{idx + 1}</>
-                            </td>
-                            {columnsArray.map((column, index) =>
-                              index === 0 ? (
-                                <>
-                                  <td className="" key={index}>
-                                    <Input
-                                      placeholder="Character"
-                                      name="trait_type"
-                                      type="text"
-                                      handleChange={handleAttributeChange}
-                                      value={null}
-                                    />
-                                  </td>
-                                </>
-                              ) : (
-                                <>
-                                  {' '}
-                                  <td className="" key={index}>
-                                    <Input
-                                      placeholder="Male"
-                                      name="value"
-                                      type="text"
-                                      handleChange={handleAttributeChange}
-                                      value={null}
-                                    />
-                                  </td>
-                                </>
-                              )
-                            )}
+        </div>
+      ) : (
+        <div className="flex justify-center">
+          <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism mt-8">
+            <p className="text-white text-3xl text-left w-full pb-8 text-center">
+              Create New Item
+            </p>
+            <label htmlFor="upload-button">
+              {image.preview ? (
+                <img
+                  src={image.preview}
+                  alt="dummy"
+                  width="300"
+                  height="300"
+                  className="my-10 mx-5"
+                />
+              ) : (
+                <div className={style.wrapper}>
+                  <HiOutlinePhotograph color="white" size={'14rem'} />
+                </div>
+              )}
+              <h5
+                onClick={handlePhotoChange}
+                className="text-white w-full mt-10 p-2 rounded-full cursor-pointer text-center btn-gradient-border"
+              >
+                Upload your photo
+              </h5>
+            </label>
 
-                            <td>
-                              <AiOutlineClose
-                                fontSize={25}
-                                className="text-white cursor-pointer ml-4"
-                                onClick={() => handleRemoveSpecificRow(idx)}
-                                // onClick={() => setToggleMenu(false)}
-                              />
-                            </td>
-                          </tr>
-                        ))}
-
-                        {/* <tr>
-                        <td>
-                          <Input
-                            placeholder="External link"
-                            name="externalLink"
-                            type="text"
-                            handleChange={handleChange}
-                            value={null}
-                          />
-                        </td>
-                        <td>
-                          <Input
-                            placeholder="External link"
-                            name="externalLink"
-                            type="text"
-                            handleChange={handleChange}
-                            value={null}
-                          />
-                        </td>
-                      </tr> */}
-                        {/* <tr>
-                        <td>Witchy Woman</td>
-                        <td>The Eagles</td>
-                      </tr>
-                      <tr>
-                        <td>Shining Star</td>
-                        <td>Earth, Wind, and Fire</td>
-                      </tr> */}
-                      </tbody>
-                    </table>
-                    <button
-                      type="button"
-                      onClick={handleAddRow}
-                      className="text-white w-1/3 mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
-                    >
-                      Add more
-                    </button>
+            <input
+              type="file"
+              id="upload-button"
+              style={{ display: 'none' }}
+              onChange={handlePhotoChange}
+            />
+            <br />
+            <Input
+              placeholder="Name"
+              name="name"
+              type="text"
+              handleChange={handleChange}
+              value={null}
+            />
+            <Input
+              placeholder="External link"
+              name="externalLink"
+              type="text"
+              handleChange={handleChange}
+              value={null}
+            />
+            <Input
+              placeholder="Description"
+              name="description"
+              type="text"
+              handleChange={handleChange}
+              value={null}
+            />
+            <CollectionInput
+              id="collection"
+              placeholder="Collection"
+              name="collection"
+              type="text"
+              handleChange={handleChange}
+              value={null}
+              searchCollections={searchCollections}
+              toggleCollectionsDropdown={toggleCollectionsDropdown}
+            />
+            {displayCollections && (
+              <>
+                {' '}
+                {collectionsOwnedByUser.length > 0 && (
+                  <div className="w-full white-glassmorphism-options ">
+                    {collectionsOwnedByUser.map(
+                      (collection: any, index: any) => {
+                        if (index !== collectionsOwnedByUser.length - 1) {
+                          return (
+                            <div
+                              className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
+                              onClick={(e) => changeCollectionInput(e)}
+                            >
+                              {collection.name}
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div
+                              className="w-full  p-2 outline-none bg-transparent text-white text-sm border-none collection  cursor-pointer"
+                              onClick={(e) => changeCollectionInput(e)}
+                            >
+                              {collection.name}
+                            </div>
+                          );
+                        }
+                      }
+                    )}
                   </div>
-                  {/* <!-- Modal footer --> */}
-                  <div className="flex w-full items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600 flex-row">
-                    <button
-                      type="button"
-                      onClick={saveAttributes}
-                      className="text-white w-full dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 bg-blue-700 w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
-                    >
-                      Save
-                    </button>
+                )}
+              </>
+            )}
+            <div
+              onClick={() => setToggleMenu(true)}
+              className=" w-full content-center text-white flex flex-row border-[#3d4f7c] md:w-3/4  cursor-pointer"
+            >
+              {' '}
+              <div className="w-11/12 flex flex-row justify-start">
+                <div>
+                  <HiMenuAlt4 fontSize={28} className=" mx-2 cursor-pointer" />
+                </div>
+                <div>
+                  {' '}
+                  <button> Properties</button>
+                </div>
+              </div>
+              <IoIosAdd size={'2rem'} />
+            </div>
+            <div className="h-[1px] w-full bg-gray-400 my-2" />
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <button
+                type="button"
+                onClick={mintNFT}
+                className="text-white w-full mt-2  p-2 btn-gradient-border rounded-full cursor-pointer "
+              >
+                Create
+              </button>
+            )}
+          </div>
+          {toggleMenu && (
+            <>
+              {/* <!-- Main modal --> */}
+              <div
+                id="defaultModal"
+                aria-hidden="true"
+                className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full "
+              >
+                <div className="relative p-4 w-full max-w-2xl h-full md:h-auto m-auto">
+                  {/* <!-- Modal content --> */}
+                  <div className="relative bg-white rounded-lg shadow bg-[#19191a] ">
+                    {/* <!-- Modal header --> */}
+                    <div className="flex flex-col justify-between items-start p-4 rounded-t border-b dark:border-gray-600">
+                      <div className=" w-full flex flex-row">
+                        <h3 className="w-11/12 ml-[8%] text-xl font-semibold text-gray-900 dark:text-white text-center">
+                          Add Properties{' '}
+                        </h3>
+                        <AiOutlineClose
+                          fontSize={28}
+                          className="text-white cursor-pointer relative"
+                          onClick={() => setToggleMenu(false)}
+                        />
+                      </div>
+                      {/* <!-- Modal body --> */}
+                      <div className="p-6 space-y-6 w-full text-white">
+                        <table className="table-auto w-full">
+                          <thead>
+                            <tr className="w-full">
+                              <th className="w-1/12	"></th>
+                              <th className="w-2/5">Type</th>
+                              <th className="w-2/5">Name</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.map((item, idx) => (
+                              <tr className="w-full" key={idx}>
+                                <td className="">
+                                  <>{idx + 1}</>
+                                </td>
+                                {columnsArray.map((column, index) =>
+                                  index === 0 ? (
+                                    <>
+                                      <td className="" key={index}>
+                                        <Input
+                                          placeholder="Character"
+                                          name="trait_type"
+                                          type="text"
+                                          handleChange={handleAttributeChange}
+                                          value={null}
+                                        />
+                                      </td>
+                                    </>
+                                  ) : (
+                                    <>
+                                      {' '}
+                                      <td className="" key={index}>
+                                        <Input
+                                          placeholder="Male"
+                                          name="value"
+                                          type="text"
+                                          handleChange={handleAttributeChange}
+                                          value={null}
+                                        />
+                                      </td>
+                                    </>
+                                  )
+                                )}
+
+                                <td>
+                                  <AiOutlineClose
+                                    fontSize={25}
+                                    className="text-white cursor-pointer ml-4"
+                                    onClick={() => handleRemoveSpecificRow(idx)}
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <button
+                          type="button"
+                          onClick={handleAddRow}
+                          className="text-white w-1/3 mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
+                        >
+                          Add more
+                        </button>
+                      </div>
+                      {/* <!-- Modal footer --> */}
+                      <div className="flex w-full items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600 flex-row">
+                        <button
+                          type="button"
+                          onClick={saveAttributes}
+                          className="text-white w-full dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 bg-blue-700 w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </>
+            </>
+          )}
+        </div>
       )}
     </div>
   );

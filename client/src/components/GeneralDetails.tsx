@@ -7,21 +7,22 @@ import { GiShare } from 'react-icons/gi';
 import { getCollection, getCollections } from '../adapters/marketItems';
 import { getUserData, me } from '../adapters/user';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 
 interface GeneralDetailsProps {}
 
 const style = {
   wrapper: `flex`,
   infoContainer: `h-36 flex flex-col flex-1 justify-between mb-6`,
-  accent: `text-[#2081e2]`,
+  accent: `text-[#2081e2] text-xl md:text-base`,
   nftTitle: `text-3xl font-extrabold`,
   otherInfo: `flex`,
   ownedBy: `text-[#8a939b] mr-4`,
   likes: `flex items-center text-[#8a939b]`,
   likeIcon: `mr-1`,
-  actionButtonsContainer: `w-44`,
-  actionButtons: `flex container justify-between text-[1.4rem] border-2 rounded-lg `,
-  actionButton: `my-2 `,
+  actionButtonsContainer: `w-24`,
+  actionButtons: `flex sm:container justify-between text-[1.4rem] border-2 rounded-lg `,
+  actionButton: `my-2 mx-auto `,
   divider: `border-r-2 `,
 };
 
@@ -29,6 +30,8 @@ export const GeneralDetails: React.FC<any> = ({
   selectedNft,
   collectionContractAddress,
 }) => {
+  /*useNavigate() allows you to route to other pages */
+  const navigate = useNavigate();
   const { data, isError, refetch } = useQuery('me', me);
   const [collections, setCollections]: any = useState([]);
   const [collectionData, setCollectionData]: any = useState();
@@ -84,19 +87,16 @@ export const GeneralDetails: React.FC<any> = ({
       <div className={style.actionButtonsContainer}>
         <div className={style.actionButtons}>
           <div className={`${style.actionButton} ml-2`}>
-            <MdRefresh />
+            <MdRefresh onClick={() => window.location.reload()} />
           </div>
           <div className={style.divider} />
           <div className={style.actionButton}>
-            <RiShareBoxLine />
-          </div>
-          <div className={style.divider} />
-          <div className={style.actionButton}>
-            <GiShare />
-          </div>
-          <div className={style.divider} />
-          <div className={style.actionButton}>
-            <FiMoreVertical />
+            <RiShareBoxLine
+              onClick={() =>
+                selectedNft.metadata.external_url !== '' &&
+                window.open(`${selectedNft.metadata.external_url}`, '_blank')
+              }
+            />
           </div>
         </div>
       </div>

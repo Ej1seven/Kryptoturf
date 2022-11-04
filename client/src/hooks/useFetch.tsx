@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+/*API_KEY is provided by giphy.com */
 const API_KEY = process.env.REACT_APP_GIPHY_API;
-
+/*useFetch takes the keyword provided by the user and fetches a giphy from giphy.com.
+  The giphy is then returned back to the user. */
 const useFetch = ({ keyword }: any) => {
   const [gifUrl, setGifUrl] = useState('');
-
   const fetchGifs = async () => {
     try {
       console.log(API_KEY);

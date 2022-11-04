@@ -6,7 +6,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { TransactionProvider } from './context/TransactionContext';
-
+/*React Query is a library used for managing server states. It provides a Hook for fetching,
+ caching, and updating asynchronous data in React without touching any “global state” like Redux*/
 const queryClient = new QueryClient();
 
 ReactDOM.render(

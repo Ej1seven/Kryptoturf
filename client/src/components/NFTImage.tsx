@@ -53,7 +53,7 @@ export const NFTImage: React.FC<any> = ({
       </div>
       <img
         src={selectedNft?.metadata.image}
-        className="rounded-b-md border-0 border-transparent"
+        className="rounded-b-md border-0 border-transparent w-full"
       />
     </div>
   );
