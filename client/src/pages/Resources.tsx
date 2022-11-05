@@ -82,7 +82,7 @@ export const Resources: React.FC<any> = ({}) => {
     }
     if (option === 11) {
       title = 'How can I get more GoerliETH??';
-      text = `<p>In order to create, list, or buy NFTs you must use Ethereum Goerli ETH. There are many faucets you can request Ethereum Goerli ETH. The two faucets I use the most are <a href="https://faucets.chain.link/">https://faucets.chain.link</a> and <a href="https://goerlifaucet.com/">https://goerlifaucet.com</a> </p)`;
+      text = `<p>In order to create, list, or buy NFTs you must use Ethereum Goerli ETH. There are many faucets you can request Ethereum Goerli ETH. Two common faucets are <a href="https://faucets.chain.link/">https://faucets.chain.link</a> and <a href="https://goerlifaucet.com/">https://goerlifaucet.com</a> </p)`;
     }
     return Swal.fire({
       icon: 'question',

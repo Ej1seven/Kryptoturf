@@ -263,7 +263,7 @@ router.route('/login').post(async (req: Request, res: Response) => {
     })
     .json({ accessToken: accessToken, refreshToken: refreshToken });
 
-  // return res.json(user);
+  return res.json(user);
 });
 /*authenticates the JWT access token and determines if the token is active or expired.
   If the access token is null then the server will respond with error message "TokenExpiredError".

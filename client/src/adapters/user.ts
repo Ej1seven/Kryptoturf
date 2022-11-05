@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 const URL = process.env.REACT_APP_API_URL;
 
@@ -47,9 +48,9 @@ export async function register(
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
-      if (res.data.user.username === username) {
-        user = res.data.user;
-      }
+      // if (res.data.user.username === username) {
+      // user = res.data.user;
+
       return Swal.fire({
         icon: 'success',
         title: 'Congrats!',
@@ -57,7 +58,15 @@ export async function register(
         background: '#19191a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          /*useNavigate() allows you to route to other pages */
+          // const navigate = useNavigate();
+          // navigate(`/login`);
+          return res.data.user;
+        }
       });
+      // }
     });
 }
 export async function login(usernameOrEmail: String, password: String) {
@@ -77,8 +86,9 @@ export async function login(usernameOrEmail: String, password: String) {
         },
       }
     )
-    .then((res) => {
+    .then((res: any) => {
       return {
+        res,
         accessToken: res.data.accessToken,
         refreshToken: res.data.refreshToken,
       };

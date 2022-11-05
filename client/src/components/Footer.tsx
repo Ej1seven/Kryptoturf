@@ -1,9 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from '../../src/images/logo.png';
 
 interface FooterProps {}
 
 export const Footer: React.FC<FooterProps> = ({}) => {
+  /*useNavigate() allows you to route to other pages */
+  const navigate = useNavigate();
   return (
     <div className="w-full flex md:justify-center justify-between items-center flex-col p-4 gradient-bg-footer">
       <div className="w-full flex sm:flex-row flex-col justify-between items-center my-4">
@@ -11,17 +14,26 @@ export const Footer: React.FC<FooterProps> = ({}) => {
           <img src={logo} alt="logo" className="w-64" />
         </div>
         <div className="flex flex-1 justify-evenly items-center flex-wrap sm:mt-0 mt-5 w-full">
-          <p className="text-white text-base text-center mx-2 cursor-pointer">
+          <p
+            className="text-white text-base text-center mx-2 cursor-pointer"
+            onClick={() => window.location.replace('https://nftplazas.com/')}
+          >
             Market
           </p>
           <p className="text-white text-base text-center mx-2 cursor-pointer">
-            Exchange
+            <a href="mailto:erikhunter@erikhunter.dev">Feedback</a>
           </p>
-          <p className="text-white text-base text-center mx-2 cursor-pointer">
-            Tutorials
+          <p
+            className="text-white text-base text-center mx-2 cursor-pointer"
+            onClick={() => navigate('/collections')}
+          >
+            Explore
           </p>
-          <p className="text-white text-base text-center mx-2 cursor-pointer">
-            Wallets
+          <p
+            className="text-white text-base text-center mx-2 cursor-pointer"
+            onClick={() => navigate('/resources')}
+          >
+            Resources
           </p>
         </div>
       </div>

@@ -499,7 +499,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 <NavbarItem
                   key={item + index}
                   title={item}
-                  classProps="my-2 text-lg"
+                  classProps="my-2 text-lg "
                 />
               ))}
               <li

@@ -59,19 +59,24 @@ export const Login: React.FC<LoginProps> = ({}) => {
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
-    await login(usernameOrEmail, password).catch((err) => (error = err));
+    await login(usernameOrEmail, password).then((res: any) => {
+      console.log(res);
+      if (res.res.data.message) {
+        error = res.res.data.message;
+      }
+    });
     if (error) {
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: 'Wrong password or username',
+        text: `${error}`,
         background: '#19191a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
+    } else {
+      navigate('/');
     }
-    await me();
-    await queryClient.invalidateQueries('me');
   };
   const navigate = useNavigate();
   useEffect(() => {

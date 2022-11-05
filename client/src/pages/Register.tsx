@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { register, user, me } from '../adapters/user';
+import { register, me } from '../adapters/user';
 import { Loader } from '../components/Loader';
 import { useWeb3 } from '@3rdweb/hooks';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +54,7 @@ export const Register: React.FC<RegisterProps> = ({}) => {
   const handleSubmit = async (e: any) => {
     const { username, email, password } = formData;
     let error: any = null;
+    let user: any = null;
     console.log(address);
     if (!address) {
       let connectWalletPrompt = window.confirm(
@@ -77,10 +78,11 @@ export const Register: React.FC<RegisterProps> = ({}) => {
         confirmButtonColor: '#2952e3',
       });
     setIsLoading(true);
-    await register(username, email, password, address);
+    await register(username, email, password, address).then((res) => {
+      user = res;
+    });
     setIsLoading(false);
     if (user) {
-      console.log(user);
       navigate('/login');
     }
   };
