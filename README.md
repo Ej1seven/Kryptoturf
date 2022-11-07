@@ -157,7 +157,7 @@ To get a local copy up and running follow these simple example steps.
    npm install
    ```
 3. Create `.env` file for client and include the following:
-   Giphy API
+   `Giphy API`
    ```js
    REACT_APP_GIPHY_API = put - your - giphy - api - url;
    ```
