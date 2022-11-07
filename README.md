@@ -120,20 +120,21 @@ If you follow any of the prominent tech influencers, I'm sure you've come across
 - [Vercel](https://vercel.com/)
 - [Node.js](https://nodejs.org/)
 - [Express.js](https://expressjs.com/)
-<!-- - [Node.js](https://nodejs.org/)
-
-- [Chakra](https://chakra-ui.com/)
-- [FontAwesome](https://fontawesome.com/)
-- [GraphQl](https:///graphql.org/)
-- [ApolloServer](https://www.apollographql.com/)
 - [Postgresql](https://postgresql.org/)
+- [ThirdWeb](https://thirdweb.com/)
+- [Axios](https://axios-http.com/)
+- [Date-FNS](https://date-fns.org/)
+- [Sweetalert2](https://sweetalert2.github.io/)
+- [React-slick](https://react-slick.neostack.com/)
+- [React-hot-toast](https://react-hot-toast.com/)
+- [React-icons](https://react-icons.github.io/react-icons/)
+- [Universal-cookie](https://www.npmjs.com/package/universal-cookie)
+- [Prisma 2](https://www.prisma.io/)
+- [Argon 2](https://www.npmjs.com/package/argon2)
 - [Redis](https://redis.io/)
-- [Nodemailer](https://nodemailer.com/) -->
-<!-- - [Docker](https://www.docker.com/)
-- [Urql](https://formidable.com/open-source/urql/)
-- [MikroOrm](https://mikro-orm.io/)
-- [Argon2](https://www.npmjs.com/package/argon2)
-- [Dataloader](https://www.npmjs.com/package/dataloader) -->
+- [JWT](https://www.npmjs.com/package/jsonwebtoken)
+- [Multer](https://www.npmjs.com/package/multer)
+- [Nodemailer](https://nodemailer.com/about/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
