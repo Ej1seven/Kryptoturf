@@ -76,6 +76,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
         contractABI, and signer */
       const availableTransactions =
         await transactionContract.getAllTransactions();
+      console.log(availableTransactions);
       /*Structures all the transactions to display addressTo, addressFrom, timestamp, message, keyword, and amount */
       const structuredTransactions = availableTransactions.map(
         (transaction: any) => ({
@@ -89,6 +90,8 @@ export const TransactionProvider: React.FC = ({ children }) => {
           amount: parseInt(transaction.amount._hex) / 10 ** 18,
         })
       );
+      /*Removed the first 19 test transactions */
+      await structuredTransactions.splice(0, 18);
       /*Adds the structured transactions to an array which will used in the <Transactions /> component 
       to display each transaction on individual cards*/
       setTransactions(structuredTransactions);
@@ -104,7 +107,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
       if (!ethereum)
         return Swal.fire({
           icon: 'info',
-          text: 'Please install metamask',
+          text: 'Please install metamask, and make sure you are connected to the Goerli Test Network. Otherwise, you will be unable to view collections and NFTs!',
           background: '#19191a',
           color: '#fff',
           confirmButtonColor: '#2952e3',

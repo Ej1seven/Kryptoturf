@@ -116,7 +116,7 @@ export const Attributes: React.FC<any> = ({
           {nftAttributes === 'Description' && (
             <>
               <p className="text-lg mb-2">Description</p>
-              <div className="w-full overflow-scroll flex flex-row justify-between pb-2">
+              <div className="w-full overflow-y-auto  flex flex-row justify-between pb-2">
                 <div>
                   <p id="about-section">{selectedNft.metadata.description}</p>
                 </div>
@@ -145,7 +145,7 @@ export const Attributes: React.FC<any> = ({
           {nftAttributes === 'About' && (
             <>
               <p className="text-lg mb-2">About</p>
-              <div className="w-full overflow-scroll flex flex-row justify-between pb-2">
+              <div className="w-full overflow-y-auto  flex flex-row justify-between pb-2">
                 <div>
                   <p id="about-section">{collectionData?.description}</p>
                 </div>

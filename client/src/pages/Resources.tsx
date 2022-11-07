@@ -176,7 +176,7 @@ export const Resources: React.FC<any> = ({}) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
   return (
-    <div className="">
+    <div className="overflow-hidden">
       <Navbar />
       <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center">
         <div className="mt-4 md:mt-0 w-5/6 md:w-1/2 md:ml-4 sm:ml-0 pb-20 flex justify-end">

@@ -16,6 +16,7 @@ import { MdPhotoSizeSelectActual } from 'react-icons/md';
 import { AiFillEdit } from 'react-icons/ai';
 import axios from 'axios';
 import { HiOutlineCurrencyDollar } from 'react-icons/hi';
+import { Loader } from '../components';
 
 interface ProfileProps {}
 
@@ -32,6 +33,8 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   with the user data. isLoading represents the processing time to pull the user data. isError is triggered
   if the server has issues pulling the data*/
   const { data } = useQuery('me', me);
+  /*Display a spinning loading icon when the collection data is being sent to the blockchain and database*/
+  const [isLoading, setIsLoading] = useState(false);
   /*Pulls all the NFTs from each collection and puts then into the allNFTS array */
   const [allNfts, setAllNfts]: any = useState([]);
   /*listing - provides all the NFTS that a actively listed on the marketplace for sale */
@@ -45,7 +48,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   /*Pulls all the collections from the database and filters the NFTs created by current user */
   const [createdNFTS, setCreatedNFTS]: any = useState([]);
   /*Toggles between the following NFT categories - (Collected, Created, Selling, Liked, Collections) */
-  const [displayNFTS, setDisplayNFTS]: any = useState('collected');
+  const [displayNFTS, setDisplayNFTS]: any = useState();
   /*Sets the collection featured image. The preview image will be displayed immediately on the front-end. 
   The raw image will be sent to the server and stored in the uploads folder. */
   const [profileImage, setProfileImage] = useState({
@@ -84,6 +87,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   };
   /*Saves the banner and profile images to the database */
   const saveChanges = async () => {
+    setIsLoading(true);
     let profileImageFilePath: any;
     let bannerImageFilePath: any;
     let photoData = new FormData();
@@ -123,6 +127,8 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       };
       await addImages(imageData);
       setUserData(await getUserData(data.email));
+      setIsLoading(false);
+      window.location.reload();
     })();
   };
   /*Discards the uploaded image data */
@@ -229,276 +235,288 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   return (
     <div className="text-white overflow-hidden">
       <Navbar />
-      <label htmlFor="upload-banner-image">
-        <div className="h-[300px] w-screen overflow-hidden flex justify-center items-center">
-          {userData?.bannerImage && !bannerImage.preview ? (
-            <>
-              <img
-                alt="banner"
-                src={`${photoURL}/${userData?.bannerImage}`}
-                className="w-full object-cover"
-              />
-            </>
-          ) : (
-            <>
-              {bannerImage.preview ? (
-                <img
-                  src={bannerImage.preview}
-                  alt="dummy"
-                  className="object-cover w-full h-[300px]"
-                />
+      {isLoading ? (
+        <div className="h-screen w-screen flex items-center justify-center">
+          <Loader />
+        </div>
+      ) : (
+        <>
+          <label htmlFor="upload-banner-image">
+            <div className="h-[300px] w-screen overflow-hidden flex justify-center items-center">
+              {userData?.bannerImage && !bannerImage.preview ? (
+                <>
+                  <img
+                    alt="banner"
+                    src={`${photoURL}/${userData?.bannerImage}`}
+                    className="w-full object-cover"
+                  />
+                </>
               ) : (
-                <div className="w-full h-[44vh] bg-black opacity-30	hover:opacity-100 flex justify-center items-center">
-                  <MdPhotoSizeSelectActual className="h-20 w-20 m-auto" />
-                </div>
+                <>
+                  {bannerImage.preview ? (
+                    <img
+                      src={bannerImage.preview}
+                      alt="dummy"
+                      className="object-cover w-full h-[300px]"
+                    />
+                  ) : (
+                    <div className="w-full h-[44vh] bg-black opacity-30	hover:opacity-100 flex justify-center items-center">
+                      <MdPhotoSizeSelectActual className="h-20 w-20 m-auto" />
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
-        </div>
-      </label>
-      <input
-        name="image"
-        type="file"
-        id="upload-banner-image"
-        style={{ display: 'none' }}
-        onChange={handleBannerPhotoChange}
-      />
-      <div className="flex flex-row h-20 justify-between">
-        {userData?.profileImage && !profileImage.preview ? (
-          <>
-            <label htmlFor="upload-profile-image">
-              <img
-                src={`${photoURL}/${userData?.profileImage}`}
-                alt="dummy"
-                className=" rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px] border-[5px] border-black border-solid"
-              />
-            </label>
-          </>
-        ) : (
-          <label htmlFor="upload-profile-image">
-            {profileImage.preview ? (
-              <img
-                src={profileImage.preview}
-                alt="dummy"
-                className=" rounded-full w-[150px] h-[150px] overflow-hidden relative -top-[75px] left-[15px] border-[5px] border-black border-solid "
-              />
-            ) : (
-              <div className=" profile-image rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px] border-[5px] border-black border-solid bg-white text-black text-5xl flex justify-center items-center">
-                <div>{data?.username.charAt(0).toUpperCase()}</div>
-                <AiFillEdit className="hidden" />
-              </div>
-            )}
+            </div>
           </label>
-        )}
-        {(profileImage.preview || bannerImage.preview) && (
-          <div className="w-1/2 flex flex-row justify-end items-center">
-            <button
-              className="blue-glassmorphism text-white w-2/6 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer mr-2"
-              onClick={saveChanges}
-            >
-              Save
-            </button>
-            <button
-              className="blue-glassmorphism text-white w-2/6 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer mr-2"
-              onClick={discardChanges}
-            >
-              Discard
-            </button>
-          </div>
-        )}
-      </div>
-      <input
-        name="image"
-        type="file"
-        id="upload-profile-image"
-        style={{ display: 'none' }}
-        onChange={handleProfilePhotoChange}
-      />
-      <div className="flex flex-col ml-4">
-        <div className="flex flex-row">
-          <div className="text-white text-2xl w-1/2">{data?.username}</div>
-          <div className="w-1/2 flex flex-col">
-            <div className="flex justify-end  flex-row pr-2">
-              <div className="text-white exSMMAX:text-lg text-2xl font-bold text-[#2081e2]">
-                TURF Coins:
-                <span className="text-[#2081e2]">
-                  {' '}
-                  {`${userData?.turfCoins}`}
-                </span>
+          <input
+            name="image"
+            type="file"
+            id="upload-banner-image"
+            style={{ display: 'none' }}
+            onChange={handleBannerPhotoChange}
+          />
+          <div className="flex flex-row h-20 justify-between">
+            {userData?.profileImage && !profileImage.preview ? (
+              <>
+                <label htmlFor="upload-profile-image">
+                  <img
+                    src={`${photoURL}/${userData?.profileImage}`}
+                    alt="dummy"
+                    className=" rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px] border-[5px] border-black border-solid"
+                  />
+                </label>
+              </>
+            ) : (
+              <label htmlFor="upload-profile-image">
+                {profileImage.preview ? (
+                  <img
+                    src={profileImage.preview}
+                    alt="dummy"
+                    className=" rounded-full w-[150px] h-[150px] overflow-hidden relative -top-[75px] left-[15px] border-[5px] border-black border-solid "
+                  />
+                ) : (
+                  <div className=" profile-image rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px] border-[5px] border-black border-solid bg-white text-black text-5xl flex justify-center items-center">
+                    <div>{data?.username.charAt(0).toUpperCase()}</div>
+                    <AiFillEdit className="hidden" />
+                  </div>
+                )}
+              </label>
+            )}
+            {(profileImage.preview || bannerImage.preview) && (
+              <div className="w-1/2 flex flex-row justify-end items-center">
+                <button
+                  className="btn-gradient-border text-white w-2/6 border-[1px] p-2 rounded-full cursor-pointer mr-2"
+                  onClick={saveChanges}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn-gradient-border text-white w-2/6 border-[1px] p-2 rounded-full cursor-pointer mr-2"
+                  onClick={discardChanges}
+                >
+                  Discard
+                </button>
               </div>
-              <HiOutlineCurrencyDollar className="text-[#2081e2]" />
-            </div>
-            <div className="flex justify-end pr-4">
-              {' '}
-              <p>${ethToUsd.toLocaleString('en-US')} USD</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-row items-center">
-          <div>
-            <FaEthereum className="text-white mr-1" />
-          </div>
-          <div>{shortenAddress(currentAccount)}</div>
-          {data?.createdAt && (
-            <div className="ml-6">Joined {format(date, 'LLLL yyyy')}</div>
-          )}
-        </div>
-        <div className="flex flex-row md:w-3/4 w-full justify-evenly mx-auto my-10">
-          <div
-            onClick={() => {
-              setDisplayNFTS('collected');
-            }}
-            className={`${
-              displayNFTS === 'collected' && 'underline'
-            } cursor-pointer`}
-          >
-            Collected
-          </div>
-          <div
-            onClick={() => {
-              setDisplayNFTS('created');
-            }}
-            className={`${
-              displayNFTS === 'created' && 'underline'
-            } cursor-pointer`}
-          >
-            Created
-          </div>
-          <div
-            onClick={() => {
-              setDisplayNFTS('selling');
-            }}
-            className={`${
-              displayNFTS === 'selling' && 'underline'
-            } cursor-pointer`}
-          >
-            Selling
-          </div>
-          <div
-            onClick={() => {
-              setDisplayNFTS('liked');
-            }}
-            className={`${
-              displayNFTS === 'liked' && 'underline'
-            } cursor-pointer`}
-          >
-            Liked
-          </div>
-          <div
-            onClick={() => {
-              setDisplayNFTS('collections');
-            }}
-            className={`${
-              displayNFTS === 'collections' && 'underline'
-            } cursor-pointer`}
-          >
-            Collections
-          </div>
-        </div>
-
-        <div className="flex justify-center">
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
-            {displayNFTS === 'collected' && (
-              <>
-                {collectedNFTS.map((nftItem: any, id: any) => (
-                  <NFTCard
-                    key={id}
-                    nftItem={nftItem.nft}
-                    title={nftItem?.nft.metadata.name}
-                    listings={listings}
-                    collectionContractAddress={
-                      nftItem.collectionContractAddress
-                    }
-                  />
-                ))}
-              </>
             )}
-            {displayNFTS === 'created' && (
-              <>
-                {createdNFTS.map((nftItem: any, id: any) => (
-                  <NFTCard
-                    key={id}
-                    nftItem={nftItem.nft}
-                    title={nftItem?.nft.metadata.name}
-                    listings={listings}
-                    collectionContractAddress={
-                      nftItem.collectionContractAddress
-                    }
-                  />
-                ))}
-              </>
-            )}
-            {displayNFTS === 'selling' && (
-              <>
-                {listings.map((listing: any, id: any) => (
+          </div>
+          <input
+            name="image"
+            type="file"
+            id="upload-profile-image"
+            style={{ display: 'none' }}
+            onChange={handleProfilePhotoChange}
+          />
+          <div className="flex flex-col ml-4">
+            <div className="flex flex-row">
+              <div className="text-white text-2xl w-1/2">{data?.username}</div>
+              <div className="w-1/2 flex flex-col">
+                <div className="flex justify-end  flex-row pr-2">
+                  <div className="text-white exSMMAX:text-lg text-2xl font-bold text-[#2081e2]">
+                    TURF Coins:
+                    <span className="text-[#2081e2]">
+                      {' '}
+                      {`${userData?.turfCoins}`}
+                    </span>
+                  </div>
+                  <HiOutlineCurrencyDollar className="text-[#2081e2]" />
+                </div>
+                <div className="flex justify-end pr-4">
+                  {' '}
+                  <p>${ethToUsd.toLocaleString('en-US')} USD</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-row items-center">
+              <div>
+                <FaEthereum className="text-white mr-1" />
+              </div>
+              <div>{shortenAddress(currentAccount)}</div>
+              {data?.createdAt && (
+                <div className="ml-6">Joined {format(date, 'LLLL yyyy')}</div>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row lg:w-3/4 sm:w-full justify-evenly mx-auto my-10">
+              <button
+                onClick={() => {
+                  setDisplayNFTS('collected');
+                }}
+                className={`${
+                  displayNFTS === 'collected' && 'font-bold'
+                } cursor-pointer btn-gradient-border py-2 w-40 rounded-full mb-2 sm:mb-0`}
+              >
+                Collected
+              </button>
+              <button
+                onClick={() => {
+                  setDisplayNFTS('created');
+                }}
+                className={`${
+                  displayNFTS === 'created' && 'font-bold'
+                } cursor-pointer btn-gradient-border py-2 w-40 rounded-full mb-2 sm:mb-0`}
+              >
+                Created
+              </button>
+              <button
+                onClick={() => {
+                  setDisplayNFTS('selling');
+                }}
+                className={`${
+                  displayNFTS === 'selling' && 'font-bold'
+                } cursor-pointer btn-gradient-border py-2 w-40 rounded-full mb-2 sm:mb-0`}
+              >
+                Selling
+              </button>
+              <button
+                onClick={() => {
+                  setDisplayNFTS('liked');
+                }}
+                className={`${
+                  displayNFTS === 'liked' && 'font-bold'
+                } cursor-pointer btn-gradient-border py-2 w-40 rounded-full mb-2 sm:mb-0`}
+              >
+                Liked
+              </button>
+              <button
+                onClick={() => {
+                  setDisplayNFTS('collections');
+                }}
+                className={`${
+                  displayNFTS === 'collections' && 'font-bold'
+                } cursor-pointer btn-gradient-border py-2 w-40 rounded-full mb-2 sm:mb-0`}
+              >
+                Collections
+              </button>
+            </div>
+
+            <div className="flex justify-center">
+              <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+                {displayNFTS === 'collected' && (
                   <>
                     {collectedNFTS.map((nftItem: any, id: any) => (
+                      <NFTCard
+                        key={id}
+                        nftItem={nftItem.nft}
+                        title={nftItem?.nft.metadata.name}
+                        listings={listings}
+                        collectionContractAddress={
+                          nftItem.collectionContractAddress
+                        }
+                      />
+                    ))}
+                  </>
+                )}
+                {displayNFTS === 'created' && (
+                  <>
+                    {createdNFTS.map((nftItem: any, id: any) => (
+                      <NFTCard
+                        key={id}
+                        nftItem={nftItem.nft}
+                        title={nftItem?.nft.metadata.name}
+                        listings={listings}
+                        collectionContractAddress={
+                          nftItem.collectionContractAddress
+                        }
+                      />
+                    ))}
+                  </>
+                )}
+                {displayNFTS === 'selling' && (
+                  <>
+                    {listings.map((listing: any, id: any) => (
                       <>
-                        {nftItem?.nft.metadata.name === listing.asset.name && (
+                        {collectedNFTS.map((nftItem: any, id: any) => (
                           <>
-                            <NFTCard
+                            {nftItem?.nft.metadata.name ===
+                              listing.asset.name && (
+                              <>
+                                <NFTCard
+                                  key={id}
+                                  nftItem={nftItem.nft}
+                                  title={nftItem?.nft.metadata.name}
+                                  listings={listings}
+                                  collectionContractAddress={
+                                    nftItem.collectionContractAddress
+                                  }
+                                />
+                              </>
+                            )}
+                          </>
+                        ))}
+                      </>
+                    ))}
+                  </>
+                )}
+                {displayNFTS === 'liked' && (
+                  <>
+                    {userData.likes.map((like: any, idx: any) => {
+                      return (
+                        <div key={idx}>
+                          {' '}
+                          {allNfts.map((nftItem: any, id: any) => (
+                            <>
+                              {like.nftName === nftItem?.nft.metadata.name && (
+                                <>
+                                  <NFTCard
+                                    key={id}
+                                    nftItem={nftItem.nft}
+                                    title={nftItem?.nft.metadata.name}
+                                    listings={listings}
+                                    collectionContractAddress={
+                                      nftItem.collectionContractAddress
+                                    }
+                                  />
+                                </>
+                              )}
+                            </>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+                {displayNFTS === 'collections' && (
+                  <>
+                    {collections.map((collection: any, id: any) => (
+                      <>
+                        {collection.createdBy === data?.username && (
+                          <>
+                            {' '}
+                            <CollectionCard
                               key={id}
-                              nftItem={nftItem.nft}
-                              title={nftItem?.nft.metadata.name}
-                              listings={listings}
-                              collectionContractAddress={
-                                nftItem.collectionContractAddress
-                              }
+                              collectionItem={collection}
                             />
                           </>
                         )}
                       </>
                     ))}
                   </>
-                ))}
-              </>
-            )}
-            {displayNFTS === 'liked' && (
-              <>
-                {userData.likes.map((like: any, idx: any) => {
-                  return (
-                    <div key={idx}>
-                      {' '}
-                      {allNfts.map((nftItem: any, id: any) => (
-                        <>
-                          {like.nftName === nftItem?.nft.metadata.name && (
-                            <>
-                              <NFTCard
-                                key={id}
-                                nftItem={nftItem.nft}
-                                title={nftItem?.nft.metadata.name}
-                                listings={listings}
-                                collectionContractAddress={
-                                  nftItem.collectionContractAddress
-                                }
-                              />
-                            </>
-                          )}
-                        </>
-                      ))}
-                    </div>
-                  );
-                })}
-              </>
-            )}
-            {displayNFTS === 'collections' && (
-              <>
-                {collections.map((collection: any, id: any) => (
-                  <>
-                    {collection.createdBy === data?.username && (
-                      <>
-                        {' '}
-                        <CollectionCard key={id} collectionItem={collection} />
-                      </>
-                    )}
-                  </>
-                ))}
-              </>
-            )}
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

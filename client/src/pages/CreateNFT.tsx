@@ -16,6 +16,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import useMarkeplaceData from '../hooks/useMarketplaceData';
+import { text } from 'node:stream/consumers';
 
 interface CreateNFTProps {}
 const Input = ({
@@ -275,6 +276,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
     /*collectionInput gets the name of the collection selected by the user from the dropdown list then 
       mints the NFT to the selected collection */
     let collectionInput: any = document.getElementById('collection');
+    let text = `<p> If you want to make an NFT of artwork that’s not your own, you need to go to the source for permission. For more information covering NFT copyright infringment <a href="https://uclawreview.org/2022/02/11/minted-nft-of-someone-elses-artwork-a-new-flavor-of-copyright-infringement/">CLICK HERE</a></p)`;
     for (let x = 0; x <= collectionsOwnedByUser.length - 1; x++) {
       if (
         collectionInput.value.toLowerCase() ===
@@ -285,47 +287,60 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
         const getModule = await sdk.getNFTCollection(
           collectionsOwnedByUser[x].contractAddress
         );
-        /*Mints the NFT to the database */
-        const mint = await getModule.mintTo(currentAccount, {
-          name: name,
-          description: description,
-          attributes: rows,
-          image: image.raw,
-          external_url: externalLink,
-        });
-        const receipt = mint.receipt; //the receipt from the transaction
-        const tokenId = mint.id; // the id of the NFT minted
-        await mint.data().catch((err) => {
-          error = err;
-        });
-        setIsLoading(false);
-        /*If there is an error minting the NFT a error message will popup */
-        if (error) {
-          return Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: `${error.message}`,
-            background: '#19191a',
-            color: '#fff',
-            confirmButtonColor: '#2952e3',
-          });
-        }
-        /*If the NFT mint is successful then a success message will popup */
-        return Swal.fire({
-          icon: 'success',
-          title: 'Congrats!',
-          text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+        Swal.fire({
+          icon: 'warning',
+          title: 'Protect Yourself',
+          html: text,
+          showCancelButton: true,
           background: '#19191a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
-        }).then((result) => {
-          console.log(untitledCollectionContractAddress);
+        }).then(async (result) => {
           if (result.isConfirmed) {
-            let collectionInput: any = document.getElementById('collection');
-            confirmNFT();
-            navigate(
-              `/collection/${collectionsOwnedByUser[x].contractAddress}`
-            );
+            /*Mints the NFT to the database */
+            const mint = await getModule.mintTo(currentAccount, {
+              name: name,
+              description: description,
+              attributes: rows,
+              image: image.raw,
+              external_url: externalLink,
+            });
+            const receipt = mint.receipt; //the receipt from the transaction
+            const tokenId = mint.id; // the id of the NFT minted
+            await mint.data().catch((err) => {
+              error = err;
+            });
+            setIsLoading(false);
+            /*If there is an error minting the NFT a error message will popup */
+            if (error) {
+              return Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `${error.message}`,
+                background: '#19191a',
+                color: '#fff',
+                confirmButtonColor: '#2952e3',
+              });
+            }
+            /*If the NFT mint is successful then a success message will popup */
+            return Swal.fire({
+              icon: 'success',
+              title: 'Congrats!',
+              text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+              background: '#19191a',
+              color: '#fff',
+              confirmButtonColor: '#2952e3',
+            }).then((result) => {
+              console.log(untitledCollectionContractAddress);
+              if (result.isConfirmed) {
+                let collectionInput: any =
+                  document.getElementById('collection');
+                confirmNFT();
+                navigate(
+                  `/collection/${collectionsOwnedByUser[x].contractAddress}`
+                );
+              }
+            });
           }
         });
       }
@@ -345,44 +360,54 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
           const getModule = await sdk.getNFTCollection(
             collectionsOwnedByUser[x].contractAddress
           );
-          const mint = await getModule.mintTo(currentAccount, {
-            name: name,
-            description: description,
-            attributes: rows,
-            image: image.raw,
-            external_url: externalLink,
-          });
-          const receipt = mint.receipt;
-          const tokenId = mint.id; // the id of the NFT minted
-          await mint.data().catch((err) => {
-            error = err;
-          });
-          setIsLoading(false);
-          /*If there is an error minting the NFT a error message will popup */
-          if (error) {
-            return Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: `${error.message}`,
-              background: '#19191a',
-              color: '#fff',
-              confirmButtonColor: '#2952e3',
-            });
-          }
-          /*If the NFT mint is successful then a success message will popup */
-          return Swal.fire({
-            icon: 'success',
-            title: 'Congrats!',
-            text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+          Swal.fire({
+            icon: 'warning',
+            title: 'Protect Yourself',
+            html: text,
+            showCancelButton: true,
             background: '#19191a',
             color: '#fff',
             confirmButtonColor: '#2952e3',
-          }).then((result) => {
-            console.log(untitledCollectionContractAddress);
-            if (result.isConfirmed) {
-              confirmNFT();
-              navigate(`/collection/${untitledCollectionContractAddress}`);
+          }).then(async (result) => {
+            const mint = await getModule.mintTo(currentAccount, {
+              name: name,
+              description: description,
+              attributes: rows,
+              image: image.raw,
+              external_url: externalLink,
+            });
+            const receipt = mint.receipt;
+            const tokenId = mint.id; // the id of the NFT minted
+            await mint.data().catch((err) => {
+              error = err;
+            });
+            setIsLoading(false);
+            /*If there is an error minting the NFT a error message will popup */
+            if (error) {
+              return Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `${error.message}`,
+                background: '#19191a',
+                color: '#fff',
+                confirmButtonColor: '#2952e3',
+              });
             }
+            /*If the NFT mint is successful then a success message will popup */
+            return Swal.fire({
+              icon: 'success',
+              title: 'Congrats!',
+              text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+              background: '#19191a',
+              color: '#fff',
+              confirmButtonColor: '#2952e3',
+            }).then((result) => {
+              console.log(untitledCollectionContractAddress);
+              if (result.isConfirmed) {
+                confirmNFT();
+                navigate(`/collection/${untitledCollectionContractAddress}`);
+              }
+            });
           });
         }
       }
@@ -404,18 +429,31 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                 owners: data.username,
               };
               const getModule = await sdk.getNFTCollection(contractAddress);
-
-              await createCollection(collectionData);
-              const mint = await getModule.mintTo(currentAccount, {
-                name: name,
-                description: description,
-                attributes: rows,
-                image: image.raw,
-                external_url: externalLink,
+              Swal.fire({
+                icon: 'warning',
+                title: 'Protect Yourself',
+                html: text,
+                showCancelButton: true,
+                background: '#19191a',
+                color: '#fff',
+                confirmButtonColor: '#2952e3',
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  await createCollection(collectionData);
+                  const mint = await getModule.mintTo(currentAccount, {
+                    name: name,
+                    description: description,
+                    attributes: rows,
+                    image: image.raw,
+                    external_url: externalLink,
+                  });
+                  const receipt = mint.receipt;
+                  const tokenId = mint.id; // the id of the NFT minted
+                  await mint.data();
+                } else {
+                  window.location.reload();
+                }
               });
-              const receipt = mint.receipt;
-              const tokenId = mint.id; // the id of the NFT minted
-              await mint.data();
             })
             .catch((err) => {
               error = err;

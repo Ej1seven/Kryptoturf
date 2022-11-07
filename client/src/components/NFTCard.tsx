@@ -7,7 +7,7 @@ import { getUserData, me } from '../adapters/user';
 import { useQuery } from 'react-query';
 
 const style = {
-  wrapper: `bg-white flex-auto w-[18rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointe btn-glow`,
+  wrapper: `bg-white flex-auto w-[18rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer btn-glow`,
   imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
   nftImg: `w-full object-cover`,
   details: `p-3`,

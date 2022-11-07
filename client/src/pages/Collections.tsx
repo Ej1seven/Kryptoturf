@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ethers } from 'ethers';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import { getCollections } from '../adapters/marketItems';
@@ -7,10 +7,16 @@ import { Navbar } from '../components/Navbar';
 import NFTCard from '../components/NFTCard';
 import { Loader } from '../components/Loader';
 import { useWeb3 } from '@3rdweb/hooks';
+import { TransactionContext } from '../context/TransactionContext';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 interface CollectionsProps {}
 
 export const Collections: React.FC<CollectionsProps> = ({}) => {
+  const { currentAccount } = useContext(TransactionContext);
+  /*useNavigate() allows you to route to other pages */
+  const navigate = useNavigate();
   /*listing - provides all the NFTS that a actively listed on the marketplace for sale */
   const [listings, setListings]: any = useState([]);
   /*Display a spinning loading icon when data is loaded*/
@@ -48,6 +54,20 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
   /*Retrieves all the collections from the database during page load*/
   useEffect(() => {
     (async () => {
+      if (!currentAccount) {
+        return Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Sorry, please install metamask and make sure you are connected to the Goerli Test Network before attempting to view collections and NFTs.`,
+          background: '#19191a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/');
+          }
+        });
+      }
       setIsLoading(true);
       /*getCollections - GET statement that retrieves all the data from the database. */
       const collections = await getCollections();

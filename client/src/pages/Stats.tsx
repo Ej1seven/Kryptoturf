@@ -121,7 +121,7 @@ export const Stats: React.FC<StatsProps> = ({}) => {
             <button
               type="button"
               onClick={() => setToggleUsers(!toggleUsers)}
-              className="text-white w-2/6 mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full white-and-blue-glassmorphism cursor-pointer py-2 px-7"
+              className="text-white w-1/2 max-w-sm mt-4 border-[1px] p-2 border-[#3d4f7c] rounded-full white-and-blue-glassmorphism cursor-pointer py-2 px-7"
             >
               {!toggleUsers ? 'View User Ranking' : 'View Collection Rankings'}
             </button>
