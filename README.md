@@ -184,7 +184,7 @@ To get a local copy up and running follow these simple example steps.
 
 <!-- ROADMAP -->
 
-## Roadmap
+<!-- ## Roadmap
 
 ### MVP / User Stories
 
@@ -194,7 +194,7 @@ To get a local copy up and running follow these simple example steps.
 
 See the [open issues](https://github.com/ej1seven/Kryptoturf/issues) for a full list of proposed features (and known issues).
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p> -->
 
 <!-- CONTRIBUTING -->
 
