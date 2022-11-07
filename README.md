@@ -240,4 +240,5 @@ Project Link: [https://github.com/Ej1seven/Kryptoturf](https://github.com/Ej1sev
 
 ## Copyright and license
 
+Kryptoturf is licensed under the GNU General Public License v3.0
 <p align="right">(<a href="#top">back to top</a>)</p>
