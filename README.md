@@ -202,6 +202,24 @@ See the [open issues](https://github.com/ej1seven/Kryptoturf/issues) for a full 
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
+Before making your first contribution make sure to add your name to the `CONTRIBUTORS.md` file.
+
+1. Add the changes with git add, git commit (write a good commit message, if possible):
+```js
+git add CONTRIBUTORS.md
+git commit -m "Add <your-github-username>"
+```
+**Replace \<your-github-username>\!**
+
+2. Push your changes to your repository:
+
+```js
+git push origin <branch-name>
+```
+3. Go to the GitHub page of your fork, and make a pull request:
+
+4. Wait until I merge your pull request. If there are any conflicts, you will get a notification.
+
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
@@ -220,6 +238,8 @@ Don't forget to give the project a star! Thanks again!
 Erik Hunter - <erikhunter@erikhunter.dev>
 
 Project Link: [https://github.com/Ej1seven/Kryptoturf](https://github.com/Ej1seven/Kryptoturf)
+
+Website: [www.kryptoturf.com](https://kryptoturf.com/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
