@@ -105,7 +105,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
 
 ## About The Project
 
-If you follow any of the prominent tech influencers, I'm sure you've come across the word Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. I designed Kryptoturf to allow users the ability to participate in the world of NFTs without the pressure of spending their own money. Kryptoturf can be seen as an introductory platform that familiarizes users with blockchain and the technologies it encompasses. 
+If you follow any of the prominent tech influencers, I'm sure you've come across the phrase Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. I designed Kryptoturf to allow users the ability to participate in the world of NFTs without the pressure of spending their own money. Kryptoturf can be seen as an introductory platform that familiarizes users with the blockchain and the technologies it encompasses. 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
