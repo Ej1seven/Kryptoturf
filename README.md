@@ -64,7 +64,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
   
   ![The Forum Lab Logo](client/src/images/logo.png "Kryptoturf Logo")
 
-  <h3 align="center">Kryptoturf is a Web 3.0 application that allows users to send transactions through the blockchain.</h3>
+  <h3 align="center">Kryptoturf is a NFT Marketplace, where users have the ability to create, trade, and collect NFTs without the need to spend their own money.</h3>
 
   <p align="center">
     <br />
