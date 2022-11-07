@@ -118,8 +118,10 @@ If you follow any of the prominent tech influencers, I'm sure you've come across
 - [Solidity](https://docs.soliditylang.org/)
 - [TailwindCSS](https://tailwindcss.com/)
 - [Vercel](https://vercel.com/)
-<!-- - [Node.js](https://nodejs.org/)
+- [Node.js](https://nodejs.org/)
 - [Express.js](https://expressjs.com/)
+<!-- - [Node.js](https://nodejs.org/)
+
 - [Chakra](https://chakra-ui.com/)
 - [FontAwesome](https://fontawesome.com/)
 - [GraphQl](https:///graphql.org/)
