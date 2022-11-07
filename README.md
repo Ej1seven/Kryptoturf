@@ -237,3 +237,7 @@ Project Link: [https://github.com/Ej1seven/Kryptoturf](https://github.com/Ej1sev
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=plastic&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/erik-hunter/
 [product-screenshot]: images/screenshot.png
+
+## Copyright and license
+
+<p align="right">(<a href="#top">back to top</a>)</p>
