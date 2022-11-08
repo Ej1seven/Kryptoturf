@@ -105,7 +105,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
 
 ## About The Project
 
-If you follow any of the prominent tech influencers, I'm sure you've come across the phrase Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. Kryptoturf is a dApp designed to allow users the ability to participate in the world of NFTs using Goerli testnet ETH. Kryptoturf can be seen as an introductory platform that familiarizes users with the blockchain and the technologies it encompasses.
+As Web 3.0 emerges, we are starting to see the potential of the blockchain. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. Kryptoturf is a dApp designed to allow users the ability to participate in the world of NFTs using Goerli testnet ETH. Kryptoturf can be seen as an introductory platform that familiarizes users with NFTs, one of the many use cases for blockchain technology.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
