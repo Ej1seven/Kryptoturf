@@ -62,7 +62,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
 <br />
 <div align="center">
   
-  ![The Forum Lab Logo](client/src/images/logo.png "Kryptoturf Logo")
+  ![The Forum Lab Logo](client/src/images/logoTwo.png "Kryptoturf Logo")
 
   <h3 align="center">Kryptoturf is a NFT marketplace, where users have the ability to create, trade, and collect NFTs without the need to spend their own money.</h3>
 
@@ -105,7 +105,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
 
 ## About The Project
 
-If you follow any of the prominent tech influencers, I'm sure you've come across the phrase Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. I designed Kryptoturf to allow users the ability to participate in the world of NFTs without the pressure of spending their own money. Kryptoturf can be seen as an introductory platform that familiarizes users with the blockchain and the technologies it encompasses. 
+If you follow any of the prominent tech influencers, I'm sure you've come across the phrase Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. I designed Kryptoturf to allow users the ability to participate in the world of NFTs without the pressure of spending their own money. Kryptoturf can be seen as an introductory platform that familiarizes users with the blockchain and the technologies it encompasses.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -158,7 +158,7 @@ To get a local copy up and running follow these simple example steps.
    ```
 3. To run this project, you will need to add the following environment variables to your `.env` file in the client folder and include the following:
    <p>Giphy API</p>
-   
+
    ```js
    REACT_APP_GIPHY_API = put - your - giphy - api - url;
    ```
@@ -205,10 +205,12 @@ Contributions are what make the open source community such an amazing place to l
 Before making your first contribution make sure to add your name to the `CONTRIBUTORS.md` file.
 
 1. Add the changes with git add, git commit (write a good commit message, if possible):
+
 ```js
 git add CONTRIBUTORS.md
 git commit -m "Add <your-github-username>"
 ```
+
 **Replace \<your-github-username>\!**
 
 2. Push your changes to your repository:
@@ -216,6 +218,7 @@ git commit -m "Add <your-github-username>"
 ```js
 git push origin <branch-name>
 ```
+
 3. Go to the GitHub page of your fork, and make a pull request:
 
 4. Wait until I merge your pull request. If there are any conflicts, you will get a notification.
@@ -261,4 +264,5 @@ Website: [www.kryptoturf.com](https://kryptoturf.com/)
 ## Copyright and license
 
 Kryptoturf is licensed under the GNU General Public License v3.0
+
 <p align="right">(<a href="#top">back to top</a>)</p>
