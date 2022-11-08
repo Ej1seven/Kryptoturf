@@ -116,13 +116,10 @@ As Web 3.0 emerges, we are starting to see the potential of the blockchain. Web 
 - [React.js](https://reactjs.org/)
 - [Typescript](https://typescriptlang.org/)
 - [Solidity](https://docs.soliditylang.org/)
-- [TailwindCSS](https://tailwindcss.com/)
 - [Vercel](https://vercel.com/)
 - [Node.js](https://nodejs.org/)
-- [Postgresql](https://postgresql.org/)
 - [ThirdWeb](https://thirdweb.com/)
 - [Prisma 2](https://www.prisma.io/)
-- [Redis](https://redis.io/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
