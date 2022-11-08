@@ -341,8 +341,13 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
       <Toaster position="top-center" reverseOrder={false} />
       <Navbar />
       {isLoading ? (
-        <div className="h-screen w-screen flex items-center justify-center">
+        <div className="h-screen w-screen flex flex-col items-center justify-center">
           <Loader />
+          <p className="text-white text-1xl text-center">Please wait...</p>
+          <p className="text-white text-1xl text-center">
+            The task is being executed. May take up to 3 minutes until it is
+            completed.
+          </p>
         </div>
       ) : (
         <>

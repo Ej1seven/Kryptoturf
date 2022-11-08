@@ -193,8 +193,13 @@ export const Purchase: React.FC<any> = ({
     <>
       {' '}
       {isLoading ? (
-        <div className="flex items-center justify-center z-10">
+        <div className="flex flex-col items-center justify-center z-10">
           <Loader />
+          <p className="text-white text-1xl text-center">Please wait...</p>
+          <p className="text-white text-1xl text-center">
+            The task is being executed. May take up to 3 minutes until it is
+            completed.
+          </p>
         </div>
       ) : (
         <>
