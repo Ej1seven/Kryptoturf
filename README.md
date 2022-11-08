@@ -153,15 +153,17 @@ To get a local copy up and running follow these simple example steps.
    ```
 
 2. Install NPM packages
+
    ```sh
    npm install
    ```
-3. To run this project, you will need to add the following environment variables to your `.env` file in the client folder and include the following:
-   <p>Giphy API</p>
 
-   ```js
-   REACT_APP_GIPHY_API = put - your - giphy - api - url;
-   ```
+   <!-- 3. To run this project, you will need to add the following environment variables to your `.env` file in the client folder and include the following:
+      <p>Giphy API</p>
+
+      ```js
+      REACT_APP_GIPHY_API = put - your - giphy - api - url;
+      ``` -->
 
 <!-- 4. Create `.env` file for server
 
