@@ -33,9 +33,8 @@ export const Hero: React.FC<HeroProps> = ({}) => {
               Discover, collect, and sell extraordinary NFTs
             </div>
             <div className={style.description}>
-              Kryptoturf is a web3 NFT Marketplace, where users have the ability
-              to create, trade, and collect NFTs without the need to spend their
-              own money.
+              Kryptoturf is a NFT marketplace built on the Goerli testnet, where
+              users have the ability to create, list, and buy NFTs
             </div>
             <div className={style.ctaContainer}>
               <button
