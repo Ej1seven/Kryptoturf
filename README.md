@@ -64,7 +64,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
   
   ![The Forum Lab Logo](client/src/images/logo.png "Kryptoturf Logo")
 
-  <h3 align="center">Kryptoturf is a Web 3.0 application that allows users to send transactions through the blockchain.</h3>
+  <h3 align="center">Kryptoturf is a NFT marketplace, where users have the ability to create, trade, and collect NFTs without the need to spend their own money.</h3>
 
   <p align="center">
     <br />
@@ -105,7 +105,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
 
 ## About The Project
 
-If you follow any of the prominent tech influencers, I'm sure you've come across the word Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. Kryptoturf allows users to connect to their wallet using Metamask, then send ethereum to another account. Kyptoturf shows the last transactions from the related account. Each transaction is associated with a gif that is determined by a keyword supplied by the end user at the time of exchange.
+If you follow any of the prominent tech influencers, I'm sure you've come across the phrase Web 3.0. Web 3.0 is the third generation of the Internet which enables decentralized data interconnection. This new form of Internet enables people to legitimately own their data through transparency. I designed Kryptoturf to allow users the ability to participate in the world of NFTs without the pressure of spending their own money. Kryptoturf can be seen as an introductory platform that familiarizes users with the blockchain and the technologies it encompasses. 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -118,20 +118,23 @@ If you follow any of the prominent tech influencers, I'm sure you've come across
 - [Solidity](https://docs.soliditylang.org/)
 - [TailwindCSS](https://tailwindcss.com/)
 - [Vercel](https://vercel.com/)
-<!-- - [Node.js](https://nodejs.org/)
+- [Node.js](https://nodejs.org/)
 - [Express.js](https://expressjs.com/)
-- [Chakra](https://chakra-ui.com/)
-- [FontAwesome](https://fontawesome.com/)
-- [GraphQl](https:///graphql.org/)
-- [ApolloServer](https://www.apollographql.com/)
 - [Postgresql](https://postgresql.org/)
+- [ThirdWeb](https://thirdweb.com/)
+- [Axios](https://axios-http.com/)
+- [Date-FNS](https://date-fns.org/)
+- [Sweetalert2](https://sweetalert2.github.io/)
+- [React-slick](https://react-slick.neostack.com/)
+- [React-hot-toast](https://react-hot-toast.com/)
+- [React-icons](https://react-icons.github.io/react-icons/)
+- [Universal-cookie](https://www.npmjs.com/package/universal-cookie)
+- [Prisma 2](https://www.prisma.io/)
+- [Argon 2](https://www.npmjs.com/package/argon2)
 - [Redis](https://redis.io/)
-- [Nodemailer](https://nodemailer.com/) -->
-<!-- - [Docker](https://www.docker.com/)
-- [Urql](https://formidable.com/open-source/urql/)
-- [MikroOrm](https://mikro-orm.io/)
-- [Argon2](https://www.npmjs.com/package/argon2)
-- [Dataloader](https://www.npmjs.com/package/dataloader) -->
+- [JWT](https://www.npmjs.com/package/jsonwebtoken)
+- [Multer](https://www.npmjs.com/package/multer)
+- [Nodemailer](https://nodemailer.com/about/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -153,8 +156,9 @@ To get a local copy up and running follow these simple example steps.
    ```sh
    npm install
    ```
-3. Create `.env` file for web
-
+3. To run this project, you will need to add the following environment variables to your `.env` file in the client folder and include the following:
+   <p>Giphy API</p>
+   
    ```js
    REACT_APP_GIPHY_API = put - your - giphy - api - url;
    ```
@@ -180,7 +184,7 @@ To get a local copy up and running follow these simple example steps.
 
 <!-- ROADMAP -->
 
-## Roadmap
+<!-- ## Roadmap
 
 ### MVP / User Stories
 
@@ -190,13 +194,31 @@ To get a local copy up and running follow these simple example steps.
 
 See the [open issues](https://github.com/ej1seven/Kryptoturf/issues) for a full list of proposed features (and known issues).
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p> -->
 
 <!-- CONTRIBUTING -->
 
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+Before making your first contribution make sure to add your name to the `CONTRIBUTORS.md` file.
+
+1. Add the changes with git add, git commit (write a good commit message, if possible):
+```js
+git add CONTRIBUTORS.md
+git commit -m "Add <your-github-username>"
+```
+**Replace \<your-github-username>\!**
+
+2. Push your changes to your repository:
+
+```js
+git push origin <branch-name>
+```
+3. Go to the GitHub page of your fork, and make a pull request:
+
+4. Wait until I merge your pull request. If there are any conflicts, you will get a notification.
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
@@ -217,6 +239,8 @@ Erik Hunter - <erikhunter@erikhunter.dev>
 
 Project Link: [https://github.com/Ej1seven/Kryptoturf](https://github.com/Ej1seven/Kryptoturf)
 
+Website: [www.kryptoturf.com](https://kryptoturf.com/)
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
@@ -233,3 +257,8 @@ Project Link: [https://github.com/Ej1seven/Kryptoturf](https://github.com/Ej1sev
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=plastic&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/erik-hunter/
 [product-screenshot]: images/screenshot.png
+
+## Copyright and license
+
+Kryptoturf is licensed under the GNU General Public License v3.0
+<p align="right">(<a href="#top">back to top</a>)</p>
