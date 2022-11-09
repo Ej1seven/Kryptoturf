@@ -129,7 +129,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
               <p>Need an account?</p>
               <p
                 className="underline cursor-pointer"
-                onClick={() => window.location.reload()}
+                onClick={() => navigate('/register')}
               >
                 Sign up
               </p>
