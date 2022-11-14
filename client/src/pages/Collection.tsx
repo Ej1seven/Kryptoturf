@@ -9,6 +9,9 @@ import { FaEthereum } from 'react-icons/fa';
 import { roundUpToHundreths } from '../utils/roundUpToHundreths';
 import { Loader } from '../components';
 import useMarkeplaceData from '../hooks/useMarketplaceData';
+import defaultBannerImage from '../../src/images/default-banner.jpg';
+import defaultLogoImage from '../../src/images/default-profile.jpg';
+import { MdPhotoSizeSelectLarge } from 'react-icons/md';
 
 interface CollectionsProps {}
 
@@ -40,14 +43,6 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
   /*id = (collection contract address) found in URL parameter */
   let { id }: any = useParams();
   const { listings, marketPlaceModule, nftModule } = useMarkeplaceData(id);
-  console.log(
-    'marketPlaceModule',
-    marketPlaceModule,
-    'listings',
-    listings,
-    'nftModule',
-    nftModule
-  );
   /*Pulls all the NFTs for this collection */
   const [nfts, setNfts] = useState([]);
   /*Sets the floor price by finding the NFT listed for the lowest amount of ETH on the market */
@@ -117,27 +112,45 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
       ) : (
         <>
           <div className={style.bannerImageContainer}>
-            <img
-              className={style.bannerImage}
-              alt="banner"
-              src={
-                collectionItem?.bannerImage
-                  ? `${URL}/${collectionItem.bannerImage}`
-                  : 'https://via.placeholder.com/200'
-              }
-            />
+            {collectionItem?.bannerImage ? (
+              <>
+                <img
+                  className={style.bannerImage}
+                  alt="banner"
+                  src={
+                    collectionItem?.bannerImage
+                      ? `${URL}/${collectionItem.bannerImage}`
+                      : `${defaultBannerImage}`
+                  }
+                />
+              </>
+            ) : (
+              <div className="w-full h-full flex justify-center items-center bg-black border-2 border white">
+                <MdPhotoSizeSelectLarge className="h-20 w-20 m-auto text-white" />
+              </div>
+            )}
           </div>
           <div className={style.infoContainer}>
             <div className={style.midRow}>
-              <img
-                className={style.profileImg}
-                src={
-                  collectionItem?.profileImage
-                    ? `${URL}/${collectionItem.logoImage}`
-                    : 'https://via.placeholder.com/200'
-                }
-                alt="profile image"
-              />
+              {collectionItem?.profileImage ? (
+                <>
+                  <img
+                    className={style.profileImg}
+                    src={
+                      collectionItem?.profileImage
+                        ? `${URL}/${collectionItem.logoImage}`
+                        : `${defaultLogoImage}`
+                    }
+                    alt="profile image"
+                  />
+                </>
+              ) : (
+                <div className="w-40 h-40 object-cover rounded-full border-2 border-[#202225] mt-[-4rem] flex justify-center items-center bg-white">
+                  <p className="text-black text-4xl">
+                    {collectionItem?.title.charAt(0).toUpperCase()}
+                  </p>
+                </div>
+              )}
             </div>
             <div className={style.endRow}></div>
             <div className={style.midRow}>

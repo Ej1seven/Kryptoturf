@@ -25,10 +25,7 @@ export const EventItem: React.FC<any> = ({ transaction }) => {
     let differenceInTime: any;
     let date1 = new Date(transaction?.createdAt);
     let date2 = new Date();
-    console.log(new Date(transaction?.createdAt));
-    console.log(new Date());
     differenceInTime = formatDistance(date1, date2);
-    console.log(differenceInTime);
     setDate(differenceInTime);
   };
   const getEventName = () => {

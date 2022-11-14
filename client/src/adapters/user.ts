@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 const URL = process.env.REACT_APP_API_URL;
 
@@ -11,7 +10,6 @@ export async function register(
   password: String,
   address?: String
 ) {
-  // console.log(usernameOrEmail, password);
   return await axios
     .post(`${URL}/userAuth/register`, {
       username: username.toLowerCase(),
@@ -20,7 +18,6 @@ export async function register(
       address: address,
     })
     .then((res): any => {
-      console.log(res.data);
       if (res.data === 'invalid email')
         return Swal.fire({
           icon: 'error',
@@ -48,9 +45,6 @@ export async function register(
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
-      // if (res.data.user.username === username) {
-      // user = res.data.user;
-
       return Swal.fire({
         icon: 'success',
         title: 'Congrats!',
@@ -60,17 +54,12 @@ export async function register(
         confirmButtonColor: '#2952e3',
       }).then((result) => {
         if (result.isConfirmed) {
-          /*useNavigate() allows you to route to other pages */
-          // const navigate = useNavigate();
-          // navigate(`/login`);
           return res.data.user;
         }
       });
-      // }
     });
 }
 export async function login(usernameOrEmail: String, password: String) {
-  // console.log(usernameOrEmail, password);
   return await axios
     .post(
       `${URL}/userAuth/login`,
@@ -95,7 +84,6 @@ export async function login(usernameOrEmail: String, password: String) {
     });
 }
 export async function logout() {
-  // console.log(usernameOrEmail, password);
   return await axios
     .delete(`${URL}/userAuth/logout`, {
       withCredentials: true,
@@ -112,7 +100,6 @@ export async function me() {
       withCredentials: true,
     })
     .then(async (res) => {
-      console.log(res.data);
       if (res.data === 'TokenExpiredError') {
         return token();
       }
@@ -127,7 +114,6 @@ export async function token() {
       withCredentials: true,
     })
     .then((res) => {
-      console.log(res.data);
       return res.data;
     });
 }
@@ -137,7 +123,6 @@ export async function addImages(images: {
   bannerImage?: String;
   email: String;
 }) {
-  console.log(images);
   return await axios
     .post(
       `${URL}/userAuth/images`,
@@ -149,14 +134,11 @@ export async function addImages(images: {
       { withCredentials: true }
     )
     .then((res): any => {
-      console.log(res.data);
-      // collectionItem = res.data;
       return res.data;
     });
 }
 
 export async function getUserData(emailOrContractAddress: String) {
-  console.log(emailOrContractAddress);
   return await axios
     .post(
       `${URL}/userAuth/user`,
@@ -166,7 +148,6 @@ export async function getUserData(emailOrContractAddress: String) {
       { withCredentials: true }
     )
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }
@@ -174,7 +155,6 @@ export async function getAllUsers() {
   return await axios
     .get(`${URL}/userAuth/users`, { withCredentials: true })
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }
@@ -185,8 +165,6 @@ export async function buyNFT(
   royaltyOwnerAddress: String,
   royaltyFee: Number
 ) {
-  console.log(buyerAddress);
-  console.log(sellerAddress);
   return await axios
     .post(
       `${URL}/userAuth/buyNFT`,
@@ -200,7 +178,6 @@ export async function buyNFT(
       { withCredentials: true }
     )
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }

@@ -14,6 +14,7 @@ import toast, { Toaster } from 'react-hot-toast';
 interface HomeProps {}
 
 export const Home: React.FC<HomeProps> = ({}) => {
+  const { ethereum } = window;
   /*me query checks if the user is logged in. If the user is logged in the server responds 
     with the user data */
   const { data } = useQuery('me', me);
@@ -28,6 +29,17 @@ export const Home: React.FC<HomeProps> = ({}) => {
       });
     }
   }, [data]);
+  useEffect(() => {
+    if (ethereum) {
+      ethereum.on('chainChanged', () => {
+        window.location.reload();
+      });
+      ethereum.on('accountsChanged', () => {
+        window.location.reload();
+      });
+    }
+    me();
+  });
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />

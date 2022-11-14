@@ -33,10 +33,6 @@ export const ItemActivity: React.FC<any> = ({
   const lastPostIndex = currentPage + postPerPage;
   const firstPostIndex = lastPostIndex - postPerPage;
   const currentPost = nftTransactions?.slice(firstPostIndex - 1, lastPostIndex);
-  console.log(collectionContractAddress);
-  console.log(id);
-  console.log(nftTransactions);
-  console.log(currentPost);
   useEffect(() => {
     (async () => {
       setNftTransactions(await getTransactions(collectionContractAddress, id));

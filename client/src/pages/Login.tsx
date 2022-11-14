@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { me, login } from '../adapters/user';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { Loader } from '../components/Loader';
 import { useNavigate } from 'react-router-dom';
-import { useIsAuth } from '../utils/useIsAuth';
 import Swal from 'sweetalert2';
 import { Navbar } from '../components';
+import { TransactionContext } from '../context/TransactionContext';
 
 interface LoginProps {}
 const Input = ({
@@ -36,6 +36,8 @@ const commonStyles =
 
 export const Login: React.FC<LoginProps> = ({}) => {
   // const [isLoading, setIsLoading] = useState(false);
+  const { connectWallet, currentAccount } = useContext(TransactionContext);
+  const { ethereum } = window;
   const [formData, setFormData] = useState({
     usernameOrEmail: '',
     password: '',
@@ -60,7 +62,6 @@ export const Login: React.FC<LoginProps> = ({}) => {
         confirmButtonColor: '#2952e3',
       });
     await login(usernameOrEmail, password).then((res: any) => {
-      console.log(res);
       if (res.res.data.message) {
         error = res.res.data.message;
       }
@@ -75,6 +76,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
         confirmButtonColor: '#2952e3',
       });
     } else {
+      me();
       navigate('/');
     }
   };
@@ -86,6 +88,17 @@ export const Login: React.FC<LoginProps> = ({}) => {
       navigate('/');
     }
   }, [data, navigate]);
+  useEffect(() => {
+    if (ethereum) {
+      ethereum.on('chainChanged', () => {
+        window.location.reload();
+      });
+      ethereum.on('accountsChanged', () => {
+        window.location.reload();
+      });
+    }
+    me();
+  });
   return (
     <div className=" overflow-hidden">
       <Navbar />
@@ -97,21 +110,36 @@ export const Login: React.FC<LoginProps> = ({}) => {
         <div className="flex justify-center items-center h-screen w-screen">
           <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism">
             <p className="text-white text-2xl text-left w-full pb-8">Sign In</p>
-
-            <Input
-              placeholder="Username or Email"
-              name="usernameOrEmail"
-              type="text"
-              handleChange={handleChange}
-              value={null}
-            />
-            <Input
-              placeholder="Password"
-              name="password"
-              type="password"
-              handleChange={handleChange}
-              value={null}
-            />
+            {!currentAccount && (
+              <button
+                type="button"
+                onClick={connectWallet}
+                className="flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
+              >
+                <p className="text-white text-base font-semibold">
+                  Connect Wallet
+                </p>
+              </button>
+            )}
+            {currentAccount && (
+              <>
+                {' '}
+                <Input
+                  placeholder="Username or Email"
+                  name="usernameOrEmail"
+                  type="text"
+                  handleChange={handleChange}
+                  value={null}
+                />
+                <Input
+                  placeholder="Password"
+                  name="password"
+                  type="password"
+                  handleChange={handleChange}
+                  value={null}
+                />
+              </>
+            )}
             <div className="h-[1px] w-full bg-gray-400 my-2 max-w-[400px]" />
             {isLoading ? (
               <Loader />

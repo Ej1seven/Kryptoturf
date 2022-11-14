@@ -30,10 +30,6 @@ export const GeneralDetails: React.FC<any> = ({
   selectedNft,
   collectionContractAddress,
 }) => {
-  /*useNavigate() allows you to route to other pages */
-  const navigate = useNavigate();
-  const { data, isError, refetch } = useQuery('me', me);
-  const [collections, setCollections]: any = useState([]);
   const [collectionData, setCollectionData]: any = useState();
   const [owner, setOwner]: any = useState();
   const [likes, setLikes]: any = useState([]);
@@ -43,7 +39,6 @@ export const GeneralDetails: React.FC<any> = ({
     })();
   }, []);
   useEffect(() => {
-    let likesArray;
     (async () => {
       setOwner(await getUserData(selectedNft.owner));
       setCollectionData(await getCollection(collectionContractAddress));
@@ -53,20 +48,13 @@ export const GeneralDetails: React.FC<any> = ({
     let likesArray: any = [];
     (async () => {
       await collectionData.likes.forEach((likeData: any) => {
-        // console.log(selectedNft.metadata.name);
-        // console.log(likeData.nftName);
         if (selectedNft.metadata.name === likeData.nftName) {
-          console.log(likeData);
           likesArray.push(likeData);
         }
       });
     })();
     setLikes(likesArray);
   }, [collectionData]);
-  console.log(collectionData);
-  console.log(selectedNft);
-  console.log(owner);
-  console.log(likes);
   return (
     <div className={style.wrapper}>
       <div className={style.infoContainer}>

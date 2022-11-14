@@ -223,12 +223,11 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
   }, []);
   /*Mints the NFT to Kryptoturf marketplace */
   const mintNFT = async () => {
-    setIsLoading(true);
     let error: any = null;
     const { name, externalLink, description } = formData;
     /*If the user has not entered a name an error message will popup when they click the create button */
     if (!name) {
-      setIsLoading(false);
+      // setIsLoading(false);
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -240,7 +239,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
     }
     /*If the user has not uploaded an image an error message will popup when they click the create button */
     if (!image.raw) {
-      setIsLoading(false);
+      // setIsLoading(false);
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -253,7 +252,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
     /*If the user is not logged into their account an error message will popup when they 
       attempt to create a NFT. */
     if (!data?.id) {
-      setIsLoading(false);
+      // setIsLoading(false);
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -276,7 +275,9 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
     /*collectionInput gets the name of the collection selected by the user from the dropdown list then 
       mints the NFT to the selected collection */
     let collectionInput: any = document.getElementById('collection');
-    let text = `<p> If you want to make an NFT of artwork that’s not your own, you need to go to the source for permission. For more information covering NFT copyright infringment <a href="https://uclawreview.org/2022/02/11/minted-nft-of-someone-elses-artwork-a-new-flavor-of-copyright-infringement/">CLICK HERE</a></p)`;
+    let text = `<p> If you want to make an NFT of artwork that’s not your own, you need to go to the source for permission. For more information covering NFT copyright infringment <a href="https://uclawreview.org/2022/02/11/minted-nft-of-someone-elses-artwork-a-new-flavor-of-copyright-infringement/" target="_blank"
+    rel="noopener noreferrer">CLICK HERE</a></p)`;
+    setIsLoading(true);
     for (let x = 0; x <= collectionsOwnedByUser.length - 1; x++) {
       if (
         collectionInput.value.toLowerCase() ===
@@ -287,7 +288,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
         const getModule = await sdk.getNFTCollection(
           collectionsOwnedByUser[x].contractAddress
         );
-        Swal.fire({
+        await Swal.fire({
           icon: 'warning',
           title: 'Protect Yourself',
           html: text,
@@ -331,7 +332,6 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
               color: '#fff',
               confirmButtonColor: '#2952e3',
             }).then((result) => {
-              console.log(untitledCollectionContractAddress);
               if (result.isConfirmed) {
                 let collectionInput: any =
                   document.getElementById('collection');
@@ -341,11 +341,12 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                 );
               }
             });
+          } else {
+            window.location.reload();
           }
         });
       }
     }
-    console.log(collectionName);
     /*if the user did not select a collection they created then first check if they already have an Untitled Collection. If so, mint the new NFT to this collection. If the user does not already have an Untitled Collection create a new one and mint the NFT to it */
     if (!collectionName) {
       /*Map through the collections owned by the user and check to see if they already have a Untitled Collection. If so mint the NFT to the collection. */
@@ -360,7 +361,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
           const getModule = await sdk.getNFTCollection(
             collectionsOwnedByUser[x].contractAddress
           );
-          Swal.fire({
+          await Swal.fire({
             icon: 'warning',
             title: 'Protect Yourself',
             html: text,
@@ -369,76 +370,79 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
             color: '#fff',
             confirmButtonColor: '#2952e3',
           }).then(async (result) => {
-            const mint = await getModule.mintTo(currentAccount, {
-              name: name,
-              description: description,
-              attributes: rows,
-              image: image.raw,
-              external_url: externalLink,
-            });
-            const receipt = mint.receipt;
-            const tokenId = mint.id; // the id of the NFT minted
-            await mint.data().catch((err) => {
-              error = err;
-            });
-            setIsLoading(false);
-            /*If there is an error minting the NFT a error message will popup */
-            if (error) {
+            if (result.isConfirmed) {
+              const mint = await getModule.mintTo(currentAccount, {
+                name: name,
+                description: description,
+                attributes: rows,
+                image: image.raw,
+                external_url: externalLink,
+              });
+              const receipt = mint.receipt;
+              const tokenId = mint.id; // the id of the NFT minted
+              await mint.data().catch((err) => {
+                error = err;
+              });
+              setIsLoading(false);
+              /*If there is an error minting the NFT a error message will popup */
+              if (error) {
+                return Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: `${error.message}`,
+                  background: '#19191a',
+                  color: '#fff',
+                  confirmButtonColor: '#2952e3',
+                });
+              }
+              /*If the NFT mint is successful then a success message will popup */
               return Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: `${error.message}`,
+                icon: 'success',
+                title: 'Congrats!',
+                text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
                 background: '#19191a',
                 color: '#fff',
                 confirmButtonColor: '#2952e3',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  confirmNFT();
+                  navigate(`/collection/${untitledCollectionContractAddress}`);
+                }
               });
+            } else {
+              window.location.reload();
             }
-            /*If the NFT mint is successful then a success message will popup */
-            return Swal.fire({
-              icon: 'success',
-              title: 'Congrats!',
-              text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
-              background: '#19191a',
-              color: '#fff',
-              confirmButtonColor: '#2952e3',
-            }).then((result) => {
-              console.log(untitledCollectionContractAddress);
-              if (result.isConfirmed) {
-                confirmNFT();
-                navigate(`/collection/${untitledCollectionContractAddress}`);
-              }
-            });
           });
         }
       }
       /*If an Untitled Collection has not already been created deploy a new Untitled Collection then mint the NFT to that collection */
       if (!untitledCollectionContractAddress) {
         (async () => {
-          await sdk.deployer
-            .deployNFTCollection({
-              name: untitledCollection,
-              primary_sale_recipient: currentAccount,
-            })
-            .then(async (res) => {
-              let contractAddress = await res;
-              untitledCollectionContractAddress = await contractAddress;
-              const collectionData = await {
-                title: untitledCollection,
-                contractAddress: contractAddress,
-                createdBy: data.username,
-                owners: data.username,
-              };
-              const getModule = await sdk.getNFTCollection(contractAddress);
-              Swal.fire({
-                icon: 'warning',
-                title: 'Protect Yourself',
-                html: text,
-                showCancelButton: true,
-                background: '#19191a',
-                color: '#fff',
-                confirmButtonColor: '#2952e3',
-              }).then(async (result) => {
-                if (result.isConfirmed) {
+          await Swal.fire({
+            icon: 'warning',
+            title: 'Protect Yourself',
+            html: text,
+            showCancelButton: true,
+            background: '#19191a',
+            color: '#fff',
+            confirmButtonColor: '#2952e3',
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              await sdk.deployer
+                .deployNFTCollection({
+                  name: untitledCollection,
+                  primary_sale_recipient: currentAccount,
+                })
+                .then(async (res) => {
+                  let contractAddress = await res;
+                  untitledCollectionContractAddress = await contractAddress;
+                  const collectionData = await {
+                    title: untitledCollection,
+                    contractAddress: contractAddress,
+                    createdBy: data.username,
+                    owners: data.username,
+                  };
+                  const getModule = await sdk.getNFTCollection(contractAddress);
                   await createCollection(collectionData);
                   const mint = await getModule.mintTo(currentAccount, {
                     name: name,
@@ -450,39 +454,38 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                   const receipt = mint.receipt;
                   const tokenId = mint.id; // the id of the NFT minted
                   await mint.data();
-                } else {
-                  window.location.reload();
+                })
+                .catch((err) => {
+                  error = err;
+                });
+              setIsLoading(false);
+              /*If there is an error minting the NFT a error message will popup */
+              if (error) {
+                return Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: `${error.message}`,
+                  background: '#19191a',
+                  color: '#fff',
+                  confirmButtonColor: '#2952e3',
+                });
+              }
+              /*If the NFT mint is successful then a success message will popup */
+              return Swal.fire({
+                icon: 'success',
+                title: 'Congrats!',
+                text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
+                background: '#19191a',
+                color: '#fff',
+                confirmButtonColor: '#2952e3',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  confirmNFT();
+                  navigate(`/collection/${untitledCollectionContractAddress}`);
                 }
               });
-            })
-            .catch((err) => {
-              error = err;
-            });
-          setIsLoading(false);
-          /*If there is an error minting the NFT a error message will popup */
-          if (error) {
-            return Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: `${error.message}`,
-              background: '#19191a',
-              color: '#fff',
-              confirmButtonColor: '#2952e3',
-            });
-          }
-          /*If the NFT mint is successful then a success message will popup */
-          return Swal.fire({
-            icon: 'success',
-            title: 'Congrats!',
-            text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
-            background: '#19191a',
-            color: '#fff',
-            confirmButtonColor: '#2952e3',
-          }).then((result) => {
-            console.log(untitledCollectionContractAddress);
-            if (result.isConfirmed) {
-              confirmNFT();
-              navigate(`/collection/${untitledCollectionContractAddress}`);
+            } else {
+              window.location.reload();
             }
           });
         })();
@@ -535,7 +538,6 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
   const changeCollectionInput = (e: any) => {
     let collectionInput: any = document.getElementById('collection');
     collectionInput.value = e.target.outerText;
-    console.log(collectionInput.value);
   };
   let collectionInputElement: any = document.getElementById('collection');
   /*Recognizes when the user has selected a different collection and hides the dropdown afterwards */
@@ -548,7 +550,6 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
   return (
     <div className=" overflow-hidden">
       <Toaster position="top-center" reverseOrder={false} />
-      <Navbar />
       {isLoading ? (
         <div className="h-screen w-screen flex flex-col items-center justify-center">
           <Loader />
@@ -559,236 +560,244 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
           </p>
         </div>
       ) : (
-        <div className="flex justify-center">
-          <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism mt-8">
-            <p className="text-white text-3xl text-left w-full pb-8 text-center">
-              Create New Item
-            </p>
-            <label htmlFor="upload-button">
-              {image.preview ? (
-                <img
-                  src={image.preview}
-                  alt="dummy"
-                  width="300"
-                  height="300"
-                  className="my-10 mx-5"
-                />
-              ) : (
-                <div className={style.wrapper}>
-                  <HiOutlinePhotograph color="white" size={'14rem'} />
-                </div>
-              )}
-              <h5
-                onClick={handlePhotoChange}
-                className="text-white w-full mt-10 p-2 rounded-full cursor-pointer text-center btn-gradient-border"
-              >
-                Upload your photo
-              </h5>
-            </label>
-
-            <input
-              type="file"
-              id="upload-button"
-              style={{ display: 'none' }}
-              onChange={handlePhotoChange}
-            />
-            <br />
-            <Input
-              placeholder="Name"
-              name="name"
-              type="text"
-              handleChange={handleChange}
-              value={null}
-            />
-            <Input
-              placeholder="External link"
-              name="externalLink"
-              type="text"
-              handleChange={handleChange}
-              value={null}
-            />
-            <Input
-              placeholder="Description"
-              name="description"
-              type="text"
-              handleChange={handleChange}
-              value={null}
-            />
-            <CollectionInput
-              id="collection"
-              placeholder="Collection"
-              name="collection"
-              type="text"
-              handleChange={handleChange}
-              value={null}
-              searchCollections={searchCollections}
-              toggleCollectionsDropdown={toggleCollectionsDropdown}
-            />
-            {displayCollections && (
-              <>
-                {' '}
-                {collectionsOwnedByUser.length > 0 && (
-                  <div className="w-full white-glassmorphism-options ">
-                    {collectionsOwnedByUser.map(
-                      (collection: any, index: any) => {
-                        if (index !== collectionsOwnedByUser.length - 1) {
-                          return (
-                            <div
-                              className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
-                              onClick={(e) => changeCollectionInput(e)}
-                            >
-                              {collection.name}
-                            </div>
-                          );
-                        } else {
-                          return (
-                            <div
-                              className="w-full  p-2 outline-none bg-transparent text-white text-sm border-none collection  cursor-pointer"
-                              onClick={(e) => changeCollectionInput(e)}
-                            >
-                              {collection.name}
-                            </div>
-                          );
-                        }
-                      }
-                    )}
+        <>
+          <Navbar />
+          <div className="flex justify-center">
+            <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism mt-8">
+              <p className="text-white text-3xl text-left w-full pb-8 text-center">
+                Create New Item
+              </p>
+              <label htmlFor="upload-button">
+                {image.preview ? (
+                  <img
+                    src={image.preview}
+                    alt="dummy"
+                    width="300"
+                    height="300"
+                    className="my-10 mx-5"
+                  />
+                ) : (
+                  <div className={style.wrapper}>
+                    <HiOutlinePhotograph color="white" size={'14rem'} />
                   </div>
                 )}
-              </>
-            )}
-            <div
-              onClick={() => setToggleMenu(true)}
-              className=" w-full content-center text-white flex flex-row border-[#3d4f7c] md:w-3/4  cursor-pointer"
-            >
-              {' '}
-              <div className="w-11/12 flex flex-row justify-start">
-                <div>
-                  <HiMenuAlt4 fontSize={28} className=" mx-2 cursor-pointer" />
-                </div>
-                <div>
-                  {' '}
-                  <button> Properties</button>
-                </div>
-              </div>
-              <IoIosAdd size={'2rem'} />
-            </div>
-            <div className="h-[1px] w-full bg-gray-400 my-2" />
-            {isLoading ? (
-              <Loader />
-            ) : (
-              <button
-                type="button"
-                onClick={mintNFT}
-                className="text-white w-full mt-2  p-2 btn-gradient-border rounded-full cursor-pointer "
-              >
-                Create
-              </button>
-            )}
-          </div>
-          {toggleMenu && (
-            <>
-              {/* <!-- Main modal --> */}
-              <div
-                id="defaultModal"
-                aria-hidden="true"
-                className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full "
-              >
-                <div className="relative p-4 w-full max-w-2xl h-full md:h-auto m-auto">
-                  {/* <!-- Modal content --> */}
-                  <div className="relative bg-white rounded-lg shadow bg-[#19191a] ">
-                    {/* <!-- Modal header --> */}
-                    <div className="flex flex-col justify-between items-start p-4 rounded-t border-b dark:border-gray-600">
-                      <div className=" w-full flex flex-row">
-                        <h3 className="w-11/12 ml-[8%] text-xl font-semibold text-gray-900 dark:text-white text-center">
-                          Add Properties{' '}
-                        </h3>
-                        <AiOutlineClose
-                          fontSize={28}
-                          className="text-white cursor-pointer relative"
-                          onClick={() => setToggleMenu(false)}
-                        />
-                      </div>
-                      {/* <!-- Modal body --> */}
-                      <div className="p-6 space-y-6 w-full text-white">
-                        <table className="table-auto w-full">
-                          <thead>
-                            <tr className="w-full">
-                              <th className="w-1/12	"></th>
-                              <th className="w-2/5">Type</th>
-                              <th className="w-2/5">Name</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {rows.map((item, idx) => (
-                              <tr className="w-full" key={idx}>
-                                <td className="">
-                                  <>{idx + 1}</>
-                                </td>
-                                {columnsArray.map((column, index) =>
-                                  index === 0 ? (
-                                    <>
-                                      <td className="" key={index}>
-                                        <Input
-                                          placeholder="Character"
-                                          name="trait_type"
-                                          type="text"
-                                          handleChange={handleAttributeChange}
-                                          value={null}
-                                        />
-                                      </td>
-                                    </>
-                                  ) : (
-                                    <>
-                                      {' '}
-                                      <td className="" key={index}>
-                                        <Input
-                                          placeholder="Male"
-                                          name="value"
-                                          type="text"
-                                          handleChange={handleAttributeChange}
-                                          value={null}
-                                        />
-                                      </td>
-                                    </>
-                                  )
-                                )}
+                <h5
+                  onClick={handlePhotoChange}
+                  className="text-white w-full mt-10 p-2 rounded-full cursor-pointer text-center btn-gradient-border"
+                >
+                  Upload your photo
+                </h5>
+              </label>
 
-                                <td>
-                                  <AiOutlineClose
-                                    fontSize={25}
-                                    className="text-white cursor-pointer ml-4"
-                                    onClick={() => handleRemoveSpecificRow(idx)}
-                                  />
-                                </td>
+              <input
+                type="file"
+                id="upload-button"
+                style={{ display: 'none' }}
+                onChange={handlePhotoChange}
+              />
+              <br />
+              <Input
+                placeholder="Name"
+                name="name"
+                type="text"
+                handleChange={handleChange}
+                value={null}
+              />
+              <Input
+                placeholder="External link"
+                name="externalLink"
+                type="text"
+                handleChange={handleChange}
+                value={null}
+              />
+              <Input
+                placeholder="Description"
+                name="description"
+                type="text"
+                handleChange={handleChange}
+                value={null}
+              />
+              <CollectionInput
+                id="collection"
+                placeholder="Collection"
+                name="collection"
+                type="text"
+                handleChange={handleChange}
+                value={null}
+                searchCollections={searchCollections}
+                toggleCollectionsDropdown={toggleCollectionsDropdown}
+              />
+              {displayCollections && (
+                <>
+                  {' '}
+                  {collectionsOwnedByUser.length > 0 && (
+                    <div className="w-full white-glassmorphism-options ">
+                      {collectionsOwnedByUser.map(
+                        (collection: any, index: any) => {
+                          if (index !== collectionsOwnedByUser.length - 1) {
+                            return (
+                              <div
+                                className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
+                                onClick={(e) => changeCollectionInput(e)}
+                              >
+                                {collection.name}
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div
+                                className="w-full  p-2 outline-none bg-transparent text-white text-sm border-none collection  cursor-pointer"
+                                onClick={(e) => changeCollectionInput(e)}
+                              >
+                                {collection.name}
+                              </div>
+                            );
+                          }
+                        }
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+              <div
+                onClick={() => setToggleMenu(true)}
+                className=" w-full content-center text-white flex flex-row border-[#3d4f7c] md:w-3/4  cursor-pointer"
+              >
+                {' '}
+                <div className="w-11/12 flex flex-row justify-start">
+                  <div>
+                    <HiMenuAlt4
+                      fontSize={28}
+                      className=" mx-2 cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    {' '}
+                    <button> Properties</button>
+                  </div>
+                </div>
+                <IoIosAdd size={'2rem'} />
+              </div>
+              <div className="h-[1px] w-full bg-gray-400 my-2" />
+              {isLoading ? (
+                <Loader />
+              ) : (
+                <button
+                  type="button"
+                  onClick={mintNFT}
+                  className="text-white w-full mt-2  p-2 btn-gradient-border rounded-full cursor-pointer "
+                >
+                  Create
+                </button>
+              )}
+            </div>
+            {toggleMenu && (
+              <>
+                {/* <!-- Main modal --> */}
+                <div
+                  id="defaultModal"
+                  aria-hidden="true"
+                  className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full "
+                >
+                  <div className="relative p-4 w-full max-w-2xl h-full md:h-auto m-auto">
+                    {/* <!-- Modal content --> */}
+                    <div className="relative bg-white rounded-lg shadow bg-[#19191a] ">
+                      {/* <!-- Modal header --> */}
+                      <div className="flex flex-col justify-between items-start p-4 rounded-t border-b dark:border-gray-600">
+                        <div className=" w-full flex flex-row">
+                          <h3 className="w-11/12 ml-[8%] text-xl font-semibold text-gray-900 dark:text-white text-center">
+                            Add Properties{' '}
+                          </h3>
+                          <AiOutlineClose
+                            fontSize={28}
+                            className="text-white cursor-pointer relative"
+                            onClick={() => setToggleMenu(false)}
+                          />
+                        </div>
+                        {/* <!-- Modal body --> */}
+                        <div className="p-6 space-y-6 w-full text-white">
+                          <table className="table-auto w-full">
+                            <thead>
+                              <tr className="w-full">
+                                <th className="w-1/12	"></th>
+                                <th className="w-2/5">Type</th>
+                                <th className="w-2/5">Name</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        <button
-                          type="button"
-                          onClick={handleAddRow}
-                          className="text-white w-1/3 mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
-                        >
-                          Add more
-                        </button>
-                      </div>
-                      {/* <!-- Modal footer --> */}
-                      <div className="flex w-full items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600 flex-row">
-                        <button
-                          type="button"
-                          onClick={saveAttributes}
-                          className="text-white w-full dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 bg-blue-700 w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
-                        >
-                          Save
-                        </button>
+                            </thead>
+                            <tbody>
+                              {rows.map((item, idx) => (
+                                <tr className="w-full" key={idx}>
+                                  <td className="">
+                                    <>{idx + 1}</>
+                                  </td>
+                                  {columnsArray.map((column, index) =>
+                                    index === 0 ? (
+                                      <>
+                                        <td className="" key={index}>
+                                          <Input
+                                            placeholder="Character"
+                                            name="trait_type"
+                                            type="text"
+                                            handleChange={handleAttributeChange}
+                                            value={null}
+                                          />
+                                        </td>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {' '}
+                                        <td className="" key={index}>
+                                          <Input
+                                            placeholder="Male"
+                                            name="value"
+                                            type="text"
+                                            handleChange={handleAttributeChange}
+                                            value={null}
+                                          />
+                                        </td>
+                                      </>
+                                    )
+                                  )}
+
+                                  <td>
+                                    <AiOutlineClose
+                                      fontSize={25}
+                                      className="text-white cursor-pointer ml-4"
+                                      onClick={() =>
+                                        handleRemoveSpecificRow(idx)
+                                      }
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <button
+                            type="button"
+                            onClick={handleAddRow}
+                            className="text-white w-1/3 mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
+                          >
+                            Add more
+                          </button>
+                        </div>
+                        {/* <!-- Modal footer --> */}
+                        <div className="flex w-full items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600 flex-row">
+                          <button
+                            type="button"
+                            onClick={saveAttributes}
+                            className="text-white w-full dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 bg-blue-700 w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer px-5 py-2.5"
+                          >
+                            Save
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </>
-          )}
-        </div>
+              </>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

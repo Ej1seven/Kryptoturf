@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { collectionTransactions } from '../adapters/marketItems';
 import { roundUpToHundreths } from '../utils/roundUpToHundreths';
+import defaultBannerImage from '../../src/images/default-banner.jpg';
 
 interface CollectionItemProps {}
 
@@ -40,7 +41,7 @@ export const CollectionItem: React.FC<any> = ({ collection }) => {
           src={
             collection?.logoImage
               ? `${URL}/${collection.logoImage}`
-              : 'https://via.placeholder.com/200'
+              : `${defaultBannerImage}`
           }
           alt="profile image"
         />

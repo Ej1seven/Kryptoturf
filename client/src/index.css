@@ -421,3 +421,12 @@ input[type='number'] {
   text-shadow: 0 0 80px rgba(255, 255, 255, 0.75),
     0 0 32px rgba(255, 255, 255, 0.24);
 }
+
+.swal2-styled {
+  width: 6rem;
+  height: 3rem;
+}
+
+.swal2-cancel {
+  border: 2px solid rgba(109, 119, 128, 0.453);
+}

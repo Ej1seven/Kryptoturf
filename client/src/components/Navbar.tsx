@@ -128,7 +128,10 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     classProps?: any;
   }) => {
     return (
-      <li className={`mx-4 cursor-pointer ${classProps}`} onClick={navigateTo}>
+      <li
+        className={title && `mx-4 cursor-pointer ${classProps}`}
+        onClick={navigateTo}
+      >
         {title}
       </li>
     );
@@ -152,7 +155,9 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   const navigateTo: any = (e: any) => {
     switch (e.target.innerText) {
       case 'Explore':
-        navigate('/collections');
+        {
+          currentAccount && data?.id && navigate('/collections');
+        }
         break;
       case 'Stats':
         navigate('/stats');
@@ -161,11 +166,13 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         navigate('/resources');
         break;
       case 'Create':
-        navigate('/create');
+        {
+          currentAccount && data?.id && navigate('/create');
+        }
         break;
       case 'Profile':
         {
-          data?.id
+          currentAccount && data?.id
             ? navigate('/profile')
             : Swal.fire({
                 icon: 'error',
@@ -179,7 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         break;
       case 'Wallet':
         {
-          currentAccount
+          currentAccount && data?.id
             ? navigate('/wallet')
             : Swal.fire({
                 icon: 'error',
@@ -198,12 +205,10 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   };
   /*Toggles the collections dropdown menu */
   const toggleCollectionsAndNFTSDropdown = (e: any) => {
-    console.log(collections.concat(allNfts));
     setCollectionsAndNFTS(collections.concat(allNfts));
     setDisplayCollectionsAndNFTS(!displayCollectionsAndNFTS);
   };
   const toggleCollectionsAndNFTSDropdownMobile = (e: any) => {
-    console.log(collections.concat(allNfts));
     setCollectionsAndNFTS(collections.concat(allNfts));
     setDisplayCollectionsAndNFTSMobile(true);
   };
@@ -230,11 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
       isListed: `${isListed}`,
       collection: `${collection.collectionContractAddress}`,
     };
-
-    console.log(e);
     collectionInput.value = e.target.outerText;
-    console.log(collectionInput.value);
-    console.log(collection);
     /*Checks if the current NFT is listed on the marketplace */
     const listing = listings.find(
       (listing: any) =>
@@ -265,7 +266,6 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   useEffect(() => {
     (async () => {
       const collections = await getCollections();
-      console.log(collections);
       await setCollections(collections);
     })();
   }, []);
@@ -291,9 +291,6 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
       setAllNfts(allNftsArray);
     }
   }, [marketPlaceModule]);
-  // useEffect(() => {
-  //   setCollectionsAndNFTS(collections.concat(allNfts));
-  // }, [allNfts]);
   let searchInputElement: any = document.getElementById('search-bar');
 
   return (
@@ -421,43 +418,55 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         )}
       </div>
       <ul className="text-white md:flex  list-none flex-row justify-between items-center flex-initial">
-        {['Explore', 'Stats', 'Resources', 'Create'].map((item, index) => (
+        {[
+          currentAccount && data?.id && 'Explore',
+          'Stats',
+          'Resources',
+          currentAccount && data?.id && 'Create',
+        ].map((item, index) => (
           <div className="hidden lg:block">
             <NavbarItem key={item + index} title={item} />
           </div>
         ))}
-        <div className=" text-3xl font-black px-4 hidden lg:block cursor-pointer">
-          <CgProfile
-            onClick={() =>
-              data?.id
-                ? navigate('/profile')
-                : Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Please login to view your profile',
-                    background: '#19191a',
-                    color: '#fff',
-                    confirmButtonColor: '#2952e3',
-                  })
-            }
-          />
-        </div>
-        <div className=" text-3xl font-black px-4 hidden lg:block cursor-pointer">
-          <MdAccountBalanceWallet
-            onClick={() =>
-              currentAccount
-                ? setToggleWallet(true)
-                : Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Please connect your Metamask wallet to view your funds',
-                    background: '#19191a',
-                    color: '#fff',
-                    confirmButtonColor: '#2952e3',
-                  })
-            }
-          />
-        </div>
+        {currentAccount && data?.id && (
+          <>
+            <div className=" text-3xl font-black px-4 hidden lg:block cursor-pointer">
+              <CgProfile
+                onClick={() =>
+                  data?.id
+                    ? navigate('/profile')
+                    : Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please login to view your profile',
+                        background: '#19191a',
+                        color: '#fff',
+                        confirmButtonColor: '#2952e3',
+                      })
+                }
+              />
+            </div>
+          </>
+        )}
+
+        {currentAccount && data?.id && (
+          <div className=" text-3xl font-black px-4 hidden lg:block cursor-pointer">
+            <MdAccountBalanceWallet
+              onClick={() =>
+                currentAccount
+                  ? setToggleWallet(true)
+                  : Swal.fire({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: 'Please connect your Metamask wallet to view your funds',
+                      background: '#19191a',
+                      color: '#fff',
+                      confirmButtonColor: '#2952e3',
+                    })
+              }
+            />
+          </div>
+        )}
         {toggleWallet && (
           <div className="flex relative hidden lg:block">
             {' '}
@@ -489,17 +498,17 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 <AiOutlineClose onClick={() => setToggleMenu(false)} />
               </li>
               {[
-                'Explore',
+                currentAccount && data?.id && 'Explore',
                 'Stats',
                 'Resources',
-                'Create',
-                'Profile',
-                'Wallet',
+                currentAccount && data?.id && 'Create',
+                currentAccount && data?.id && 'Profile',
+                currentAccount && data?.id && 'Wallet',
               ].map((item, index) => (
                 <NavbarItem
                   key={item + index}
                   title={item}
-                  classProps="my-2 text-lg "
+                  classProps={item && 'my-2 text-lg '}
                 />
               ))}
               <li

@@ -111,6 +111,17 @@ export const Attributes: React.FC<any> = ({
                 <div>Creator Earnings</div>
                 <div>{`${nftRoyaltyDetails}%`}</div>
               </div>
+              <div className="w-full flex flex-row justify-center">
+                <a
+                  href={`https://goerli.etherscan.io/token/${collectionContractAddress}?a=${id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="mx-auto flex items-center py-2 px-8 md:px-12 font-bold rounded-lg cursor-pointer text-[#2081e2] hover:text-white bg-white hover:bg-[#2081e2]">
+                    View on Etherscan
+                  </button>
+                </a>
+              </div>
             </>
           )}
           {nftAttributes === 'Description' && (

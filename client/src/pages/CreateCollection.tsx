@@ -339,7 +339,6 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
   return (
     <div className=" overflow-hidden">
       <Toaster position="top-center" reverseOrder={false} />
-      <Navbar />
       {isLoading ? (
         <div className="h-screen w-screen flex flex-col items-center justify-center">
           <Loader />
@@ -351,6 +350,7 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
         </div>
       ) : (
         <>
+          <Navbar />
           <div className="flex justify-center">
             <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism mt-8">
               <p className="text-white text-3xl text-left w-full pb-8 text-center">

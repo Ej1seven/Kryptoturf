@@ -135,7 +135,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
   const marketPlaceModule: any = useMemo(() => {
     if (!provider) return;
     const sdk = new ThirdwebSDK(provider.getSigner());
-    return sdk.getMarketplace('0xF6CcFB6EE02a4d8BE306Ec34A0E511C9B8c6c1a5');
+    return sdk.getMarketplace('0x3d121d397dF89B6F293dc360403E9c902bAe4367');
   }, [provider]);
   /*Retrieves all the NFTs on the marketplace from Thirdweb*/
   const nftModule = useMemo(() => {
@@ -191,7 +191,6 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
         const royaltyFee: any = await contract?.royalties.getTokenRoyaltyInfo(
           id
         );
-        console.log(royaltyFee.seller_fee_basis_points / 100);
         setNftRoyaltyDetails(royaltyFee.seller_fee_basis_points / 100);
       })();
     })();
@@ -308,7 +307,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
   return (
     <div className="overflow-hidden">
       <Toaster position="top-center" reverseOrder={false} />
-      <Navbar />
+      {!isLoading && <Navbar />}
       <div className={style.wrapper}>
         {!toggleMenu ? (
           <div className={style.container}>

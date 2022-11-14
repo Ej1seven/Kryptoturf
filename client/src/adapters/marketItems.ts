@@ -15,7 +15,6 @@ export async function createCollection(collection: {
   bannerImage?: String;
   logoImage?: String;
 }) {
-  console.log(collection);
   return await axios
     .post(
       `${URL}/collection`,
@@ -34,8 +33,6 @@ export async function createCollection(collection: {
       { withCredentials: true }
     )
     .then((res): any => {
-      console.log(res.data);
-      // collectionItem = res.data;
       return res.data;
     });
 }
@@ -43,7 +40,6 @@ export async function getCollections() {
   return await axios
     .get(`${URL}/collections`, { withCredentials: true })
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }
@@ -51,7 +47,6 @@ export async function getCollection(id: String) {
   return await axios
     .get(`${URL}/collection/${id}`, { withCredentials: true })
     .then((res): any => {
-      console.log(res.data);
       return res.data.collection;
     });
 }
@@ -62,7 +57,6 @@ export async function addLike(like: {
   nftName: String;
   email: String;
 }) {
-  console.log(like);
   return await axios
     .post(
       `${URL}/likes`,
@@ -75,26 +69,20 @@ export async function addLike(like: {
       { withCredentials: true }
     )
     .then((res): any => {
-      console.log(res.data);
-      // collectionItem = res.data;
       return res.data;
     });
 }
 export async function getLikes(collectionContractAddress: String) {
-  console.log(collectionContractAddress);
   return await axios
     .get(`${URL}/likes/${collectionContractAddress}`, { withCredentials: true })
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }
 export async function deleteLike(id: Number) {
-  console.log(id);
   return await axios
     .delete(`${URL}/likes/${id}`, { withCredentials: true })
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }
@@ -109,7 +97,6 @@ export async function addTransaction(transaction: {
   blockNumber: Number;
   txHash: String;
 }) {
-  console.log(transaction);
   return await axios
     .post(
       `${URL}/transactions`,
@@ -126,8 +113,6 @@ export async function addTransaction(transaction: {
       { withCredentials: true }
     )
     .then((res): any => {
-      console.log(res.data);
-      // collectionItem = res.data;
       return res.data;
     });
 }
@@ -135,37 +120,29 @@ export async function getTransactions(
   collectionContractAddress: String,
   tokenId: String
 ) {
-  console.log(collectionContractAddress);
-  console.log(tokenId);
   return await axios
     .get(`${URL}/transactions/${collectionContractAddress}/${tokenId}`, {
       withCredentials: true,
     })
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }
 export async function collectionTransactions(
   collectionContractAddress: String
 ) {
-  console.log(collectionContractAddress);
   return await axios
     .get(`${URL}/allTransactions/${collectionContractAddress}`, {
       withCredentials: true,
     })
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }
-
 export async function updateTradedVolume(
   contractAddress: String,
   volume: Number
 ) {
-  console.log(contractAddress);
-  console.log(volume);
   return await axios
     .put(
       `${URL}/collection`,
@@ -176,7 +153,6 @@ export async function updateTradedVolume(
       { withCredentials: true }
     )
     .then((res): any => {
-      console.log(res.data);
       return res.data;
     });
 }

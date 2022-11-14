@@ -14,12 +14,16 @@ export const Footer: React.FC<FooterProps> = ({}) => {
           <img src={logo} alt="logo" className="w-64" />
         </div>
         <div className="flex flex-1 justify-evenly items-center flex-wrap sm:mt-0 mt-5 w-full">
-          <p
-            className="text-white text-base text-center mx-2 cursor-pointer"
-            onClick={() => window.location.replace('https://nftplazas.com/')}
+          <a
+            href="https://nftplazas.com/"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Market
-          </p>
+            {' '}
+            <p className="text-white text-base text-center mx-2 cursor-pointer">
+              Market
+            </p>
+          </a>
           <p className="text-white text-base text-center mx-2 cursor-pointer">
             <a href="mailto:erikhunter@erikhunter.dev">Feedback</a>
           </p>

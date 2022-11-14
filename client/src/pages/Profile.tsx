@@ -175,7 +175,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     let allNftsArray: any = [];
     (async () => {
       const marketplace = await marketPlaceModule.getMarketplace(
-        '0xF6CcFB6EE02a4d8BE306Ec34A0E511C9B8c6c1a5'
+        '0x3d121d397dF89B6F293dc360403E9c902bAe4367'
       );
       setListings(await marketplace.getActiveListings());
     })();

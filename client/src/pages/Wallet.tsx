@@ -27,9 +27,6 @@ export const Wallet: React.FC<any> = ({}) => {
       setWalletTurfCoinsBalance(userData.turfCoins);
     })();
   }, []);
-  console.log(walletEthereumBalance);
-  console.log(walletTurfCoinsBalance);
-  console.log(walletAddress);
   return (
     <div className="overflow-hidden">
       <Navbar />

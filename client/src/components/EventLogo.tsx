@@ -5,7 +5,6 @@ import { TiShoppingCart } from 'react-icons/ti';
 interface EventLogoProps {}
 
 export const EventLogo: React.FC<any> = ({ event }) => {
-  console.log(event);
   return (
     <>
       {event === 'ListingAdded' && <AiFillTag />}

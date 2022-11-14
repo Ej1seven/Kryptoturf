@@ -76,7 +76,6 @@ export const TransactionProvider: React.FC = ({ children }) => {
         contractABI, and signer */
       const availableTransactions =
         await transactionContract.getAllTransactions();
-      console.log(availableTransactions);
       /*Structures all the transactions to display addressTo, addressFrom, timestamp, message, keyword, and amount */
       const structuredTransactions = availableTransactions.map(
         (transaction: any) => ({
@@ -95,8 +94,8 @@ export const TransactionProvider: React.FC = ({ children }) => {
       /*Adds the structured transactions to an array which will used in the <Transactions /> component 
       to display each transaction on individual cards*/
       setTransactions(structuredTransactions);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      throw new Error(error);
     }
   };
   /*checkIfWalletIsConnected- checks if the user's Metamask account is currently connected to Krytoturf */
@@ -119,7 +118,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
         setCurrentAccount(accounts[0]);
         getAllTransactions();
       } else {
-        console.log('No accounts found');
+        return 'No accounts found';
       }
     } catch (error) {
       throw new Error('No ethereum object.');
@@ -143,7 +142,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
       if (!ethereum)
         return Swal.fire({
           icon: 'info',
-          text: 'Please install metamask',
+          text: 'Please install metamask and refresh page',
           background: '#19191a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
@@ -198,8 +197,8 @@ export const TransactionProvider: React.FC = ({ children }) => {
       /*Sets the new transaction count */
       setTransactionCount(transactionCount.toNumber());
       return 'success';
-    } catch (error) {
-      return error;
+    } catch (error: any) {
+      throw new Error(error);
     }
   };
   /*When TransactionContext is first loaded it checks if the users wallet is connected and how many transactions exist. */

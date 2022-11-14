@@ -48,7 +48,7 @@
   },
   "scripts": {
     "dev": "nodemon dev",
-    "build": "craco build",
+    "build": "craco build GENERATE_SOURCEMAP=false",
     "test": "craco test",
     "eject": "react-scripts eject",
     "start": "craco start"

@@ -178,8 +178,8 @@ export const Resources: React.FC<any> = ({}) => {
   return (
     <div className="overflow-hidden">
       <Navbar />
-      <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center">
-        <div className="mt-4 md:mt-0 w-5/6 md:w-1/2 md:ml-4 sm:ml-0 pb-20 flex justify-end">
+      <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center pb-16 sm:pb-0">
+        <div className="sm:mt-0 w-5/6 md:w-1/2 md:ml-4 sm:ml-0 mr-4 sm:mr-8 md:mr-0 pb-20 flex justify-end">
           <div className={style.cardContainer}>
             <img
               className="rounded-lg w-full"

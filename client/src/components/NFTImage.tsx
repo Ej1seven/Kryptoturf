@@ -27,19 +27,13 @@ export const NFTImage: React.FC<any> = ({
     let likesArray: any = [];
     (async () => {
       await collectionData.likes.forEach((likeData: any) => {
-        // console.log(selectedNft.metadata.name);
-        // console.log(likeData.nftName);
         if (selectedNft.metadata.name === likeData.nftName) {
-          console.log(likeData);
           likesArray.push(likeData);
         }
       });
     })();
     setLikes(likesArray);
   }, [collectionData]);
-  console.log(collectionData);
-  console.log(selectedNft);
-  console.log(likes);
   return (
     <div>
       <div className={style.topBar}>

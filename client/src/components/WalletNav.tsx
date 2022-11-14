@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { FaEthereum } from 'react-icons/fa';
 import { HiOutlineCurrencyDollar } from 'react-icons/hi';
-import { TiArrowSortedDown } from 'react-icons/ti';
 import { getUserData } from '../adapters/user';
-import { Navbar } from '.';
 import { shortenAddress } from '../utils/shortenAddress';
 
 interface WalletProps {}
 
 export const WalletNav: React.FC<any> = ({}) => {
-  const { ethereum } = window;
   const Web3 = require('web3');
   const convert = require('ether-converter');
   const [walletAddress, setWalletAddress]: any = useState();
@@ -27,9 +24,6 @@ export const WalletNav: React.FC<any> = ({}) => {
       setWalletTurfCoinsBalance(userData.turfCoins);
     })();
   }, []);
-  console.log(walletEthereumBalance);
-  console.log(walletTurfCoinsBalance);
-  console.log(walletAddress);
   return (
     <div className="flex flex-col w-full text-white">
       <div className="flex flex-row w-full items-center px-4">
@@ -49,7 +43,10 @@ export const WalletNav: React.FC<any> = ({}) => {
             {' '}
             <FaEthereum className="mx-2" />
             <p className="mr-2">ETH</p>
-            <p>{Math.round(100 * walletEthereumBalance) / 100}</p>
+            <p>
+              {walletEthereumBalance &&
+                Math.round(100 * walletEthereumBalance) / 100}
+            </p>
           </div>
           <div className="w-1/2 flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center ">
@@ -57,7 +54,10 @@ export const WalletNav: React.FC<any> = ({}) => {
               <HiOutlineCurrencyDollar className="mx-1" />
               <p className="mr-2">TURF Coins</p>
             </div>
-            <p>{Math.round(100 * walletTurfCoinsBalance) / 100}</p>
+            <p>
+              {walletTurfCoinsBalance &&
+                Math.round(100 * walletTurfCoinsBalance) / 100}
+            </p>
           </div>
         </div>
       </div>

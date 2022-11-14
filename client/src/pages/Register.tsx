@@ -40,7 +40,7 @@ export const Register: React.FC<RegisterProps> = ({}) => {
   const navigate = useNavigate();
   const { ethereum } = window;
   const { data } = useQuery('me', me);
-  const { address } = useWeb3();
+  // const { address } = useWeb3();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -48,27 +48,24 @@ export const Register: React.FC<RegisterProps> = ({}) => {
     password: '',
   });
   const handleChange = (e: any, name: any) => {
-    console.log(e.target.value);
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
   const handleSubmit = async (e: any) => {
     const { username, email, password } = formData;
     let error: any = null;
     let user: any = null;
-    console.log(address);
-    if (!address) {
-      let connectWalletPrompt = window.confirm(
-        'You need to connect your wallet to create a new account. Would you like to connect your wallet now?'
-      );
-      if (connectWalletPrompt) {
-        connectWallet();
-      } else {
-        return;
-      }
-    }
-    console.log(address);
+    // if (!address) {
+    //   let connectWalletPrompt = window.confirm(
+    //     'You need to connect your wallet to create a new account. Would you like to connect your wallet now?'
+    //   );
+    //   if (connectWalletPrompt) {
+    //     connectWallet();
+    //   } else {
+    //     return;
+    //   }
+    // }
     e.preventDefault();
-    if (!username || !email || !password || !address)
+    if (!username || !email || !password || !currentAccount)
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -78,7 +75,7 @@ export const Register: React.FC<RegisterProps> = ({}) => {
         confirmButtonColor: '#2952e3',
       });
     setIsLoading(true);
-    await register(username, email, password, address).then((res) => {
+    await register(username, email, password, currentAccount).then((res) => {
       user = res;
     });
     setIsLoading(false);
@@ -115,27 +112,32 @@ export const Register: React.FC<RegisterProps> = ({}) => {
         <div className="flex justify-center items-center h-screen w-screen">
           <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism">
             <p className="text-white text-2xl text-left w-full pb-8">Sign Up</p>
-            <Input
-              placeholder="Username"
-              name="username"
-              type="text"
-              handleChange={handleChange}
-              value={null}
-            />
-            <Input
-              placeholder="Email"
-              name="email"
-              type="email"
-              handleChange={handleChange}
-              value={null}
-            />
-            <Input
-              placeholder="Password"
-              name="password"
-              type="text"
-              handleChange={handleChange}
-              value={null}
-            />
+            {currentAccount && (
+              <>
+                {' '}
+                <Input
+                  placeholder="Username"
+                  name="username"
+                  type="text"
+                  handleChange={handleChange}
+                  value={null}
+                />
+                <Input
+                  placeholder="Email"
+                  name="email"
+                  type="email"
+                  handleChange={handleChange}
+                  value={null}
+                />
+                <Input
+                  placeholder="Password"
+                  name="password"
+                  type="text"
+                  handleChange={handleChange}
+                  value={null}
+                />
+              </>
+            )}
             {!currentAccount && (
               <button
                 type="button"
