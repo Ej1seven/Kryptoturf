@@ -143,9 +143,6 @@ To get a local copy up and running follow these simple example steps.
   npm install
   ```
 
-````
-
-
 <!-- 3. To run this project, you will need to add the following environment variables to your `.env` file in the client folder and include the following:
    <p>Giphy API</p>
 
@@ -169,7 +166,8 @@ CORS_ORIGIN = put - your - localhost - url;
    SESSION_SECRET = put - your - session - password;
    CORS_ORIGIN = put - your - production - website - url;
    ``` -->
-   ````
+
+````
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -257,3 +255,4 @@ Website: [www.kryptoturf.com](https://kryptoturf.com/)
 Kryptoturf is licensed under the GNU General Public License v3.0
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+````
