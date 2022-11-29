@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import logo from '../../src/images/logo.png';
+import mobileLogo from '../../src/images/mobileLogo.png';
 import { useQuery, useQueryClient } from 'react-query';
 import { createSearchParams, Link, useNavigate } from 'react-router-dom';
 import { me, logout } from '../adapters/user';
@@ -294,10 +295,19 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   let searchInputElement: any = document.getElementById('search-bar');
 
   return (
-    <div className="w-full flex md:justify-center justify-between items-center">
-      <div className="flex-1 md:flex-[0.5] sm:flex-[1] justify-center items-center">
+    <div className="w-full flex md:justify-center md:justify-between items-center px-4 pt-4">
+      <div className="hidden md:block flex-1 md:flex-[0.5] sm:flex-[1] justify-center items-center">
         <Link to="/">
           <img src={logo} alt="logo" className="cursor-pointer"></img>
+        </Link>
+      </div>
+      <div className="md:hidden block justify-center items-center">
+        <Link to="/">
+          <img
+            src={mobileLogo}
+            alt="logo"
+            className="h-12 cursor-pointer"
+          ></img>
         </Link>
       </div>
       <div className="hide-search-bar flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#27335966] rounded-[0.8rem] hover:bg-[#4c505c] border-[#ffffff4d] border-2">
@@ -356,8 +366,13 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
           </>
         )}
       </div>
-      <div className="show-search-icon hidden text-3xl mr-2 text-white remove-margin">
-        <AiOutlineSearch onClick={() => setToggleSearchBar(!toggleSearchBar)} />
+      <div className="w-3/4 show-search-icon hidden text-3xl mr-2 text-white remove-margin">
+        <div className="w-full flex justify-end px-4">
+          {' '}
+          <AiOutlineSearch
+            onClick={() => setToggleSearchBar(!toggleSearchBar)}
+          />
+        </div>
         {toggleSearchBar && (
           <div className="w-screen z-[100] fixed bg-white inset-x-0 top-20 flex flex-col items-center h-1/2 rounded-md">
             {' '}
@@ -414,6 +429,12 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 )}
               </>
             )}
+            <div className="w-full flex justify-end pr-4 pb-4 absolute bottom-0">
+              <AiOutlineClose
+                onClick={() => setToggleSearchBar(!toggleSearchBar)}
+                color={'black'}
+              />
+            </div>
           </div>
         )}
       </div>

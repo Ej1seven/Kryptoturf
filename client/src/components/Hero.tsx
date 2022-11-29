@@ -6,11 +6,11 @@ interface HeroProps {}
 
 const style = {
   wrapper: `relative`,
-  container: `before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('https://lh3.googleusercontent.com/ujepnqpnL0nDQIHsWxlCXzyw4pf01yjz1Jmb4kAQHumJAPrSEj0-e3ABMZlZ1HEpJoqwOcY_kgnuJGzfXbd2Tijri66GXUtfN2MXQA=s250')] before:bg-cover before:bg-center before:opacity-30 before:blur w-full`,
+  container: `before:content-[''] before:bg-red-500 before:absolute before:top-10 md:before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('https://lh3.googleusercontent.com/ujepnqpnL0nDQIHsWxlCXzyw4pf01yjz1Jmb4kAQHumJAPrSEj0-e3ABMZlZ1HEpJoqwOcY_kgnuJGzfXbd2Tijri66GXUtfN2MXQA=s250')] before:bg-cover before:bg-center before:opacity-30 before:blur w-full`,
   contentWrapper: `flex md:h-screen relative justify-center flex-wrap items-center`,
-  copyContainer: `md:w-1/2`,
-  title: `relative text-center md:text-left text-white text-4xl  pt-8 md:pt-0 sm:text-[46px] font-semibold`,
-  description: `text-[#8a939b] container-[400px] text-2xl  text-center md:text-left mt-[0.8rem] mb-[2.5rem]`,
+  copyContainer: `md:w-1/2 md:pr-8`,
+  title: `relative text-center md:text-left text-white text-2xl my-16 md:pt-0 sm:text-[46px] font-semibold leading-10 md:leading-normal px-4 md:px-0`,
+  description: `text-[#8a939b] container-[400px] text-xl sm:text-2xl  text-center md:text-left mt-[0.8rem] mb-[2.5rem] px-4 md:px-0`,
   ctaContainer: `flex justify-center md:justify-start mb-8 md:mb-0`,
   accentedButton: ` relative text-lg font-semibold px-8 sm:px-12 py-4 bg-[#2181e2] rounded-lg mr-5 text-white hover:bg-[#42a0ff] cursor-pointer`,
   button: ` relative text-lg font-semibold px-8 sm:px-12 py-4 bg-[#363840] rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
