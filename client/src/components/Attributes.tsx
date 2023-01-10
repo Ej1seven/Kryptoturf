@@ -117,7 +117,7 @@ export const Attributes: React.FC<any> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <button className="mx-auto flex items-center py-2 px-8 md:px-12 font-bold rounded-lg cursor-pointer text-[#2081e2] hover:text-white bg-white hover:bg-[#2081e2]">
+                  <button className="mx-auto flex items-center py-2 px-8 md:px-12 font-bold rounded-lg cursor-pointer text-[#2081e2] text-glow hover:text-white bg-white hover:bg-[#2081e2]">
                     View on Etherscan
                   </button>
                 </a>

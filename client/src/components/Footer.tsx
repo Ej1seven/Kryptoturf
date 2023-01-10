@@ -20,21 +20,21 @@ export const Footer: React.FC<FooterProps> = ({}) => {
             rel="noopener noreferrer"
           >
             {' '}
-            <p className="text-white text-base text-center mx-2 cursor-pointer">
+            <p className="text-white text-base text-glow text-center mx-2 cursor-pointer">
               Market
             </p>
           </a>
-          <p className="text-white text-base text-center mx-2 cursor-pointer">
+          <p className="text-white text-base text-glow text-center mx-2 cursor-pointer">
             <a href="mailto:erikhunter@erikhunter.dev">Feedback</a>
           </p>
           <p
-            className="text-white text-base text-center mx-2 cursor-pointer"
+            className="text-white text-base text-glow text-center mx-2 cursor-pointer"
             onClick={() => navigate('/collections')}
           >
             Explore
           </p>
           <p
-            className="text-white text-base text-center mx-2 cursor-pointer"
+            className="text-white text-base text-glow text-center mx-2 cursor-pointer"
             onClick={() => navigate('/resources')}
           >
             Resources

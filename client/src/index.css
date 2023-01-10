@@ -153,6 +153,13 @@
   -webkit-text-fill-color: transparent;
 }
 
+/* .text-gradient-description {
+  background: -webkit-linear-gradient(rgb(1, 110, 218), rgb(217, 0, 192));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px #ffffff;
+} */
+
 .gradient-bg-transactions {
   background-color: #0f0e13;
   background-image: radial-gradient(
@@ -417,9 +424,12 @@ input[type='number'] {
   box-shadow: rgba(39, 51, 89, 1) 0px 0px 90px 0px;
 }
 
-.text-glow {
-  text-shadow: 0 0 80px rgba(255, 255, 255, 0.75),
-    0 0 32px rgba(255, 255, 255, 0.24);
+.text-glow:hover {
+  text-shadow: 0 0 10px #ffffff, 0 0 10px #ffffff;
+}
+
+.text-glow-description {
+  text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff;
 }
 
 .swal2-styled {

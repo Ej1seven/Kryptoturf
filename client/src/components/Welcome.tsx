@@ -107,9 +107,9 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
             <button
               type="button"
               onClick={connectWallet}
-              className="flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
+              className="flex flex-row text-glow justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
             >
-              <p className="text-white text-base font-semibold">
+              <p className="text-white text-glow text-base font-semibold">
                 Connect Wallet
               </p>
             </button>
@@ -179,7 +179,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="text-white w-full mt-2 p-2 rounded-full cursor-pointer btn-gradient-border"
+                className="text-white text-glow w-full mt-2 p-2 rounded-full cursor-pointer btn-gradient-border"
               >
                 Send Now
               </button>

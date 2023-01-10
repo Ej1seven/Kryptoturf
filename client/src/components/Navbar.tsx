@@ -133,7 +133,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         className={title && `mx-4 cursor-pointer ${classProps}`}
         onClick={navigateTo}
       >
-        {title}
+        <p className="text-glow"> {title}</p>
       </li>
     );
   };
@@ -295,7 +295,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   let searchInputElement: any = document.getElementById('search-bar');
 
   return (
-    <div className="w-full flex md:justify-center md:justify-between items-center px-4 pt-4">
+    <div className="w-full flex justify-between items-center px-4 pt-4">
       <div className="hidden md:block flex-1 md:flex-[0.5] sm:flex-[1] justify-center items-center">
         <Link to="/">
           <img src={logo} alt="logo" className="cursor-pointer"></img>
@@ -303,82 +303,19 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
       </div>
       <div className="md:hidden block justify-center items-center">
         <Link to="/">
-          <img
-            src={mobileLogo}
-            alt="logo"
-            className="h-12 cursor-pointer"
-          ></img>
+          <img src={mobileLogo} alt="logo" className="h-8 cursor-pointer"></img>
         </Link>
       </div>
-      <div className="hide-search-bar flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#27335966] rounded-[0.8rem] hover:bg-[#4c505c] border-[#ffffff4d] border-2">
-        <div className="text-[#8a939b] mx-3 font-bold text-lg">
-          <AiOutlineSearch />
-        </div>
-        <SearchInput
-          toggleCollectionsAndNFTSDropdown={toggleCollectionsAndNFTSDropdown}
-          placeholder="Search items, collections, and accounts"
-          id="search-bar"
-          name="search-bar"
-          type="text"
-          value={null}
-          searchCollections={searchCollections}
-        ></SearchInput>
-        {displayCollectionsAndNFTS && (
-          <>
-            {' '}
-            {currentPost.length > 0 && (
-              <div className="z-10 fixed top-[4rem]  p-3 w-1/2 max-w-xl min-width-[100px] h-1/2 shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-down blue-glassmorphism">
-                {currentPost.map((collection: any, index: any) => {
-                  if (index !== collections.length - 1) {
-                    return (
-                      <div
-                        className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
-                        onClick={(e) => changeSearchInput(e, collection)}
-                      >
-                        {collection.title
-                          ? collection.title
-                          : collection.nft.metadata.name}
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div
-                        className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
-                        onClick={(e) => changeSearchInput(e, collection)}
-                      >
-                        {collection.title
-                          ? collection.title
-                          : collection.nft.metadata.name}
-                      </div>
-                    );
-                  }
-                })}
-                <div className="w-full">
-                  <Pagination
-                    totalPosts={collectionsAndNFTS?.length}
-                    postPerPage={postPerPage}
-                    setCurrentPage={setCurrentPage}
-                    currentPage={currentPage}
-                  />
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-      <div className="w-3/4 show-search-icon hidden text-3xl mr-2 text-white remove-margin">
-        <div className="w-full flex justify-end px-4">
+      {currentAccount && data?.id && (
+        <>
           {' '}
-          <AiOutlineSearch
-            onClick={() => setToggleSearchBar(!toggleSearchBar)}
-          />
-        </div>
-        {toggleSearchBar && (
-          <div className="w-screen z-[100] fixed bg-white inset-x-0 top-20 flex flex-col items-center h-1/2 rounded-md">
-            {' '}
-            <SearchInputMobile
-              toggleCollectionsAndNFTSDropdownMobile={
-                toggleCollectionsAndNFTSDropdownMobile
+          <div className="hide-search-bar flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#27335966] rounded-[0.8rem] hover:bg-[#4c505c] border-[#ffffff4d] border-2">
+            <div className="text-[#8a939b] mx-3 font-bold text-lg">
+              <AiOutlineSearch />
+            </div>
+            <SearchInput
+              toggleCollectionsAndNFTSDropdown={
+                toggleCollectionsAndNFTSDropdown
               }
               placeholder="Search items, collections, and accounts"
               id="search-bar"
@@ -386,17 +323,17 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
               type="text"
               value={null}
               searchCollections={searchCollections}
-            ></SearchInputMobile>
-            {displayCollectionsAndNFTSMobile && (
+            ></SearchInput>
+            {displayCollectionsAndNFTS && (
               <>
                 {' '}
                 {currentPost.length > 0 && (
-                  <div className="p-3 w-full max-w-xl min-width-[100px] h-full shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-black animate-slide-down rounded-md">
+                  <div className="z-10 fixed top-[4rem]  p-3 w-1/2 max-w-xl min-width-[100px] h-1/2 shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-down blue-glassmorphism">
                     {currentPost.map((collection: any, index: any) => {
                       if (index !== collections.length - 1) {
                         return (
                           <div
-                            className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
+                            className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
                             onClick={(e) => changeSearchInput(e, collection)}
                           >
                             {collection.title
@@ -407,7 +344,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                       } else {
                         return (
                           <div
-                            className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
+                            className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
                             onClick={(e) => changeSearchInput(e, collection)}
                           >
                             {collection.title
@@ -429,15 +366,85 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 )}
               </>
             )}
-            <div className="w-full flex justify-end pr-4 pb-4 absolute bottom-0">
-              <AiOutlineClose
+          </div>
+          <div className="w-3/4 show-search-icon hidden text-3xl mr-2 text-white remove-margin">
+            <div className="w-full flex justify-end px-4">
+              {' '}
+              <AiOutlineSearch
                 onClick={() => setToggleSearchBar(!toggleSearchBar)}
-                color={'black'}
               />
             </div>
+            {toggleSearchBar && (
+              <div className="w-screen z-[100] fixed bg-white inset-x-0 top-20 flex flex-col items-center h-1/2 rounded-md">
+                {' '}
+                <SearchInputMobile
+                  toggleCollectionsAndNFTSDropdownMobile={
+                    toggleCollectionsAndNFTSDropdownMobile
+                  }
+                  placeholder="Search items, collections, and accounts"
+                  id="search-bar"
+                  name="search-bar"
+                  type="text"
+                  value={null}
+                  searchCollections={searchCollections}
+                ></SearchInputMobile>
+                {displayCollectionsAndNFTSMobile && (
+                  <>
+                    {' '}
+                    {currentPost.length > 0 && (
+                      <div className="p-3 w-full max-w-xl min-width-[100px] h-full shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-black animate-slide-down rounded-md">
+                        {currentPost.map((collection: any, index: any) => {
+                          if (index !== collections.length - 1) {
+                            return (
+                              <div
+                                className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
+                                onClick={(e) =>
+                                  changeSearchInput(e, collection)
+                                }
+                              >
+                                {collection.title
+                                  ? collection.title
+                                  : collection.nft.metadata.name}
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div
+                                className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
+                                onClick={(e) =>
+                                  changeSearchInput(e, collection)
+                                }
+                              >
+                                {collection.title
+                                  ? collection.title
+                                  : collection.nft.metadata.name}
+                              </div>
+                            );
+                          }
+                        })}
+                        <div className="w-full">
+                          <Pagination
+                            totalPosts={collectionsAndNFTS?.length}
+                            postPerPage={postPerPage}
+                            setCurrentPage={setCurrentPage}
+                            currentPage={currentPage}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+                <div className="w-full flex justify-end pr-4 pb-4 absolute bottom-0">
+                  <AiOutlineClose
+                    onClick={() => setToggleSearchBar(!toggleSearchBar)}
+                    color={'black'}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
       <ul className="text-white md:flex  list-none flex-row justify-between items-center flex-initial">
         {[
           currentAccount && data?.id && 'Explore',
@@ -529,7 +536,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 <NavbarItem
                   key={item + index}
                   title={item}
-                  classProps={item && 'my-2 text-lg '}
+                  classProps={item && 'my-2 text-lg text-glow'}
                 />
               ))}
               <li
@@ -549,7 +556,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         </div>
         <button
           onClick={handleSubmit}
-          className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full hidden md:block cursor-pointer hover:bg-[#2546bd]"
+          className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full hidden md:block cursor-pointer hover:bg-[#2546bd] text-glow"
         >
           {isLoading
             ? 'Loading'

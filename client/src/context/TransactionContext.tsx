@@ -90,7 +90,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
         })
       );
       /*Removed the first 19 test transactions */
-      await structuredTransactions.splice(0, 18);
+      await structuredTransactions.splice(0, 19);
       /*Adds the structured transactions to an array which will used in the <Transactions /> component 
       to display each transaction on individual cards*/
       setTransactions(structuredTransactions);

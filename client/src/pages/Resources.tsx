@@ -26,7 +26,7 @@ const style = {
   title: `relative text-center md:text-left text-white text-4xl  pt-8 md:pt-0 sm:text-[46px] font-semibold`,
   description: `text-[#8a939b] container-[400px] text-2xl  text-center md:text-left mt-[0.8rem] mb-[2.5rem]`,
   ctaContainer: `flex justify-center md:justify-start mb-8 md:mb-0`,
-  accentedButton: `mx-auto md:mx-0 lg:w-36 md:w-34 sm:w-32 w-28 h-12 smMAX:h-14 mt-5 text-lg font-semibold bg-[#2181e2]  rounded-lg text-white text-center hover:bg-[#42a0ff] cursor-pointer`,
+  accentedButton: ` text-glow mx-auto md:mx-0 lg:w-36 md:w-34 sm:w-32 w-28 h-12 smMAX:h-14 mt-5 text-lg font-semibold bg-[#2181e2]  rounded-lg text-white text-center hover:bg-[#42a0ff] cursor-pointer`,
   button: ` relative text-lg font-semibold   bg-[#363840] rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
   cardContainer: `rounded-lg w-1/2 h-full md:h-3/4 bg-[#313338] shadow-black shadow-lg shadow-inner px-4 pt-8 -rotate-12 scale-75 -translate-y-6 translate-x-9 slide-in-left`,
   infoContainer: `h-28 pt-6 smMAX:pt-8 pb-4 smMAX:pr-0 pr-4 flex flex-row`,
@@ -179,7 +179,7 @@ export const Resources: React.FC<any> = ({}) => {
     <div className="overflow-hidden">
       <Navbar />
       <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center pb-16 sm:pb-0">
-        <div className="sm:mt-0 w-5/6 md:w-1/2 md:ml-4 sm:ml-0 mr-4 sm:mr-8 md:mr-0 pb-20 flex justify-end">
+        <div className="sm:mt-0 w-5/6 md:w-1/2 md:ml-4 mr-4 md:mr-0 mr-[70px] pb-20 flex justify-end">
           <div className={style.cardContainer}>
             <img
               className="rounded-lg w-full"
