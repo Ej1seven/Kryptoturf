@@ -40,7 +40,7 @@ export const CollectionItem: React.FC<any> = ({ collection }) => {
           className={style.profileImg}
           src={
             collection?.logoImage
-              ? `${URL}/${collection.logoImage}`
+              ? `${collection.logoImage}`
               : `${defaultBannerImage}`
           }
           alt="profile image"

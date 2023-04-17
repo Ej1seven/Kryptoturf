@@ -17,6 +17,8 @@ import { AiFillEdit } from 'react-icons/ai';
 import axios from 'axios';
 import { HiOutlineCurrencyDollar } from 'react-icons/hi';
 import { Loader } from '../components';
+import storage from '../firebaseConfig';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface ProfileProps {}
 
@@ -51,20 +53,23 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
   const [displayNFTS, setDisplayNFTS]: any = useState();
   /*Sets the collection featured image. The preview image will be displayed immediately on the front-end. 
   The raw image will be sent to the server and stored in the uploads folder. */
-  const [profileImage, setProfileImage] = useState({
+  const [profileImage, setProfileImage]: any = useState({
     preview: '',
     raw: '',
+    name: null,
   });
   /*Sets the collection banner image. The preview image will be displayed immediately on the front-end. 
   The raw image will be sent to the server and stored in the uploads folder. */
-  const [bannerImage, bannerSetImage] = useState({
+  const [bannerImage, bannerSetImage]: any = useState({
     preview: '',
     raw: '',
+    name: null,
   });
   /*Converts the Ethereum value to US dollars */
   const [ethToUsd, setEthToUsd]: any = useState(0);
   /*Sets Ethereum value that will be used when listing an NFT for sale */
-  const [eth, setEth]: any = useState();
+  const [eth, setEth]: any = useState(); // progress
+  const [percent, setPercent] = useState(0);
   /*Sets the profile photo image */
   const handleProfilePhotoChange = (e: any) => {
     e.preventDefault();
@@ -72,6 +77,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       setProfileImage({
         preview: URL.createObjectURL(e.target.files[0]),
         raw: e.target.files[0],
+        name: e.target.files[0].name,
       });
     }
   };
@@ -82,54 +88,130 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       bannerSetImage({
         preview: URL.createObjectURL(e.target.files[0]),
         raw: e.target.files[0],
+        name: e.target.files[0].name,
       });
     }
   };
   /*Saves the banner and profile images to the database */
   const saveChanges = async () => {
-    setIsLoading(true);
+    console.log(profileImage.name);
     let profileImageFilePath: any;
     let bannerImageFilePath: any;
-    let photoData = new FormData();
-    await photoData.append('image', profileImage.raw);
-    await photoData.append('image', bannerImage.raw);
-    await axios
-      .post(`${apiURL}/userAuth/upload`, photoData, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'multipart/form-data',
+    const storageRefProfileImage = ref(storage, `/files/${profileImage.name}`);
+    const uploadTaskProfileImage = uploadBytesResumable(
+      storageRefProfileImage,
+      profileImage.raw
+    );
+    const storageRefBannerImage = ref(storage, `/files/${bannerImage.name}`);
+    const uploadTaskBannerImage = uploadBytesResumable(
+      storageRefBannerImage,
+      bannerImage.raw
+    );
+    if (profileImage.name) {
+      uploadTaskProfileImage.on(
+        'state_changed',
+        (snapshot) => {
+          const percent = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          ); // update progress
+          setPercent(percent);
         },
-      })
-      .then((res): any => {
-        let imageFilePath = res.data;
-        /*After the images are saved to the uploads folder the server responds with a file path for each photo.
-          We map through file paths and save them to their respective variable. Later we will attach the file paths to their collections
-          so they can be referenced in the future. */
-        imageFilePath.map((image: any, index: any) => {
-          if (profileImage.raw && index < 1) {
-            profileImageFilePath = image.path
-              /*edits the file path so it can be pulled from the front-end */
-              .split('uploads\\')
-              .join('')
-              .trim();
-          } else {
-            bannerImageFilePath = image.path.split('uploads\\').join('').trim();
-          }
-        });
-        return res.data;
-      });
-    (async () => {
-      /*saves the image data to the database */
-      const imageData = await {
-        profileImage: profileImageFilePath,
-        bannerImage: bannerImageFilePath,
-        email: data.email,
-      };
-      await addImages(imageData);
-      setUserData(await getUserData(data.email));
-      setIsLoading(false);
-      window.location.reload();
-    })();
+        (err) => console.log(err),
+        () => {
+          // download url
+          getDownloadURL(uploadTaskProfileImage.snapshot.ref).then(
+            async (url) => {
+              console.log(url);
+              const imageData = {
+                profileImage: url,
+                email: data.email,
+              };
+              await addImages(imageData);
+              setUserData(await getUserData(data.email));
+              setIsLoading(false);
+              setProfileImage({
+                preview: '',
+                raw: '',
+                name: null,
+              });
+            }
+          );
+        }
+      );
+    } else {
+      uploadTaskBannerImage.on(
+        'state_changed',
+        (snapshot) => {
+          const percent = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          ); // update progress
+          setPercent(percent);
+        },
+        (err) => console.log(err),
+        () => {
+          // download url
+          getDownloadURL(uploadTaskBannerImage.snapshot.ref).then(
+            async (url) => {
+              console.log(url);
+              const imageData = {
+                bannerImage: url,
+                email: data.email,
+              };
+              await addImages(imageData);
+              setUserData(await getUserData(data.email));
+              setIsLoading(false);
+              bannerSetImage({
+                preview: '',
+                raw: '',
+                name: null,
+              });
+            }
+          );
+        }
+      );
+    }
+
+    setIsLoading(true);
+    // let photoData = new FormData();
+    // await photoData.append('image', profileImage.raw);
+    // await photoData.append('image', bannerImage.raw);
+    // await axios
+    //   .post(`${apiURL}/userAuth/upload`, photoData, {
+    //     withCredentials: true,
+    //     headers: {
+    //       'Content-Type': 'multipart/form-data',
+    //     },
+    //   })
+    //   .then((res): any => {
+    //     let imageFilePath = res.data;
+    //     /*After the images are saved to the uploads folder the server responds with a file path for each photo.
+    //       We map through file paths and save them to their respective variable. Later we will attach the file paths to their collections
+    //       so they can be referenced in the future. */
+    //     imageFilePath.map((image: any, index: any) => {
+    //       if (profileImage.raw && index < 1) {
+    //         profileImageFilePath = image.path
+    //           /*edits the file path so it can be pulled from the front-end */
+    //           .split('uploads\\')
+    //           .join('')
+    //           .trim();
+    //       } else {
+    //         bannerImageFilePath = image.path.split('uploads\\').join('').trim();
+    //       }
+    //     });
+    //     return res.data;
+    //   });
+    // (async () => {
+    /*saves the image data to the database */
+    // const imageData = await {
+    //   profileImage: profileImageFilePath,
+    //   bannerImage: bannerImageFilePath,
+    //   email: data.email,
+    // };
+    // await addImages(imageData);
+    // setUserData(await getUserData(data.email));
+    // setIsLoading(false);
+    // // window.location.reload();
+    // })();
   };
   /*Discards the uploaded image data */
   const discardChanges = () => {
@@ -137,6 +219,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       setProfileImage({
         preview: '',
         raw: '',
+        name: '',
       });
     }
     if (bannerImage.preview) {
@@ -247,7 +330,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                 <>
                   <img
                     alt="banner"
-                    src={`${photoURL}/${userData?.bannerImage}`}
+                    src={`${userData?.bannerImage}`}
                     className="w-full object-cover"
                   />
                 </>
@@ -280,7 +363,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
               <>
                 <label htmlFor="upload-profile-image">
                   <img
-                    src={`${photoURL}/${userData?.profileImage}`}
+                    src={`${userData?.profileImage}`}
                     alt="dummy"
                     className=" rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px] border-[5px] border-black border-solid"
                   />

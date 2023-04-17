@@ -119,7 +119,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
                   alt="banner"
                   src={
                     collectionItem?.bannerImage
-                      ? `${URL}/${collectionItem.bannerImage}`
+                      ? `${collectionItem.bannerImage}`
                       : `${defaultBannerImage}`
                   }
                 />
@@ -138,7 +138,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
                     className={style.profileImg}
                     src={
                       collectionItem?.profileImage
-                        ? `${URL}/${collectionItem.logoImage}`
+                        ? `${collectionItem.logoImage}`
                         : `${defaultLogoImage}`
                     }
                     alt="profile image"

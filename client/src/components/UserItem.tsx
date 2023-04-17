@@ -1,5 +1,5 @@
 import React from 'react';
-import defaultLogoImage from '../../src/images/default-profile.jpg';
+import defaultLogoImage from '../../src/images/user-profile.png';
 
 interface UserItemProps {}
 
@@ -25,9 +25,7 @@ export const UserItem: React.FC<any> = ({ user }) => {
         <img
           className={style.profileImg}
           src={
-            user?.profileImage
-              ? `${URL}/${user.profileImage}`
-              : `${defaultLogoImage}`
+            user?.profileImage ? `${user.profileImage}` : `${defaultLogoImage}`
           }
           alt="profile image"
         />

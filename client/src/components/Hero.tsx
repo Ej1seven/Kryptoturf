@@ -13,7 +13,7 @@ const style = {
   description: `text-white container-[400px] text-xl sm:text-2xl  text-center md:text-left mt-[0.8rem] mb-[2.5rem] px-4 md:px-0`,
   ctaContainer: `flex justify-center md:justify-start mb-8 md:mb-0`,
   accentedButton: ` relative text-lg text-glow font-semibold px-8 sm:px-12 py-4 bg-[#2181e2] rounded-lg mr-5 text-white hover:bg-[#42a0ff] cursor-pointer`,
-  button: ` relative text-lg font-semibold text-glow px-8 sm:px-12 py-4 bg-[#363840] rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
+  button: ` relative text-lg font-semibold text-glow px-8 sm:px-12 py-4 bg-[#301934] rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#9e52ab] cursor-pointer`,
   cardContainer: `rounded-[3rem]`,
   infoContainer: `h-20 bg-[#313338] p-4 rounded-b-lg flex items-center text-white`,
   author: `flex flex-col justify-center ml-4`,

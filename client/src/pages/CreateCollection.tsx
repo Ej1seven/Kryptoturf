@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { me } from '../adapters/user';
 import { useQuery } from 'react-query';
 import { ethers } from 'ethers';
@@ -11,6 +11,8 @@ import { Navbar } from '../components';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import storage from '../firebaseConfig';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface CreateCollectionProps {}
 const Input = ({
@@ -135,21 +137,24 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
   const sdk = new ThirdwebSDK(wallet);
   /*Sets the collection logo image. The preview image will be displayed immediately on the front-end. 
   The raw image will be sent to the server and stored in the uploads folder. */
-  const [logoImage, setLogoImage] = useState({
+  const [logoImage, setLogoImage]: any = useState({
     preview: '',
     raw: '',
+    name: null,
   });
   /*Sets the collection featured image. The preview image will be displayed immediately on the front-end. 
   The raw image will be sent to the server and stored in the uploads folder. */
-  const [profileImage, setProfileImage] = useState({
+  const [profileImage, setProfileImage]: any = useState({
     preview: '',
     raw: '',
+    name: null,
   });
   /*Sets the collection banner image. The preview image will be displayed immediately on the front-end. 
   The raw image will be sent to the server and stored in the uploads folder. */
-  const [bannerImage, bannerSetImage] = useState({
+  const [bannerImage, bannerSetImage]: any = useState({
     preview: '',
     raw: '',
+    name: null,
   });
   /*Sets the form data which will be stored in the database. */
   const [formData, setFormData] = useState({
@@ -158,12 +163,19 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
     fee_recipient: '',
     seller_fee_basis_points: '',
   });
+
+  const [profileImageURL, setProfileImageUrl]: any = useState(null);
+  const [bannerImageURL, setBannerImageUrl]: any = useState(null);
+  const [logoImageURL, setLogoImageUrl]: any = useState(null);
+  const [percent, setPercent] = useState(0);
+
   /*Sets the logo image */
   const handleLogoPhotoChange = (e: any) => {
     if (e.target.files.length) {
       setLogoImage({
         preview: URL.createObjectURL(e.target.files[0]),
         raw: e.target.files[0],
+        name: e.target.files[0].name,
       });
     }
   };
@@ -173,6 +185,7 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
       setProfileImage({
         preview: URL.createObjectURL(e.target.files[0]),
         raw: e.target.files[0],
+        name: e.target.files[0].name,
       });
     }
   };
@@ -182,6 +195,7 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
       bannerSetImage({
         preview: URL.createObjectURL(e.target.files[0]),
         raw: e.target.files[0],
+        name: e.target.files[0].name,
       });
     }
   };
@@ -219,7 +233,6 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
     });
 
   const createNFTCollection = async () => {
-    let error: any = null;
     /*If the user is not logged into their account an error message will popup when they 
       attempt to create a collection. */
     if (!data?.id) {
@@ -233,50 +246,140 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
       });
     }
     setIsLoading(true);
+    const storageRefProfileImage = ref(storage, `/files/${profileImage.name}`);
+    const uploadTaskProfileImage = uploadBytesResumable(
+      storageRefProfileImage,
+      profileImage.raw
+    );
+    const storageRefBannerImage = ref(storage, `/files/${bannerImage.name}`);
+    const uploadTaskBannerImage = uploadBytesResumable(
+      storageRefBannerImage,
+      bannerImage.raw
+    );
+    const storageRefLogoImage = ref(storage, `/files/${logoImage.name}`);
+    const uploadTaskLogoImage = uploadBytesResumable(
+      storageRefLogoImage,
+      logoImage.raw
+    );
+
+    await uploadTaskProfileImage.on(
+      'state_changed',
+      (snapshot) => {
+        const percent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        ); // update progress
+        setPercent(percent);
+      },
+      (err) => console.log(err),
+      async () => {
+        // download url
+        await getDownloadURL(uploadTaskProfileImage.snapshot.ref).then(
+          async (url) => {
+            console.log(url);
+            await setProfileImageUrl(url);
+          }
+        );
+      }
+    );
+    await uploadTaskBannerImage.on(
+      'state_changed',
+      (snapshot) => {
+        const percent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        ); // update progress
+        setPercent(percent);
+      },
+      (err) => console.log(err),
+      async () => {
+        // download url
+        await getDownloadURL(uploadTaskBannerImage.snapshot.ref).then(
+          async (url) => {
+            console.log(url);
+            await setBannerImageUrl(url);
+          }
+        );
+      }
+    );
+    await uploadTaskLogoImage.on(
+      'state_changed',
+      (snapshot) => {
+        const percent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        ); // update progress
+        setPercent(percent);
+      },
+      (err) => console.log(err),
+      async () => {
+        // download url
+        await getDownloadURL(uploadTaskLogoImage.snapshot.ref).then(
+          async (url) => {
+            console.log(url);
+            await setLogoImageUrl(url);
+          }
+        );
+      }
+    );
+
+    /*Formats the photos so the server can receive them and save them to the uploads folder. */
+    // let photoData = new FormData();
+    // await photoData.append('image', profileImage.raw);
+    // await photoData.append('image', bannerImage.raw);
+    // await photoData.append('image', logoImage.raw);
+    // /*Saves the images to the uploads folder. */
+    // await axios
+    //   .post(`${apiURL}/marketItems/upload`, photoData, {
+    //     withCredentials: true,
+    //     headers: {
+    //       'Content-Type': 'multipart/form-data',
+    //       'Access-Control-Allow-Credentials': 'true',
+    //       'Access-Control-Allow-Origin': 'https://kryptoturf.com',
+    //     },
+    //   })
+    //   .then((res): any => {
+    //     let imageFilePath = res.data;
+    //     /*After the images are saved to the uploads folder the server responds with a file path for each photo.
+    //       We map through file paths and save them to their respective variable. Later we will attach the file paths to their collections
+    //       so they can be referenced in the future. */
+    //     imageFilePath.map((image: any, index: any) => {
+    //       if (profileImage.raw && index < 1) {
+    //         profileImageFilePath = image.path
+    //           /*edits the file path so it can be pulled from the front-end */
+    //           .split('uploads\\')
+    //           .join('')
+    //           .trim();
+    //       } else if (bannerImage.raw && index < 2) {
+    //         bannerImageFilePath = image.path.split('uploads\\').join('').trim();
+    //       } else {
+    //         logoImageFilePath = image.path.split('uploads\\').join('').trim();
+    //       }
+    //     });
+    //     return res.data;
+    //   });
+    /*send the collection data to the blockchain */
+  };
+
+  useEffect(() => {
+    // console.log('profile', profileImageURL);
+    // console.log('banner', bannerImageURL);
+    // console.log('logo', logoImageURL);
+    if (profileImageURL && bannerImageURL && logoImageURL) {
+      // console.log('All files succesfully loaded');
+      // console.log('formData', formData);
+      deployNFTCollection();
+    }
+  }, [profileImageURL, bannerImageURL, logoImageURL]);
+
+  const deployNFTCollection = async () => {
+    let error: any = null;
     const { name, description, fee_recipient, seller_fee_basis_points } =
       formData;
+    console.log('formData', formData);
+    console.log('profile', profileImageURL);
+    console.log('banner', bannerImageURL);
+    console.log('logo', logoImageURL);
     /*Multiplies the seller fee basis points by 100 to get the accurate percentage of royalty fees. */
     const basisPoints = Number(seller_fee_basis_points) * 100;
-    let profileImageFilePath: any;
-    let bannerImageFilePath: any;
-    let logoImageFilePath: any;
     let contractAddress: any;
-    /*Formats the photos so the server can receive them and save them to the uploads folder. */
-    let photoData = new FormData();
-    await photoData.append('image', profileImage.raw);
-    await photoData.append('image', bannerImage.raw);
-    await photoData.append('image', logoImage.raw);
-    /*Saves the images to the uploads folder. */
-    await axios
-      .post(`${apiURL}/marketItems/upload`, photoData, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Allow-Origin': 'https://kryptoturf.com',
-        },
-      })
-      .then((res): any => {
-        let imageFilePath = res.data;
-        /*After the images are saved to the uploads folder the server responds with a file path for each photo.
-          We map through file paths and save them to their respective variable. Later we will attach the file paths to their collections
-          so they can be referenced in the future. */
-        imageFilePath.map((image: any, index: any) => {
-          if (profileImage.raw && index < 1) {
-            profileImageFilePath = image.path
-              /*edits the file path so it can be pulled from the front-end */
-              .split('uploads\\')
-              .join('')
-              .trim();
-          } else if (bannerImage.raw && index < 2) {
-            bannerImageFilePath = image.path.split('uploads\\').join('').trim();
-          } else {
-            logoImageFilePath = image.path.split('uploads\\').join('').trim();
-          }
-        });
-        return res.data;
-      });
-    /*send the collection data to the blockchain */
     await sdk.deployer
       .deployNFTCollection({
         name: name,
@@ -297,9 +400,9 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
           description: description,
           createdBy: data.username,
           owners: data.username,
-          profileImage: profileImageFilePath,
-          bannerImage: bannerImageFilePath,
-          logoImage: logoImageFilePath,
+          profileImage: profileImageURL,
+          bannerImage: bannerImageURL,
+          logoImage: logoImageURL,
         };
         /*Saves the collection data to the database. */
         await createCollection(collectionData);
@@ -308,7 +411,7 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
         error = err;
       });
     setIsLoading(false);
-    /*If an error occurred while deploying the collection to the marketplace display a popup 
+    /*If an error occurred while deploying the collection to the marketplace display a popup
       error modal */
     if (error) {
       return Swal.fire({

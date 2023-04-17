@@ -179,7 +179,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="text-white text-glow w-full mt-2 p-2 rounded-full cursor-pointer btn-gradient-border"
+                className="text-white text-glow w-full mt-2 p-2 rounded-full cursor-pointer btn-gradient-border bg-[#301934]"
               >
                 Send Now
               </button>

@@ -3,14 +3,19 @@
 @tailwind utilities;
 
 #root {
-  background-color: #000000;
+  /* background-color: #000000; */
   background-image: radial-gradient(
+    circle farthest-corner at 10% 20%,
+    rgba(100, 43, 115, 1) 0%,
+    rgba(4, 0, 4, 1) 90%
+  );
+  /* background-image: radial-gradient(
       at 0% 0%,
       hsla(253, 16%, 7%, 1) 0,
       transparent 50%
     ),
     radial-gradient(at 50% 0%, rgb(19, 133, 61) 0, transparent 50%),
-    radial-gradient(at 100% 0%, rgb(87, 28, 49) 0, transparent 50%);
+    radial-gradient(at 100% 0%, rgb(87, 28, 49) 0, transparent 50%); */
 }
 
 .blue-glassmorphism {
@@ -403,7 +408,7 @@ input[type='number'] {
 
 .btn-gradient-border {
   border: 2px double transparent;
-  background-image: linear-gradient(rgb(13, 14, 33), rgb(13, 14, 33)),
+  background-image: linear-gradient(#301934, #301934),
     radial-gradient(circle at left top, rgb(1, 110, 218), rgb(217, 0, 192));
   background-origin: border-box;
   background-clip: padding-box, border-box;

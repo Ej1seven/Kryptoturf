@@ -21,7 +21,7 @@ const CollectionCard = ({ collectionItem }: any) => {
           <>
             {' '}
             <img
-              src={`${URL}/${collectionItem.profileImage}`}
+              src={`${collectionItem.profileImage}`}
               alt="image"
               className={style.nftImg}
             />
@@ -41,7 +41,7 @@ const CollectionCard = ({ collectionItem }: any) => {
               <>
                 {' '}
                 <img
-                  src={`${URL}/${collectionItem.logoImage}`}
+                  src={`${collectionItem.logoImage}`}
                   alt="image"
                   className={style.nftImg}
                 />
