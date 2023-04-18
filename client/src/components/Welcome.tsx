@@ -143,7 +143,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
               </div>
             </div>
           </div>
-          <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
+          <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center white-glassmorphism">
             <Input
               placeholder="Address to"
               name="addressTo"

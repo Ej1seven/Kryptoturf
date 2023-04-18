@@ -27,7 +27,7 @@ const Input = ({
     step="0.0001"
     value={value}
     onChange={(e) => handleChange(e, name)}
-    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism cursor-pointer max-w-[400px]"
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white text-sm white-glassmorphism cursor-pointer max-w-[400px]"
   />
 );
 
@@ -108,7 +108,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen w-screen">
-          <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center blue-glassmorphism">
+          <div className="p-5 w-96 sm:w-4/6 max-w-[700px] flex flex-col justify-start items-center white-glassmorphism">
             <p className="text-white text-2xl text-left w-full pb-8">Sign In</p>
             {!currentAccount && (
               <button
