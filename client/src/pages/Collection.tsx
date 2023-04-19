@@ -16,7 +16,7 @@ import { MdPhotoSizeSelectLarge } from 'react-icons/md';
 interface CollectionsProps {}
 
 const style = {
-  bannerImageContainer: `h-[300px] w-screen overflow-hidden flex justify-center items-center`,
+  bannerImageContainer: `h-[300px] w-11/12 overflow-hidden flex justify-center items-center rounded-md mx-auto mt-4`,
   bannerImage: `w-full h-full object-cover`,
   infoContainer: `w-screen px-4`,
   midRow: `w-full flex justify-center text-white`,
@@ -34,7 +34,7 @@ const style = {
   statValue: `smMAX:text-2xl text-3xl font-bold w-full flex items-center justify-center`,
   ethLogo: `h-6 mr-2`,
   statName: `text-lg w-full text-center mt-1`,
-  description: `text-white text-xl w-max-1/4 flex-wrap mt-4`,
+  description: `text-white text-xl md:w-4/5 flex-wrap mt-4`,
 };
 
 export const Collection: React.FC<CollectionsProps> = ({}) => {
@@ -52,7 +52,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
   /*Retrieves the selected collection from the database */
   const [collectionItem, setCollectionItem]: any = useState();
   /*Display a spinning loading icon when data is loaded*/
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   /*Retrieves all the NFTs from the selected collection and maps through them only returning the NFTs that have a owner.
     This is meant to filter out the NFTs that have been deleted */
   useEffect(() => {

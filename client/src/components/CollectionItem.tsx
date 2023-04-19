@@ -11,8 +11,8 @@ const style = {
   eventIcon: `mr-2 text-xl text-[#e5e8eb]`,
   eventName: `text-lg font-semibold`,
   ethLogo: `h-5 mr-2`,
-  accent: `text-[#2081e2] w-1/5 text-base flex items-center mr-4`,
-  profileImg: `w-20 h-20 object-cover rounded-md border-2 border-[#202225] `,
+  accent: `text-[#2081e2] w-1/5 exSMMAX:w-1/4 text-base flex items-center mr-4 exSMMAX:mr-0 exSMMAX:ml-4`,
+  profileImg: `min-w-[85px] w-20 h-20 object-cover rounded-md border-2 border-[#202225] `,
 };
 
 export const CollectionItem: React.FC<any> = ({ collection }) => {
@@ -31,13 +31,37 @@ export const CollectionItem: React.FC<any> = ({ collection }) => {
     })();
   }, []);
   return (
-    <div className={style.eventItem}>
-      <div className="w-2 sm:w-8 text-[#2081e2] text-base flex items-center">
-        {collection?.ranking}
+    <>
+      <div className={style.eventItem}>
+        <div className="w-2 sm:w-8 text-[#2081e2] text-base flex items-center">
+          {collection?.ranking}
+        </div>
+        <div className="text-[#2081e2] w-1/5 text-base flex items-center exSMMAX:hidden">
+          <img
+            className={style.profileImg}
+            src={
+              collection?.logoImage
+                ? `${collection.logoImage}`
+                : `${defaultBannerImage}`
+            }
+            alt="profile image"
+          />
+        </div>
+        <div className="text-[#2081e2] w-1/5 exSMMAX:w-1/4 text-base flex items-center mr-4 exSMMAX:mr-0 exSMMAX:ml-4 min-w-[100px]">
+          {collection?.title}
+        </div>
+        <div className={`${style.accent}`}>{collection?.volumeTraded}</div>
+        <div className={`${style.accent}`}>
+          {collection?.floorPrice === (Infinity || NaN)
+            ? 0
+            : roundUpToHundreths(collection?.floorPrice)}
+        </div>
+        <div className={`${style.accent}`}>{sales?.length}</div>
       </div>
-      <div className="text-[#2081e2] w-1/5 text-base flex items-center">
+      <div>
+        {' '}
         <img
-          className={style.profileImg}
+          className="min-w-[85px] w-40 h-40 object-cover rounded-md border-2 border-[#202225] hidden exSMMAX:block mx-auto"
           src={
             collection?.logoImage
               ? `${collection.logoImage}`
@@ -46,14 +70,6 @@ export const CollectionItem: React.FC<any> = ({ collection }) => {
           alt="profile image"
         />
       </div>
-      <div className={`${style.accent}`}>{collection?.title}</div>
-      <div className={`${style.accent}`}>{collection?.volumeTraded}</div>
-      <div className={`${style.accent}`}>
-        {collection?.floorPrice === (Infinity || NaN)
-          ? 0
-          : roundUpToHundreths(collection?.floorPrice)}
-      </div>
-      <div className={`${style.accent}`}>{sales?.length}</div>
-    </div>
+    </>
   );
 };

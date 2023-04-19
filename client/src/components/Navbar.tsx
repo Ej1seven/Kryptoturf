@@ -156,9 +156,10 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   const navigateTo: any = (e: any) => {
     switch (e.target.innerText) {
       case 'Explore':
-        {
-          currentAccount && data?.id && navigate('/collections');
-        }
+        // {
+        //   currentAccount && data?.id && navigate('/collections');
+        // }
+        navigate('/collections');
         break;
       case 'Stats':
         navigate('/stats');
@@ -167,9 +168,10 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         navigate('/resources');
         break;
       case 'Create':
-        {
-          currentAccount && data?.id && navigate('/create');
-        }
+        // {
+        //   currentAccount && data?.id && navigate('/create');
+        // }
+        navigate('/create');
         break;
       case 'Profile':
         {
@@ -306,151 +308,147 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
           <img src={mobileLogo} alt="logo" className="h-8 cursor-pointer"></img>
         </Link>
       </div>
-      {currentAccount && data?.id && (
-        <>
-          {' '}
-          <div className="hide-search-bar flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#27335966] rounded-[0.8rem] hover:bg-[#4c505c] border-[#ffffff4d] border-2">
-            <div className="text-[#8a939b] mx-3 font-bold text-lg">
-              <AiOutlineSearch />
-            </div>
-            <SearchInput
-              toggleCollectionsAndNFTSDropdown={
-                toggleCollectionsAndNFTSDropdown
-              }
-              placeholder="Search items, collections, and accounts"
-              id="search-bar"
-              name="search-bar"
-              type="text"
-              value={null}
-              searchCollections={searchCollections}
-            ></SearchInput>
-            {displayCollectionsAndNFTS && (
-              <>
-                {' '}
-                {currentPost.length > 0 && (
-                  <div className="z-10 fixed top-[4rem]  p-3 w-1/2 max-w-xl min-width-[100px] h-1/2 shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-down blue-glassmorphism">
-                    {currentPost.map((collection: any, index: any) => {
-                      if (index !== collections.length - 1) {
-                        return (
-                          <div
-                            className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
-                            onClick={(e) => changeSearchInput(e, collection)}
-                          >
-                            {collection.title
-                              ? collection.title
-                              : collection.nft.metadata.name}
-                          </div>
-                        );
-                      } else {
-                        return (
-                          <div
-                            className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
-                            onClick={(e) => changeSearchInput(e, collection)}
-                          >
-                            {collection.title
-                              ? collection.title
-                              : collection.nft.metadata.name}
-                          </div>
-                        );
-                      }
-                    })}
-                    <div className="w-full">
-                      <Pagination
-                        totalPosts={collectionsAndNFTS?.length}
-                        postPerPage={postPerPage}
-                        setCurrentPage={setCurrentPage}
-                        currentPage={currentPage}
-                      />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+      {/* {currentAccount && data?.id && ( */}
+      <>
+        {' '}
+        <div className="hide-search-bar flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#27335966] rounded-[0.8rem] hover:bg-[#4c505c] border-[#ffffff4d] border-2">
+          <div className="text-[#8a939b] mx-3 font-bold text-lg">
+            <AiOutlineSearch />
           </div>
-          <div className="w-3/4 show-search-icon hidden text-3xl mr-2 text-white remove-margin">
-            <div className="w-full flex justify-end px-4">
+          <SearchInput
+            toggleCollectionsAndNFTSDropdown={toggleCollectionsAndNFTSDropdown}
+            placeholder="Search items, collections, and accounts"
+            id="search-bar"
+            name="search-bar"
+            type="text"
+            value={null}
+            searchCollections={searchCollections}
+          ></SearchInput>
+          {displayCollectionsAndNFTS && (
+            <>
               {' '}
-              <AiOutlineSearch
-                onClick={() => setToggleSearchBar(!toggleSearchBar)}
-              />
-            </div>
-            {toggleSearchBar && (
-              <div className="w-screen z-[100] fixed bg-white inset-x-0 top-20 flex flex-col items-center h-1/2 rounded-md">
-                {' '}
-                <SearchInputMobile
-                  toggleCollectionsAndNFTSDropdownMobile={
-                    toggleCollectionsAndNFTSDropdownMobile
-                  }
-                  placeholder="Search items, collections, and accounts"
-                  id="search-bar"
-                  name="search-bar"
-                  type="text"
-                  value={null}
-                  searchCollections={searchCollections}
-                ></SearchInputMobile>
-                {displayCollectionsAndNFTSMobile && (
-                  <>
-                    {' '}
-                    {currentPost.length > 0 && (
-                      <div className="p-3 w-full max-w-xl min-width-[100px] h-full shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-black animate-slide-down rounded-md">
-                        {currentPost.map((collection: any, index: any) => {
-                          if (index !== collections.length - 1) {
-                            return (
-                              <div
-                                className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
-                                onClick={(e) =>
-                                  changeSearchInput(e, collection)
-                                }
-                              >
-                                {collection.title
-                                  ? collection.title
-                                  : collection.nft.metadata.name}
-                              </div>
-                            );
-                          } else {
-                            return (
-                              <div
-                                className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
-                                onClick={(e) =>
-                                  changeSearchInput(e, collection)
-                                }
-                              >
-                                {collection.title
-                                  ? collection.title
-                                  : collection.nft.metadata.name}
-                              </div>
-                            );
-                          }
-                        })}
-                        <div className="w-full">
-                          <Pagination
-                            totalPosts={collectionsAndNFTS?.length}
-                            postPerPage={postPerPage}
-                            setCurrentPage={setCurrentPage}
-                            currentPage={currentPage}
-                          />
+              {currentPost.length > 0 && (
+                <div className="z-10 fixed top-[4rem]  p-3 w-1/2 max-w-xl min-width-[100px] h-1/2 shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-down blue-glassmorphism">
+                  {currentPost.map((collection: any, index: any) => {
+                    if (index !== collections.length - 1) {
+                      return (
+                        <div
+                          className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
+                          onClick={(e) => changeSearchInput(e, collection)}
+                        >
+                          {collection.title
+                            ? collection.title
+                            : collection.nft.metadata.name}
                         </div>
-                      </div>
-                    )}
-                  </>
-                )}
-                <div className="w-full flex justify-end pr-4 pb-4 absolute bottom-0">
-                  <AiOutlineClose
-                    onClick={() => setToggleSearchBar(!toggleSearchBar)}
-                    color={'black'}
-                  />
+                      );
+                    } else {
+                      return (
+                        <div
+                          className="w-full  p-2 outline-none bg-transparent text-white text-sm border-b border-[#3d4f7c] collection  cursor-pointer"
+                          onClick={(e) => changeSearchInput(e, collection)}
+                        >
+                          {collection.title
+                            ? collection.title
+                            : collection.nft.metadata.name}
+                        </div>
+                      );
+                    }
+                  })}
+                  <div className="w-full">
+                    <Pagination
+                      totalPosts={collectionsAndNFTS?.length}
+                      postPerPage={postPerPage}
+                      setCurrentPage={setCurrentPage}
+                      currentPage={currentPage}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </>
+          )}
+        </div>
+        <div className="w-3/4 show-search-icon hidden text-3xl mr-2 text-white remove-margin">
+          <div className="w-full flex justify-end px-4">
+            {' '}
+            <AiOutlineSearch
+              onClick={() => setToggleSearchBar(!toggleSearchBar)}
+            />
           </div>
-        </>
-      )}
+          {toggleSearchBar && (
+            <div className="w-screen z-[100] fixed bg-white inset-x-0 top-20 flex flex-col items-center h-1/2 rounded-md">
+              {' '}
+              <SearchInputMobile
+                toggleCollectionsAndNFTSDropdownMobile={
+                  toggleCollectionsAndNFTSDropdownMobile
+                }
+                placeholder="Search items, collections, and accounts"
+                id="search-bar"
+                name="search-bar"
+                type="text"
+                value={null}
+                searchCollections={searchCollections}
+              ></SearchInputMobile>
+              {displayCollectionsAndNFTSMobile && (
+                <>
+                  {' '}
+                  {currentPost.length > 0 && (
+                    <div className="p-3 w-full max-w-xl min-width-[100px] h-full shadow-2xl  list-none flex flex-col justify-start items-end rounded-md text-black animate-slide-down rounded-md">
+                      {currentPost.map((collection: any, index: any) => {
+                        if (index !== collections.length - 1) {
+                          return (
+                            <div
+                              className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
+                              onClick={(e) => changeSearchInput(e, collection)}
+                            >
+                              {collection.title
+                                ? collection.title
+                                : collection.nft.metadata.name}
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div
+                              className="w-full  p-2 outline-none bg-transparent text-black text-sm border-b border-black font-bold collection  cursor-pointer"
+                              onClick={(e) => changeSearchInput(e, collection)}
+                            >
+                              {collection.title
+                                ? collection.title
+                                : collection.nft.metadata.name}
+                            </div>
+                          );
+                        }
+                      })}
+                      <div className="w-full">
+                        <Pagination
+                          totalPosts={collectionsAndNFTS?.length}
+                          postPerPage={postPerPage}
+                          setCurrentPage={setCurrentPage}
+                          currentPage={currentPage}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+              <div className="w-full flex justify-end pr-4 pb-4 absolute bottom-0">
+                <AiOutlineClose
+                  onClick={() => setToggleSearchBar(!toggleSearchBar)}
+                  color={'black'}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </>
+      {/* )} */}
       <ul className="text-white md:flex  list-none flex-row justify-between items-center flex-initial">
         {[
-          currentAccount && data?.id && 'Explore',
+          // currentAccount && data?.id && 'Explore',
+          'Explore',
           'Stats',
           'Resources',
-          currentAccount && data?.id && 'Create',
+          // currentAccount && data?.id && 'Create',
+          'Create',
         ].map((item, index) => (
           <div className="hidden lg:block">
             <NavbarItem key={item + index} title={item} />
@@ -526,10 +524,12 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 <AiOutlineClose onClick={() => setToggleMenu(false)} />
               </li>
               {[
-                currentAccount && data?.id && 'Explore',
+                // currentAccount && data?.id && 'Explore',
+                'Explore',
                 'Stats',
                 'Resources',
-                currentAccount && data?.id && 'Create',
+                // currentAccount && data?.id && 'Create',
+                'Create',
                 currentAccount && data?.id && 'Profile',
                 currentAccount && data?.id && 'Wallet',
               ].map((item, index) => (

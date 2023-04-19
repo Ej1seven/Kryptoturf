@@ -20,6 +20,7 @@ const style = {
   filterTitle: `flex-1`,
   tableHeader: `flex w-11/12 mt-8 px-4 py-1 text-white mx-auto border-b border-white/25`,
   tableColumn: `w-1/5  exSMMAX:ml-4`,
+  tableColumnTwo: `w-1/2  exSMMAX:ml-4`,
   eventItem: `flex px-4`,
   ethLogo: `h-5 mr-2`,
   accent: `text-[#2081e2]`,
@@ -116,20 +117,20 @@ export const Stats: React.FC<StatsProps> = ({}) => {
           <div className="w-full h-8 text-white font-bold text-4xl text-center mt-4">
             {!toggleUsers ? 'Collection Rankings' : 'User Rankings'}
           </div>
-          <div className="mx-4 mt-2 flex justify-center">
+          <div className="mx-4 mt-2 flex justify-center md:justify-end">
             {' '}
             <button
               type="button"
               onClick={() => setToggleUsers(!toggleUsers)}
-              className="text-white w-1/2 max-w-sm mt-4 border-[1px] p-2 border-[#3d4f7c] rounded-full white-and-blue-glassmorphism cursor-pointer py-2 px-7"
+              className="text-white max-w-sm mt-4 border-[1px] p-2 border-[#3d4f7c] rounded-full white-and-blue-glassmorphism cursor-pointer py-2 px-7"
             >
-              {!toggleUsers ? 'View User Ranking' : 'View Collection Rankings'}
+              {!toggleUsers ? 'View User Rankings' : 'View Collection Rankings'}
             </button>
           </div>
           <div className={style.tableHeader}>
             {!toggleUsers ? (
               <>
-                <div className={style.tableColumn} />
+                <div className="w-1/5 exSMMAX:hidden" />
                 <div className={style.tableColumn}>Collection</div>
                 <div className={style.tableColumn}>Volume</div>
                 <div className={style.tableColumn}>Floor Price</div>
@@ -137,9 +138,9 @@ export const Stats: React.FC<StatsProps> = ({}) => {
               </>
             ) : (
               <>
-                <div className={style.tableColumn} />
-                <div className={style.tableColumn}>Username</div>
-                <div className={style.tableColumn}>TURF Coins</div>
+                <div className="w-1/2 md:w-1/6 md:mr-4 exSMMAX:ml-4" />
+                <div className={style.tableColumnTwo}>Username</div>
+                <div className={style.tableColumnTwo}>TURF Coins</div>
               </>
             )}
           </div>
