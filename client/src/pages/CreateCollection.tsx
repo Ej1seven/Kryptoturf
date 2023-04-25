@@ -239,8 +239,8 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: `You must first login to create a collection`,
-        background: '#19191a',
+        text: `Sorry, you must be logged in to create a collection`,
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -418,7 +418,7 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: `${error.message}`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -428,7 +428,7 @@ export const CreateCollection: React.FC<CreateCollectionProps> = ({}) => {
       icon: 'success',
       title: 'Congrats!',
       text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
-      background: '#19191a',
+      background: '#180c1a',
       color: '#fff',
       confirmButtonColor: '#2952e3',
     }).then((result) => {

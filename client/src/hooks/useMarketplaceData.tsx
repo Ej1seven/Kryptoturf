@@ -34,6 +34,6 @@ const useMarkeplaceData = (collectionId?: any) => {
       setListings(await marketplace.getAllListings());
     })();
   }, [marketPlaceModule]);
-  return { listings, marketPlaceModule, nftModule };
+  return { listings, marketPlaceModule, nftModule, provider };
 };
 export default useMarkeplaceData;

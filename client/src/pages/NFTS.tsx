@@ -45,7 +45,7 @@ const Input = ({
     step="0.0001"
     value={value}
     onChange={(e) => handleChange(e, name)}
-    className="mt-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism cursor-pointer"
+    className="mt-2 w-full rounded-sm p-2 outline-none bg-transparent text-white text-sm white-glassmorphism cursor-pointer"
   />
 );
 
@@ -113,18 +113,18 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: `You must first login to list a NFT`,
-        background: '#19191a',
+        text: `Sorry, you must be logged in to list a NFT`,
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
     }
-    if (data?.walletAddress !== selectedNft.owner) {
+    if (data?.walletAddress !== selectedNft.owner.toLowerCase()) {
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
         text: `You must own the NFT to list it on the marketplace`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -157,6 +157,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
       await me();
     })();
   });
+
   useEffect(() => {
     if (!nftModule) return;
     (async () => {
@@ -177,7 +178,20 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
   /*Once the marketplace data is pulled from Thirdweb, the following useEffect hook retrieves
    all listings on the marketplace from ThirdWeb */
   useEffect(() => {
-    if (!marketPlaceModule) return;
+    if (!marketPlaceModule) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `Sorry, please install Metamask and make sure you are connected to the Goerli Test Network before attempting to view this NFT's detail page.`,
+        background: '#180c1a',
+        color: '#fff',
+        confirmButtonColor: '#2952e3',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/');
+        }
+      });
+    }
     (async () => {
       setListings(await marketPlaceModule.getAllListings());
       /*Sets a gas limit on all transaction to 5000000 gwei */
@@ -193,6 +207,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
         );
         setNftRoyaltyDetails(royaltyFee.seller_fee_basis_points / 100);
       })();
+      setIsLoading(false);
     })();
   }, [marketPlaceModule]);
   /*Sets the coverted value of Ethereum to USD or sets the remaining values on the List Item form*/
@@ -269,7 +284,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: `${error.message}`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -294,7 +309,7 @@ export const NFTS: React.FC<NFTSProps> = ({}) => {
       icon: 'success',
       title: 'Congrats!',
       text: `${selectedNft?.metadata.name} has successfully been listed on the Kryptoturf Marketplace!`,
-      background: '#19191a',
+      background: '#180c1a',
       color: '#fff',
       confirmButtonColor: '#2952e3',
     }).then((result) => {

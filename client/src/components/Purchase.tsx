@@ -97,20 +97,20 @@ export const Purchase: React.FC<any> = ({
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: `You must first login to buy a NFT`,
-        background: '#19191a',
+        text: `Sorry, you must be logged in to buy a NFT`,
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
     }
     /*If the user is the owner of the NFT they can not buy their own NFT */
-    if (user?.walletAddress === selectedNft.owner) {
+    if (user?.walletAddress === selectedNft.owner.toLowerCase()) {
       setIsLoading(false);
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
         text: `Sorry, you can not purchase your own NFT`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -139,7 +139,7 @@ export const Purchase: React.FC<any> = ({
         icon: 'error',
         title: 'Oops...',
         text: `${error.message}`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -179,7 +179,7 @@ export const Purchase: React.FC<any> = ({
       icon: 'success',
       title: 'Congrats!',
       text: `You've successfully purchased ${selectedNft?.metadata.name} from the Kryptoturf marketplace!`,
-      background: '#19191a',
+      background: '#180c1a',
       color: '#fff',
       confirmButtonColor: '#2952e3',
     }).then((result) => {
@@ -203,7 +203,7 @@ export const Purchase: React.FC<any> = ({
         </div>
       ) : (
         <>
-          <div className="flex h-16 md:h-20 w-72 mb-4 sm:mb-0 md:w-96 items-center justify-center rounded-lg border border-[#151c22] bg-[#303339] mx-auto px-12">
+          <div className="flex h-16 md:h-20 w-72 mb-4 sm:mb-0 md:w-96 items-center justify-center rounded-lg border white-glassmorphism-nft-attributes mx-auto px-12">
             <Toaster position="top-center" reverseOrder={false} />
             {isListed === 'true' ? (
               <>

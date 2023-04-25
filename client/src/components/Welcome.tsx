@@ -55,7 +55,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: 'All fields must be filled out to send Ethereum!',
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -69,7 +69,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
           icon: 'error',
           title: 'Oops...',
           text: `${transactionResponse.message}`,
-          background: '#19191a',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
@@ -80,7 +80,7 @@ export const Welcome: React.FC<WelcomeProps> = ({}) => {
           icon: 'success',
           title: 'Transaction Complete',
           text: `You've successfully transferred ${amount} ETH to account ${addressTo}`,
-          background: '#19191a',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         }).then((result) => {

@@ -58,7 +58,7 @@ export const Resources: React.FC<any> = ({}) => {
     }
     if (option === 5) {
       title = 'How can I view my wallet funds and Turf coins?';
-      text = `<p>You can view your Metamask wallet funds and TURF coins by selecting the wallet or profile icons on the navigation bar. If you select the profile icon your wallet funds and TURF coins will be located on the top left of the profile page. </p)`;
+      text = `<p>You can view your Metamask wallet funds and TURF coins by selecting the wallet or profile icons on the navigation bar. If you select the profile icon your wallet funds and TURF coins will be located on the top right of the profile page. </p)`;
     }
     if (option === 6) {
       title = 'How do I create an NFT?';
@@ -66,15 +66,15 @@ export const Resources: React.FC<any> = ({}) => {
     }
     if (option === 7) {
       title = 'How do I create an Collection?';
-      text = `<p>Select the "Explore" option located on the Navigation bar then select "Create Collection". </p)`;
+      text = `<p>Select the "Create" option located on the Navigation bar then select "Create Collection". </p)`;
     }
     if (option === 8) {
       title = 'Why is my collection named "Untitled Collection"?';
-      text = `<p>Untitled collections are considered generic collections. These collections automatically created for unassigned NFTs.</p)`;
+      text = `<p>Untitled collections are considered generic collections. These collections are automatically created for unassigned NFTs.</p)`;
     }
     if (option === 9) {
       title = 'How do I list an NFT on the marketplace?';
-      text = `<p>Select "Collections" on the navigation bar then find the collection that contains the NFT you desire to list. Once you are on the collection page select the NFT you want to list and click "List Item". You can also find all the NFTs you created on your profile page and list them from there.</p)`;
+      text = `<p>Select "Explore" on the navigation bar then find the collection that contains the NFT you desire to list. Once you are on the collection page select the NFT you want to list and click "List Item". You can also find all the NFTs you created on your profile page and list them from there as well.</p)`;
     }
     if (option === 10) {
       title = 'How can I view my Profile?';
@@ -88,7 +88,7 @@ export const Resources: React.FC<any> = ({}) => {
       icon: 'question',
       title: title,
       html: text,
-      background: '#19191a',
+      background: '#180c1a',
       width: '50%',
       color: '#fff',
       confirmButtonColor: '#2952e3',
@@ -179,7 +179,7 @@ export const Resources: React.FC<any> = ({}) => {
     <div className="overflow-hidden">
       <Navbar />
       <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center pb-16 sm:pb-0">
-        <div className="sm:mt-0 w-5/6 md:w-1/2 md:ml-4 mr-4 md:mr-0 mr-[70px] pb-20 flex justify-end">
+        <div className="sm:mt-0 w-5/6 md:w-1/2 md:ml-4 mr-4 md:mr-0 mr-[100px] pb-20 flex justify-end">
           <div className={style.cardContainer}>
             <img
               className="rounded-lg w-full"
@@ -212,17 +212,17 @@ export const Resources: React.FC<any> = ({}) => {
           </div>
         </div>
         <div className="w-3/4 md:w-1/3 ml-8 flex items-center">
-          <div className=" flex flex-col text-white ">
-            <p className="text-4xl text-bold">
+          <div className=" flex flex-col text-white max-w-[500px] text-center sm:text-left">
+            <p className="text-4xl text-bold animate-charcter">
               It's time to explore the world of NFTS!
             </p>
-            <p className="">
+            <p className="pt-4">
               A practical guide covering the main features of Kryptoturf for
-              first-time users interested in the NFT market.
+              first-time users.
             </p>
             <button className={style.accentedButton}>
               <div className="w-full" onClick={handleClick}>
-                Start Learning
+                FAQ
               </div>
             </button>
           </div>

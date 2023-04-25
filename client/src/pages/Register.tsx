@@ -70,7 +70,7 @@ export const Register: React.FC<RegisterProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: 'Please fill out the required fields',
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });

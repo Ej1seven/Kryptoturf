@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { FaEthereum } from 'react-icons/fa';
 import { HiOutlineCurrencyDollar } from 'react-icons/hi';
-import { getUserData } from '../adapters/user';
+import { useQuery } from 'react-query';
+import { me } from '../adapters/user';
 import { shortenAddress } from '../utils/shortenAddress';
 
 interface WalletProps {}
@@ -9,19 +10,21 @@ interface WalletProps {}
 export const WalletNav: React.FC<any> = ({}) => {
   const Web3 = require('web3');
   const convert = require('ether-converter');
+  /*me query checks if the user is logged in. If the user is logged in the server responds 
+  with the user data. isLoading represents the processing time to pull the user data. isError is triggered
+  if the server has issues pulling the data*/
+  const { data } = useQuery('me', me);
   const [walletAddress, setWalletAddress]: any = useState();
   const [walletEthereumBalance, setWalletEthereumBalance]: any = useState();
-  const [walletTurfCoinsBalance, setWalletTurfCoinsBalance]: any = useState();
   let web3 = new Web3(window.ethereum);
   useEffect(() => {
     (async () => {
+      await me();
       let walletAddress: any = await web3.eth.getAccounts();
       let walletBalance: any = await web3.eth.getBalance(walletAddress[0]);
       await setWalletAddress(shortenAddress(walletAddress[0]));
       let result = await convert(walletBalance, 'wei');
-      let userData = await getUserData(walletAddress[0]);
       setWalletEthereumBalance(Number(result.ether));
-      setWalletTurfCoinsBalance(userData.turfCoins);
     })();
   }, []);
   return (
@@ -54,10 +57,7 @@ export const WalletNav: React.FC<any> = ({}) => {
               <HiOutlineCurrencyDollar className="mx-1" />
               <p className="mr-2">TURF Coins</p>
             </div>
-            <p>
-              {walletTurfCoinsBalance &&
-                Math.round(100 * walletTurfCoinsBalance) / 100}
-            </p>
+            <p>{Math.round(100 * data?.turfCoins) / 100}</p>
           </div>
         </div>
       </div>

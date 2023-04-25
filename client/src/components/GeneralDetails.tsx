@@ -14,10 +14,10 @@ interface GeneralDetailsProps {}
 const style = {
   wrapper: `flex`,
   infoContainer: `h-36 flex flex-col flex-1 justify-between mb-6`,
-  accent: `text-[#2081e2] text-xl md:text-base`,
+  accent: `text-[#2081e2] text-xl md:text-base font-bold`,
   nftTitle: `text-3xl font-extrabold`,
   otherInfo: `flex`,
-  ownedBy: `text-[#8a939b] mr-4`,
+  ownedBy: `text-[#8a939b] mr-4 font-bold`,
   likes: `flex items-center text-[#8a939b]`,
   likeIcon: `mr-1`,
   actionButtonsContainer: `w-24`,
@@ -39,8 +39,9 @@ export const GeneralDetails: React.FC<any> = ({
     })();
   }, []);
   useEffect(() => {
+    console.log('selectedNFT', selectedNft?.owner.toLowerCase());
     (async () => {
-      setOwner(await getUserData(selectedNft.owner));
+      setOwner(await getUserData(selectedNft?.owner.toLowerCase()));
       setCollectionData(await getCollection(collectionContractAddress));
     })();
   }, [selectedNft]);

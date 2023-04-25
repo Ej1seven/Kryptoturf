@@ -23,7 +23,7 @@ export async function register(
           icon: 'error',
           title: 'Oops...',
           text: res.data,
-          background: '#19191a',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
@@ -32,7 +32,7 @@ export async function register(
           icon: 'error',
           title: 'Oops...',
           text: res.data.message,
-          background: '#19191a',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
@@ -41,7 +41,7 @@ export async function register(
           icon: 'error',
           title: 'Oops...',
           text: res.data.err,
-          background: '#19191a',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
@@ -49,7 +49,7 @@ export async function register(
         icon: 'success',
         title: 'Congrats!',
         text: `You have successfully created a new account. A confirmation email has been sent to ${email}. Please confirm your email before attempting to login.`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       }).then((result) => {

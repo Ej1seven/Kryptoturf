@@ -1,6 +1,6 @@
 import { useWeb3 } from '@3rdweb/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import { getCollection } from '../adapters/marketItems';
 import NFTCard from '../components/NFTCard';
@@ -12,6 +12,7 @@ import useMarkeplaceData from '../hooks/useMarketplaceData';
 import defaultBannerImage from '../../src/images/default-banner.jpg';
 import defaultLogoImage from '../../src/images/default-profile.jpg';
 import { MdPhotoSizeSelectLarge } from 'react-icons/md';
+import Swal from 'sweetalert2';
 
 interface CollectionsProps {}
 
@@ -38,11 +39,14 @@ const style = {
 };
 
 export const Collection: React.FC<CollectionsProps> = ({}) => {
+  /*useNavigate() allows you to route to other pages */
+  const navigate = useNavigate();
   /*URL path to pull collection photos from the database */
   const URL = process.env.REACT_APP_PHOTO_API_URL;
   /*id = (collection contract address) found in URL parameter */
   let { id }: any = useParams();
-  const { listings, marketPlaceModule, nftModule } = useMarkeplaceData(id);
+  const { listings, marketPlaceModule, nftModule, provider } =
+    useMarkeplaceData(id);
   /*Pulls all the NFTs for this collection */
   const [nfts, setNfts] = useState([]);
   /*Sets the floor price by finding the NFT listed for the lowest amount of ETH on the market */
@@ -56,6 +60,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
   /*Retrieves all the NFTs from the selected collection and maps through them only returning the NFTs that have a owner.
     This is meant to filter out the NFTs that have been deleted */
   useEffect(() => {
+    console.log(nftModule);
     if (!nftModule) return;
     (async () => {
       const nfts: any = await nftModule.getAll();
@@ -82,6 +87,7 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
   }, [nfts]);
   /** Retrieves the listing prices for all the NFT listed under the selected collection */
   useEffect(() => {
+    console.log(listings);
     if (!listings) return;
     let listingPrices: any = [];
     listings.map((listing: any) => {
@@ -100,6 +106,20 @@ export const Collection: React.FC<CollectionsProps> = ({}) => {
     (async () => {
       const collection = await getCollection(id);
       await setCollectionItem(collection);
+      if (!provider) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Sorry, please install Metamask and make sure you are connected to the Goerli Test Network before attempting to view the ${collection?.title} collection page.`,
+          background: '#180c1a',
+          color: '#fff',
+          confirmButtonColor: '#2952e3',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/');
+          }
+        });
+      }
     })();
   }, [id]);
   return (

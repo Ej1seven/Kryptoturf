@@ -325,7 +325,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
       ) : (
         <>
           <label htmlFor="upload-banner-image">
-            <div className="h-[300px] w-screen overflow-hidden flex justify-center items-center">
+            <div className="h-[300px] w-11/12 overflow-hidden flex justify-center items-center rounded-md mx-auto mt-4">
               {userData?.bannerImage && !bannerImage.preview ? (
                 <>
                   <img
@@ -343,7 +343,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                       className="object-cover w-full h-[300px]"
                     />
                   ) : (
-                    <div className="w-full h-[44vh] bg-black opacity-30	hover:opacity-100 flex justify-center items-center">
+                    <div className="w-full h-[44vh] bg-black opacity-30	hover:opacity-100 flex justify-center items-center rounded-md">
                       <MdPhotoSizeSelectActual className="h-20 w-20 m-auto" />
                     </div>
                   )}
@@ -365,7 +365,7 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                   <img
                     src={`${userData?.profileImage}`}
                     alt="dummy"
-                    className=" rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px] border-[5px] border-black border-solid"
+                    className=" rounded-full w-[150px] h-[150px] relative -top-[75px] left-[15px]"
                   />
                 </label>
               </>

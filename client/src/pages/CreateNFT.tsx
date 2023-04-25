@@ -232,7 +232,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: `Please enter a name for your NFT`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -244,7 +244,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: `Please upload an image for your NFT`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -256,8 +256,8 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
       return Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: `You must first login to create a NFT`,
-        background: '#19191a',
+        text: `Sorry, you must be logged in to create a NFT`,
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -293,7 +293,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
           title: 'Protect Yourself',
           html: text,
           showCancelButton: true,
-          background: '#19191a',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         }).then(async (result) => {
@@ -318,7 +318,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                 icon: 'error',
                 title: 'Oops...',
                 text: `${error.message}`,
-                background: '#19191a',
+                background: '#180c1a',
                 color: '#fff',
                 confirmButtonColor: '#2952e3',
               });
@@ -328,7 +328,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
               icon: 'success',
               title: 'Congrats!',
               text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
-              background: '#19191a',
+              background: '#180c1a',
               color: '#fff',
               confirmButtonColor: '#2952e3',
             }).then((result) => {
@@ -366,7 +366,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
             title: 'Protect Yourself',
             html: text,
             showCancelButton: true,
-            background: '#19191a',
+            background: '#180c1a',
             color: '#fff',
             confirmButtonColor: '#2952e3',
           }).then(async (result) => {
@@ -390,7 +390,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                   icon: 'error',
                   title: 'Oops...',
                   text: `${error.message}`,
-                  background: '#19191a',
+                  background: '#180c1a',
                   color: '#fff',
                   confirmButtonColor: '#2952e3',
                 });
@@ -400,7 +400,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                 icon: 'success',
                 title: 'Congrats!',
                 text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
-                background: '#19191a',
+                background: '#180c1a',
                 color: '#fff',
                 confirmButtonColor: '#2952e3',
               }).then((result) => {
@@ -423,7 +423,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
             title: 'Protect Yourself',
             html: text,
             showCancelButton: true,
-            background: '#19191a',
+            background: '#180c1a',
             color: '#fff',
             confirmButtonColor: '#2952e3',
           }).then(async (result) => {
@@ -465,7 +465,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                   icon: 'error',
                   title: 'Oops...',
                   text: `${error.message}`,
-                  background: '#19191a',
+                  background: '#180c1a',
                   color: '#fff',
                   confirmButtonColor: '#2952e3',
                 });
@@ -475,7 +475,7 @@ export const CreateNFT: React.FC<CreateNFTProps> = ({}) => {
                 icon: 'success',
                 title: 'Congrats!',
                 text: `${name} has successfully been added to the Kryptoturf Marketplace!`,
-                background: '#19191a',
+                background: '#180c1a',
                 color: '#fff',
                 confirmButtonColor: '#2952e3',
               }).then((result) => {

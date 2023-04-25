@@ -181,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 icon: 'error',
                 title: 'Oops...',
                 text: 'Please login to view your profile',
-                background: '#19191a',
+                background: '#180c1a',
                 color: '#fff',
                 confirmButtonColor: '#2952e3',
               });
@@ -195,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                 icon: 'error',
                 title: 'Oops...',
                 text: 'Please connect your Metamask wallet to view your funds',
-                background: '#19191a',
+                background: '#180c1a',
                 color: '#fff',
                 confirmButtonColor: '#2952e3',
               });
@@ -465,7 +465,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                         icon: 'error',
                         title: 'Oops...',
                         text: 'Please login to view your profile',
-                        background: '#19191a',
+                        background: '#180c1a',
                         color: '#fff',
                         confirmButtonColor: '#2952e3',
                       })
@@ -485,7 +485,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                       icon: 'error',
                       title: 'Oops...',
                       text: 'Please connect your Metamask wallet to view your funds',
-                      background: '#19191a',
+                      background: '#180c1a',
                       color: '#fff',
                       confirmButtonColor: '#2952e3',
                     })

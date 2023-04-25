@@ -120,6 +120,7 @@ As Web 3.0 emerges, we are starting to see the potential of the blockchain. Web 
 - [Node.js](https://nodejs.org/)
 - [ThirdWeb](https://thirdweb.com/)
 - [Prisma 2](https://www.prisma.io/)
+- [Firebase](https://firebase.google.com/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

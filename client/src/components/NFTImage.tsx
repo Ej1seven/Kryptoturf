@@ -6,8 +6,8 @@ import { getCollection } from '../adapters/marketItems';
 interface NFTImageProps {}
 
 const style = {
-  topBar: `bg-[#303339] p-2 rounded-t-md border-0 border-transparent `,
-  topBarContent: `flex items-center`,
+  topBar: `bg-[#fff] p-2 rounded-t-md border-0 border-transparent `,
+  topBarContent: `flex items-center text-black font-bold`,
   likesCounter: `flex-1 flex items-center justify-end`,
 };
 

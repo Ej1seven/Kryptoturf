@@ -54,20 +54,20 @@ export const Collections: React.FC<CollectionsProps> = ({}) => {
   /*Retrieves all the collections from the database during page load*/
   useEffect(() => {
     (async () => {
-      if (!currentAccount) {
-        return Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: `Sorry, please install metamask and make sure you are connected to the Goerli Test Network before attempting to view collections and NFTs.`,
-          background: '#19191a',
-          color: '#fff',
-          confirmButtonColor: '#2952e3',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate('/');
-          }
-        });
-      }
+      // if (!currentAccount) {
+      //   return Swal.fire({
+      //     icon: 'error',
+      //     title: 'Oops...',
+      //     text: `Sorry, please install metamask and make sure you are connected to the Goerli Test Network before attempting to view collections and NFTs.`,
+      //     background: '#19191a',
+      //     color: '#fff',
+      //     confirmButtonColor: '#2952e3',
+      //   }).then((result) => {
+      //     if (result.isConfirmed) {
+      //       navigate('/');
+      //     }
+      //   });
+      // }
       setIsLoading(true);
       /*getCollections - GET statement that retrieves all the data from the database. */
       const collections = await getCollections();

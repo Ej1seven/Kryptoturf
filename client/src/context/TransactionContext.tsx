@@ -66,8 +66,8 @@ export const TransactionProvider: React.FC = ({ children }) => {
       if (!ethereum)
         return Swal.fire({
           icon: 'info',
-          text: 'Please install metamask',
-          background: '#19191a',
+          text: 'Please install Metamask',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
@@ -106,8 +106,8 @@ export const TransactionProvider: React.FC = ({ children }) => {
       if (!ethereum)
         return Swal.fire({
           icon: 'info',
-          text: 'Please install metamask, and make sure you are connected to the Goerli Test Network. Otherwise, you will be unable to view collections and NFTs!',
-          background: '#19191a',
+          text: 'Please install Metamask, and make sure you are connected to the Goerli Test Network before attempting to create an account or buy/sell NFTs!',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
@@ -143,7 +143,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
         return Swal.fire({
           icon: 'info',
           text: 'Please install metamask and refresh page',
-          background: '#19191a',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });
@@ -161,8 +161,8 @@ export const TransactionProvider: React.FC = ({ children }) => {
       if (!ethereum)
         return Swal.fire({
           icon: 'info',
-          text: 'Please install metamask',
-          background: '#19191a',
+          text: 'Please install Metamask',
+          background: '#180c1a',
           color: '#fff',
           confirmButtonColor: '#2952e3',
         });

@@ -57,7 +57,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: 'Please fill out the required fields',
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
@@ -71,7 +71,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: `${error}`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });

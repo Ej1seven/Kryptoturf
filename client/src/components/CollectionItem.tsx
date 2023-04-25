@@ -28,6 +28,7 @@ export const CollectionItem: React.FC<any> = ({ collection }) => {
   useEffect(() => {
     (async () => {
       setTransactions(await collectionTransactions(collection.contractAddress));
+      console.log(collection);
     })();
   }, []);
   return (

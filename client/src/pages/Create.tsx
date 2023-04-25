@@ -25,7 +25,7 @@ export const Create: React.FC<any> = ({}) => {
         icon: 'error',
         title: 'Oops...',
         text: `You must first login to create a ${option}`,
-        background: '#19191a',
+        background: '#180c1a',
         color: '#fff',
         confirmButtonColor: '#2952e3',
       });
